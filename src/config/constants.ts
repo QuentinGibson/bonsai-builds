@@ -1,3 +1,5 @@
+//TODO: Set this constants to something appropiate
+
 import { kNoticeActions, kNoticeIcons } from "./enums";
 import type { Notice, Toast } from "./types";
 
@@ -11,7 +13,7 @@ export const kEventBusName = "EventBus";
 
 export const kDefaultLocale = "en-GB";
 
-export const kDiscordUrl = "https://discord.gg/overwolf-developers";
+export const kDiscordUrl = "https://discord.gg/qgSYEYyXZz";
 
 export const kGameFeatures = ["match_info", "match"];
 
