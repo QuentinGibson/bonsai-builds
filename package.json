@@ -8,11 +8,11 @@
   },
   "license": "MIT",
   "scripts": {
-    "build:dev": "npx webpack --config ./config/webpack.config.ts",
-    "build:watch": "npx webpack --config ./config/webpack.config.ts --watch",
-    "build:prod": "npx webpack --config ./config/webpack.config.ts --env production",
-    "build:prod:opk": "npx webpack --config ./config/webpack.config.ts --env production --env makeOPK",
-    "build:prod:opk:patch": "npx webpack --config ./config/webpack.config.ts --env production --env makeOPK --env setVersion=patch"
+    "build:dev": "OVERWOLF_BUILD_PATH=/mnt/c/overwolf-apps/front-app npx webpack --config ./config/webpack.config.ts",
+    "build:watch": "OVERWOLF_BUILD_PATH=/mnt/c/overwolf-apps/front-app npx webpack --config ./config/webpack.config.ts --watch",
+    "build:prod": "OVERWOLF_BUILD_PATH=/mnt/c/overwolf-apps/front-app npx webpack --config ./config/webpack.config.ts --env production",
+    "build:prod:opk": "OVERWOLF_BUILD_PATH=/mnt/c/overwolf-apps/front-app npx webpack --config ./config/webpack.config.ts --env production --env makeOPK",
+    "build:prod:opk:patch": "OVERWOLF_BUILD_PATH=/mnt/c/overwolf-apps/front-app npx webpack --config ./config/webpack.config.ts --env production --env makeOPK --env setVersion=patch"
   },
   "dependencies": {
     "@splidejs/react-splide": "^0.7.12",
@@ -20,6 +20,7 @@
     "ow-libs": "^2.5.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-icons": "^5.5.0",
     "react-transition-group": "^4.4.5"
   },
   "devDependencies": {
