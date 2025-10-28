@@ -12,7 +12,6 @@ import "./Settings.scss";
 import type { DropDownOption } from "../DropDown/DropDown";
 import { HotkeyEditor } from "../HotkeyEditor/HotkeyEditor";
 import { Switch } from "../Switch/Switch";
-import { Tip } from "../Tip/Tip";
 
 export type SettingsProps = {
 	className?: string;
@@ -203,27 +202,6 @@ export function Settings({ className }: SettingsProps) {
 					{/* 	<p>We recommend placing it inside the settings screen.</p> */}
 					{/* </Tip> */}
 				</div>
-			</div>
-
-			<div className="secondary">
-				Empty state
-				<Tip
-					top="8px"
-					right="8px"
-					position="rightEdge bottom"
-					arrowPosition="center bottom"
-				>
-					<h6>Empty State</h6>
-					<p>
-						Empty states are used when there is nothing to display, it is
-						completely fine not to always show additional data if not needed and
-						where it doesn&apos;t add any value to the users.
-					</p>
-					<p>
-						Instead you can use the empty state to show your brand as a place
-						holder.
-					</p>
-				</Tip>
 			</div>
 		</div>
 	);
