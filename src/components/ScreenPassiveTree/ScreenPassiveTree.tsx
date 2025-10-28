@@ -1,3 +1,8 @@
+//TODO: Adding new build set and breakpoints are bugged
+//The overwolf alert handler does not handle the text input well
+//rewrite into a popup using the popup class
+//reference feedback or bug report popup for making a new popup
+
 import { useEffect, useRef } from "react";
 import { classNames } from "../../utils";
 import { PassiveTreeManager } from "./passiveTreeLogic";
