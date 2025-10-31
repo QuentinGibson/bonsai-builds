@@ -13,9 +13,6 @@ export type FTUEProps = {
 	className?: string;
 };
 
-//This is the first screen the walk through on how to use the app.
-//TODO: Transform this to work with path of exile app.
-
 export function FTUE({ className }: FTUEProps) {
 	const eventBus = useEventBus();
 
@@ -58,10 +55,10 @@ export function FTUE({ className }: FTUEProps) {
 				}}
 			>
 				<SplideSlide className="slide slide-1">
-					<h2>Overwolf Front App</h2>
+					<h2>Welcome to BonsaiBuild</h2>
 					<p>
-						Now that you have covered the basics with the Sample App, it&apos;s
-						time to learn how to implement UX/UI best practices in your app!
+						Your companion app for planning and perfecting your Path of Exile 2 character builds.
+						Plan your passive skill tree and share builds with the community!
 					</p>
 					<button className="next" onClick={() => setSlide(1)}>
 						Start tour
@@ -69,10 +66,10 @@ export function FTUE({ className }: FTUEProps) {
 				</SplideSlide>
 
 				<SplideSlide className="slide slide-2">
-					<h2>Informative Tooltips</h2>
+					<h2>Plan Your Builds</h2>
 					<p>
-						Interact with tooltips to learn how the different sections work.
-						Become the master of tooltips and knowledge!
+						Navigate the full Path of Exile 2 passive skill tree, allocate points,
+						and experiment with different build paths before committing in-game.
 					</p>
 					<button className="next" onClick={() => setSlide(2)}>
 						Continue
@@ -80,15 +77,13 @@ export function FTUE({ className }: FTUEProps) {
 				</SplideSlide>
 
 				<SplideSlide className="slide slide-3">
-					<h2>In-game function</h2>
+					<h2>Use In-Game</h2>
 					<p>
-						Don&apos;t forget to try the Front App in-game as well.
-						<br />
-						Try it with any Overwolf supported game
+						Access BonsaiBuild while playing Path of Exile 2 to reference your builds
+						and make real-time planning decisions.
 					</p>
 					<p>
-						To view the full list click&nbsp;
-						<Link url="https://www.overwolf.com/supported-games/">here</Link>
+						Press <kbd>Ctrl+T</kbd> to show/hide the app in-game
 					</p>
 					<button className="next next-cta" onClick={setFTUESeen}>
 						Get started

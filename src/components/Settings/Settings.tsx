@@ -1,6 +1,5 @@
 import { useContext } from "react";
 import { kHotkeyApp, kHotkeyLoading } from "../../config/constants";
-import { kMatchEndActions } from "../../config/enums";
 import { CommonStoreContext } from "../../hooks/common-context";
 import { PersStoreContext } from "../../hooks/pers-context";
 import { useEventBus } from "../../hooks/use-event-bus";
@@ -9,7 +8,6 @@ import { classNames } from "../../utils";
 
 import "./Settings.scss";
 
-import type { DropDownOption } from "../DropDown/DropDown";
 import { HotkeyEditor } from "../HotkeyEditor/HotkeyEditor";
 import { Switch } from "../Switch/Switch";
 
@@ -17,24 +15,12 @@ export type SettingsProps = {
 	className?: string;
 };
 
-const _kMatchEndOptions: DropDownOption[] = [
-	{
-		title: "Show app",
-		value: kMatchEndActions.Show,
-	},
-	{
-		title: "Nothing",
-		value: kMatchEndActions.None,
-	},
-];
-
 export function Settings({ className }: SettingsProps) {
 	const eventBus = useEventBus();
 
 	const { version } = useContext(CommonStoreContext);
 
-	const { autoLaunch, matchStart, matchEndAction, notifications } =
-		useContext(PersStoreContext);
+	const { autoLaunch, notifications } = useContext(PersStoreContext);
 
 	const setSetting = <T extends keyof PersState>(
 		key: T,

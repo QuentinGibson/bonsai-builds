@@ -1,62 +1,91 @@
-import { useEffect, useState } from 'react'
-import { HotkeyChangedEvent, HotkeyService, WindowTunnel } from 'ow-libs'
+import { useEffect, useState } from "react";
+import { kPoe2GameId } from "../config/constants";
 
-import { kHotkeyServiceName } from '../config/constants'
+const kUnassignedText = "Unassigned";
 
+// Helper to get hotkey binding using overwolf API directly
+const getHotkeyBinding = (hotkeyName: string): Promise<string | null> => {
+	return new Promise((resolve) => {
+		overwolf.settings.hotkeys.get((result) => {
+			const poe2Games = result.games?.[kPoe2GameId];
+			if (!result || !poe2Games) {
+				resolve(null);
+				return;
+			}
 
-// get HotkeysService instance from background window
-const hotkeysService = WindowTunnel.get<HotkeyService>(kHotkeyServiceName)
-
-const kUnassignedText = 'Unassigned'
+			const hotkey = poe2Games.find((h) => h.name === hotkeyName);
+			if (!hotkey) {
+				resolve(null);
+				return;
+			}
+			resolve(hotkey.binding);
+		});
+	});
+};
 
 export function useHotkey(hotkeyName: string) {
-  const [binding, setBinding] = useState(() => {
-    return hotkeysService.getHotkeyBinding(hotkeyName)
-  })
+	const [binding, setBinding] = useState<string | null>(null);
+	const [isLoading, setIsLoading] = useState(true);
 
-  const assign = (
-    virtualKey: number,
-    modifiers: overwolf.settings.hotkeys.HotkeyModifiers
-  ) => {
-    return hotkeysService.assignHotkey({
-      name: hotkeyName,
-      virtualKey,
-      modifiers
-    })
-  }
+	useEffect(() => {
+		let isMounted = true;
 
-  const unassign = () => {
-    return hotkeysService.unassignHotkey({ name: hotkeyName })
-  }
+		const fetchBinding = async () => {
+			setIsLoading(true);
+			const result = await getHotkeyBinding(hotkeyName);
+			if (isMounted) {
+				setBinding(result);
+				setIsLoading(false);
+			}
+		};
 
-  useEffect(() => {
-    const binding = hotkeysService.getHotkeyBinding(hotkeyName)
+		fetchBinding();
 
-    console.log('useHotkey', hotkeyName, binding)
+		return () => {
+			isMounted = false;
+		};
+	}, [hotkeyName]);
 
-    setBinding(binding ?? kUnassignedText)
-  }, [hotkeyName])
+	const assign = (
+		virtualKey: number,
+		modifiers: overwolf.settings.hotkeys.HotkeyModifiers,
+	): Promise<{ success: boolean; error?: string }> => {
+		return new Promise((resolve) => {
+			console.log("assignHotkey called:", hotkeyName, virtualKey, modifiers);
+			const assignHotKeyParams = {
+				name: hotkeyName,
+				gameid: kPoe2GameId,
+				virtualKey,
+				modifiers,
+			};
+			overwolf.settings.hotkeys.assign(assignHotKeyParams, (result) => {
+				resolve(result);
+				// Refetch binding after assignment
+				getHotkeyBinding(hotkeyName).then(setBinding);
+			});
+		});
+	};
 
-  useEffect(() => {
-    const onHotkeyChanged = (e: HotkeyChangedEvent) => {
-      if (e.name === hotkeyName) {
-        const binding = hotkeysService.getHotkeyBinding(hotkeyName)
-          ?? kUnassignedText
+	const unassign = (): Promise<{ success: boolean; error?: string }> => {
+		return new Promise((resolve) => {
+			overwolf.settings.hotkeys.unassign(
+				{
+					name: hotkeyName,
+					gameId: kPoe2GameId,
+				},
+				(result) => {
+					resolve(result);
+					// Refetch binding after unassignment
+					getHotkeyBinding(hotkeyName).then(setBinding);
+				},
+			);
+		});
+	};
 
-        setBinding(binding)
-      }
-    }
-
-    hotkeysService.addListener('changed', onHotkeyChanged)
-
-    return () => {
-      hotkeysService.removeListener('changed', onHotkeyChanged)
-    }
-  }, [hotkeyName])
-
-  return {
-    binding,
-    assign,
-    unassign
-  }
+	return {
+		binding: binding ?? kUnassignedText,
+		isLoading,
+		assign,
+		unassign,
+	};
 }

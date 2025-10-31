@@ -17,12 +17,19 @@ export interface EventBusEvents {
   noticeAction: kNoticeActions
   closeNotice: string
   closeApp: void
-  tryAgain: void
   setSetting: SetSetting
   submitFeedback: void
   submitBugReport: void
   closeToast: string
   setFTUESeen: void
+  createBuildSet: string
+  createBreakpoint: { name: string; level: number }
+  editBuildSet: { id: string; name: string }
+  editBreakpoint: { buildSetId: string; breakpointId: string; name: string; level: number }
+  deleteBuildSet: string
+  deleteBreakpoint: { buildSetId: string; breakpointId: string }
+  openEditBuildSet: { id: string; name: string }
+  openEditBreakpoint: { buildSetId: string; breakpointId: string; name: string; level: number }
 }
 
 export interface NoticeAction {
@@ -37,13 +44,6 @@ export interface Notice {
   devTip?: string
   action?: NoticeAction
   timeout?: number
-}
-
-export interface GameEventTypes {
-  'events.match_start': void
-  'events.match_end': void
-  'events.matchStart': void
-  'events.matchEnd': void
 }
 
 export interface Toast {

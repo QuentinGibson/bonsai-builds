@@ -1,5 +1,7 @@
 // Passive Tree Logic - Full implementation from index.html
 
+import { buildStorage, BuildSet } from '../../services/buildStorage'
+
 export interface TreeData {
   nodes: {
     [nodeId: string]: NodeData
@@ -32,6 +34,21 @@ export class PassiveTreeManager {
 
   private readonly maxPoints = 123
   private readonly maxAscendancyPoints = 8
+
+  private openAddBuildSetPopup: () => void
+  private openAddBreakpointPopup: () => void
+  private eventBus: any
+
+  // Build management
+  private buildSets: BuildSet[] = []
+  private currentBuildSetId: string | null = null
+  private currentBreakpointId: string | null = null
+
+  constructor(openAddBuildSetPopup: () => void, openAddBreakpointPopup: () => void, eventBus: any) {
+    this.openAddBuildSetPopup = openAddBuildSetPopup
+    this.openAddBreakpointPopup = openAddBreakpointPopup
+    this.eventBus = eventBus
+  }
 
   // Ascendancy data - full data from original
   private readonly ascendancyData: Record<string, { nodes: string[], transform: string }> = {
@@ -846,30 +863,513 @@ export class PassiveTreeManager {
   }
 
   private setupBuildManagement() {
+    // Load existing build sets
+    this.loadBuildSets()
+
+    // Build set dropdown handler
+    const buildSetDropdown = document.getElementById('build-set-dropdown') as HTMLSelectElement
+    if (buildSetDropdown) {
+      buildSetDropdown.addEventListener('change', (e) => {
+        const target = e.target as HTMLSelectElement
+        this.handleBuildSetChange(target.value)
+      })
+    }
+
     // Build management button handlers
     const newSetBtn = document.getElementById('new-set-btn')
+    const editSetBtn = document.getElementById('edit-set-btn')
+    const deleteSetBtn = document.getElementById('delete-set-btn')
+    const addBreakpointBtn = document.getElementById('add-breakpoint-btn')
+    const editBreakpointBtn = document.getElementById('edit-breakpoint-btn')
+    const deleteBreakpointBtn = document.getElementById('delete-breakpoint-btn-quick')
     const saveBtn = document.getElementById('save-breakpoint-btn')
     const loadBtn = document.getElementById('load-breakpoint-btn')
 
     if (newSetBtn) {
       newSetBtn.addEventListener('click', () => {
-        const name = prompt('Enter build set name:')
-        if (name) {
-          console.log('Creating new build set:', name)
+        this.openAddBuildSetPopup()
+      })
+    }
+
+    if (editSetBtn) {
+      editSetBtn.addEventListener('click', () => {
+        this.handleEditBuildSetClick()
+      })
+    }
+
+    if (deleteSetBtn) {
+      deleteSetBtn.addEventListener('click', () => {
+        this.handleDeleteBuildSetClick()
+      })
+    }
+
+    if (addBreakpointBtn) {
+      addBreakpointBtn.addEventListener('click', () => {
+        if (!this.currentBuildSetId) {
+          console.warn('Please select or create a build set first')
+          // TODO: Show a toast/notification
+          return
         }
+        this.openAddBreakpointPopup()
+      })
+    }
+
+    if (editBreakpointBtn) {
+      editBreakpointBtn.addEventListener('click', () => {
+        this.handleEditBreakpointClick()
+      })
+    }
+
+    if (deleteBreakpointBtn) {
+      deleteBreakpointBtn.addEventListener('click', () => {
+        this.handleDeleteBreakpointClick()
       })
     }
 
     if (saveBtn) {
       saveBtn.addEventListener('click', () => {
         console.log('Saving current breakpoint')
+        // TODO: Implement save current state to breakpoint
       })
     }
 
     if (loadBtn) {
       loadBtn.addEventListener('click', () => {
         console.log('Loading breakpoint')
+        // TODO: Implement load breakpoint
       })
+    }
+
+    // Breakpoint dropdown handler
+    const breakpointDropdown = document.getElementById('breakpoint-dropdown') as HTMLSelectElement
+    if (breakpointDropdown) {
+      breakpointDropdown.addEventListener('change', (e) => {
+        const target = e.target as HTMLSelectElement
+        this.handleBreakpointChange(target.value)
+      })
+    }
+  }
+
+  async handleCreateBuildSet(name: string) {
+    try {
+      const newBuildSet = await buildStorage.createBuildSet(name)
+      console.log('Created new build set:', newBuildSet)
+
+      // Reload build sets and update dropdown
+      await this.loadBuildSets()
+
+      // Select the newly created build set
+      this.currentBuildSetId = newBuildSet.id
+      this.updateBuildSetDropdown()
+
+      // Don't call onBuildSetCreated here - it would create a loop
+      // The event bus already handled the communication
+    } catch (error) {
+      console.error('Error creating build set:', error)
+    }
+  }
+
+  async loadBuildSets() {
+    try {
+      this.buildSets = await buildStorage.getAllBuildSets()
+      this.updateBuildSetDropdown()
+    } catch (error) {
+      console.error('Error loading build sets:', error)
+    }
+  }
+
+  updateBuildSetDropdown() {
+    const dropdown = document.getElementById('build-set-dropdown') as HTMLSelectElement
+    if (!dropdown) return
+
+    // Clear existing options except the first one
+    dropdown.innerHTML = '<option value="">-- New Build Set --</option>'
+
+    // Add build sets
+    this.buildSets.forEach(buildSet => {
+      const option = document.createElement('option')
+      option.value = buildSet.id
+      option.textContent = buildSet.name
+      dropdown.appendChild(option)
+    })
+
+    // Select current build set if one is active
+    if (this.currentBuildSetId) {
+      dropdown.value = this.currentBuildSetId
+    }
+  }
+
+  async handleBuildSetChange(buildSetId: string) {
+    if (!buildSetId) {
+      // User selected "New Build Set"
+      this.currentBuildSetId = null
+      this.currentBreakpointId = null
+      this.updateBreakpointDropdown()
+      return
+    }
+
+    this.currentBuildSetId = buildSetId
+    const buildSet = await buildStorage.getBuildSet(buildSetId)
+
+    if (buildSet) {
+      console.log('Loaded build set:', buildSet)
+      this.updateBreakpointDropdown()
+      // Auto-select first breakpoint if available
+      if (buildSet.breakpoints.length > 0) {
+        this.currentBreakpointId = buildSet.breakpoints[0].id
+        await this.loadBreakpoint(this.currentBreakpointId)
+      }
+    }
+  }
+
+  async handleCreateBreakpoint(name: string, level: number) {
+    if (!this.currentBuildSetId) {
+      console.error('No build set selected')
+      return
+    }
+
+    try {
+      const breakpoint = await buildStorage.addBreakpoint(this.currentBuildSetId, {
+        name,
+        level,
+        allocatedNodes: Array.from(this.allocatedNodes),
+        allocatedAscendancyNodes: Array.from(this.allocatedAscendancyNodes),
+        selectedClass: this.startingNodeId,
+        selectedAscendancy: this.currentSelectedAscendancy
+      })
+
+      if (breakpoint) {
+        console.log('Created breakpoint:', breakpoint)
+
+        // Reload the build set to get updated breakpoints
+        await this.loadBuildSets()
+
+        // Update breakpoint dropdown
+        this.currentBreakpointId = breakpoint.id
+        this.updateBreakpointDropdown()
+      }
+    } catch (error) {
+      console.error('Error creating breakpoint:', error)
+    }
+  }
+
+  updateBreakpointDropdown() {
+    const dropdown = document.getElementById('breakpoint-dropdown') as HTMLSelectElement
+    if (!dropdown) return
+
+    // Clear existing options
+    dropdown.innerHTML = '<option value="">-- Select Breakpoint --</option>'
+
+    if (!this.currentBuildSetId) {
+      return
+    }
+
+    // Find current build set
+    const buildSet = this.buildSets.find(bs => bs.id === this.currentBuildSetId)
+    if (!buildSet) return
+
+    // Add breakpoints sorted by level
+    const sortedBreakpoints = [...buildSet.breakpoints].sort((a, b) => a.level - b.level)
+
+    sortedBreakpoints.forEach(breakpoint => {
+      const option = document.createElement('option')
+      option.value = breakpoint.id
+      option.textContent = `Level ${breakpoint.level}: ${breakpoint.name}`
+      dropdown.appendChild(option)
+    })
+
+    // Select current breakpoint if one is active
+    if (this.currentBreakpointId) {
+      dropdown.value = this.currentBreakpointId
+    }
+  }
+
+  async handleBreakpointChange(breakpointId: string) {
+    if (!breakpointId) {
+      this.currentBreakpointId = null
+      return
+    }
+
+    this.currentBreakpointId = breakpointId
+    await this.loadBreakpoint(breakpointId)
+  }
+
+  async loadBreakpoint(breakpointId: string) {
+    if (!this.currentBuildSetId) return
+
+    const buildSet = await buildStorage.getBuildSet(this.currentBuildSetId)
+    if (!buildSet) return
+
+    const breakpoint = buildSet.breakpoints.find(bp => bp.id === breakpointId)
+    if (!breakpoint) return
+
+    console.log('Loading breakpoint:', breakpoint)
+
+    // Clear current allocations
+    this.clearAllAllocations()
+
+    // Restore allocated nodes
+    breakpoint.allocatedNodes.forEach(nodeId => {
+      const node = this.svg?.querySelector(`#n${nodeId}`)
+      if (node) {
+        node.classList.add('allocated')
+        this.allocatedNodes.add(nodeId)
+      }
+    })
+
+    // Restore ascendancy allocations
+    breakpoint.allocatedAscendancyNodes.forEach(nodeId => {
+      const node = this.svg?.querySelector(`#n${nodeId}`)
+      if (node) {
+        node.classList.add('allocated')
+        this.allocatedAscendancyNodes.add(nodeId)
+      }
+    })
+
+    // Restore starting node
+    if (breakpoint.selectedClass) {
+      this.startingNodeId = breakpoint.selectedClass
+    }
+
+    // Restore ascendancy selection
+    if (breakpoint.selectedAscendancy) {
+      this.currentSelectedAscendancy = breakpoint.selectedAscendancy
+      const ascendancyStartNode = this.ascendancyStartNodes[breakpoint.selectedAscendancy]
+      if (ascendancyStartNode) {
+        this.ascendancyStartingNodeId = ascendancyStartNode
+      }
+    }
+
+    // Update UI dropdowns
+    this.updateDropdownsFromState()
+
+    this.updatePointsDisplay()
+    this.updateAllConnections()
+  }
+
+  clearAllAllocations() {
+    // Clear regular nodes
+    this.allocatedNodes.forEach(nodeId => {
+      const node = this.svg?.querySelector(`#n${nodeId}`)
+      if (node) {
+        node.classList.remove('allocated')
+      }
+    })
+    this.allocatedNodes.clear()
+
+    // Clear ascendancy nodes
+    this.allocatedAscendancyNodes.forEach(nodeId => {
+      const node = this.svg?.querySelector(`#n${nodeId}`)
+      if (node) {
+        node.classList.remove('allocated')
+      }
+    })
+    this.allocatedAscendancyNodes.clear()
+
+    this.startingNodeId = null
+    this.ascendancyStartingNodeId = null
+    this.currentSelectedAscendancy = null
+  }
+
+  updateDropdownsFromState() {
+    const classDropdown = document.getElementById('class-dropdown') as HTMLSelectElement
+    const ascendancyDropdown = document.getElementById('ascendancy-dropdown') as HTMLSelectElement
+
+    if (!classDropdown || !ascendancyDropdown) return
+
+    // Update class dropdown
+    if (this.startingNodeId) {
+      classDropdown.value = this.startingNodeId
+
+      // Get the class name from the selected option
+      const selectedOption = classDropdown.selectedOptions[0]
+      const className = selectedOption ? selectedOption.textContent : null
+
+      // Populate ascendancy dropdown based on selected class
+      if (className && this.classAscendancies[className]) {
+        ascendancyDropdown.innerHTML = '<option value="">-- Select Ascendancy --</option>'
+        this.classAscendancies[className].forEach(ascKey => {
+          const option = document.createElement('option')
+          option.value = ascKey
+          option.textContent = this.ascendancyNames[ascKey] || ascKey
+          ascendancyDropdown.appendChild(option)
+        })
+        ascendancyDropdown.disabled = false
+      }
+    } else {
+      classDropdown.value = ''
+      ascendancyDropdown.innerHTML = '<option value="">-- Select Class First --</option>'
+      ascendancyDropdown.disabled = true
+    }
+
+    // Hide all ascendancy groups first
+    Object.keys(this.ascendancyData).forEach(ascName => {
+      const group = this.svg?.querySelector(`#ascendancy-${ascName}`)
+      if (group) (group as HTMLElement).style.display = 'none'
+    })
+
+    // Update ascendancy dropdown and show selected ascendancy group
+    if (this.currentSelectedAscendancy) {
+      ascendancyDropdown.value = this.currentSelectedAscendancy
+
+      // Show the selected ascendancy group
+      const group = this.svg?.querySelector(`#ascendancy-${this.currentSelectedAscendancy}`)
+      if (group) {
+        (group as HTMLElement).style.display = 'block'
+      }
+    } else {
+      ascendancyDropdown.value = ''
+    }
+  }
+
+  // Edit/Delete handlers for buttons
+  handleEditBuildSetClick() {
+    if (!this.currentBuildSetId) {
+      console.warn('No build set selected to edit')
+      return
+    }
+
+    const buildSet = this.buildSets.find(bs => bs.id === this.currentBuildSetId)
+    if (!buildSet) return
+
+    // Emit event to open edit popup with current data
+    this.eventBus.emit('openEditBuildSet', {
+      id: buildSet.id,
+      name: buildSet.name
+    })
+  }
+
+  handleDeleteBuildSetClick() {
+    if (!this.currentBuildSetId) {
+      console.warn('No build set selected to delete')
+      return
+    }
+
+    const buildSet = this.buildSets.find(bs => bs.id === this.currentBuildSetId)
+    if (!buildSet) return
+
+    if (confirm(`Delete build set "${buildSet.name}"? This will also delete all breakpoints.`)) {
+      this.eventBus.emit('deleteBuildSet', this.currentBuildSetId)
+    }
+  }
+
+  handleEditBreakpointClick() {
+    if (!this.currentBuildSetId) {
+      console.warn('No build set selected')
+      return
+    }
+
+    if (!this.currentBreakpointId) {
+      console.warn('No breakpoint selected to edit')
+      return
+    }
+
+    const buildSet = this.buildSets.find(bs => bs.id === this.currentBuildSetId)
+    if (!buildSet) return
+
+    const breakpoint = buildSet.breakpoints.find(bp => bp.id === this.currentBreakpointId)
+    if (!breakpoint) return
+
+    // Emit event to open edit popup with current data
+    this.eventBus.emit('openEditBreakpoint', {
+      buildSetId: this.currentBuildSetId,
+      breakpointId: breakpoint.id,
+      name: breakpoint.name,
+      level: breakpoint.level
+    })
+  }
+
+  handleDeleteBreakpointClick() {
+    if (!this.currentBuildSetId) {
+      console.warn('No build set selected')
+      return
+    }
+
+    if (!this.currentBreakpointId) {
+      console.warn('No breakpoint selected to delete')
+      return
+    }
+
+    const buildSet = this.buildSets.find(bs => bs.id === this.currentBuildSetId)
+    if (!buildSet) return
+
+    const breakpoint = buildSet.breakpoints.find(bp => bp.id === this.currentBreakpointId)
+    if (!breakpoint) return
+
+    if (confirm(`Delete breakpoint "${breakpoint.name}"?`)) {
+      this.eventBus.emit('deleteBreakpoint', {
+        buildSetId: this.currentBuildSetId,
+        breakpointId: this.currentBreakpointId
+      })
+    }
+  }
+
+  async handleEditBuildSet(id: string, name: string) {
+    try {
+      const updatedBuildSet = await buildStorage.updateBuildSetName(id, name)
+      if (updatedBuildSet) {
+        console.log('Updated build set:', updatedBuildSet)
+        await this.loadBuildSets()
+        this.updateBuildSetDropdown()
+      }
+    } catch (error) {
+      console.error('Error updating build set:', error)
+    }
+  }
+
+  async handleDeleteBuildSet(id: string) {
+    try {
+      const success = await buildStorage.deleteBuildSet(id)
+      if (success) {
+        console.log('Deleted build set')
+
+        // Clear current selection if we deleted it
+        if (this.currentBuildSetId === id) {
+          this.currentBuildSetId = null
+          this.currentBreakpointId = null
+        }
+
+        await this.loadBuildSets()
+        this.updateBuildSetDropdown()
+        this.updateBreakpointDropdown()
+      }
+    } catch (error) {
+      console.error('Error deleting build set:', error)
+    }
+  }
+
+  async handleEditBreakpoint(buildSetId: string, breakpointId: string, name: string, level: number) {
+    try {
+      const updatedBreakpoint = await buildStorage.updateBreakpoint(buildSetId, breakpointId, {
+        name,
+        level
+      })
+      if (updatedBreakpoint) {
+        console.log('Updated breakpoint:', updatedBreakpoint)
+        await this.loadBuildSets()
+        this.updateBreakpointDropdown()
+      }
+    } catch (error) {
+      console.error('Error updating breakpoint:', error)
+    }
+  }
+
+  async handleDeleteBreakpoint(buildSetId: string, breakpointId: string) {
+    try {
+      const success = await buildStorage.deleteBreakpoint(buildSetId, breakpointId)
+      if (success) {
+        console.log('Deleted breakpoint')
+
+        // Clear current breakpoint if we deleted it
+        if (this.currentBreakpointId === breakpointId) {
+          this.currentBreakpointId = null
+        }
+
+        await this.loadBuildSets()
+        this.updateBreakpointDropdown()
+      }
+    } catch (error) {
+      console.error('Error deleting breakpoint:', error)
     }
   }
 

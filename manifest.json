@@ -4,9 +4,9 @@
   "meta": {
     "name": "BonsaiBuilds",
     "description": "",
-    "version": "0.0.0",
+    "version": "0.0.1",
     "minimum-overwolf-version": "0.165.0",
-    "author": "Overwolf",
+    "author": "quentmadeit",
     "icon": "assets-static/bonsai-dock.png",
     "icon_gray": "assets-static/dock-gray.png",
     "launcher_icon": "assets-static/launcher.ico",
@@ -141,6 +141,7 @@
         "start_minimized": true
       }
     ],
-    "game_events": []
+    "game_events": [],
+    "open_dev_tools": true
   }
 }

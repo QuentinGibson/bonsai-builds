@@ -1,12 +1,10 @@
 import { makeNiceState, StateManager, Viewport } from 'ow-libs'
 
-import { kAppScreens, kMatchEndActions } from '../config/enums'
+import { kAppScreens } from '../config/enums'
 
 export interface PersState {
   screen: kAppScreens
   autoLaunch: boolean
-  matchStart: boolean
-  matchEndAction: kMatchEndActions
   notifications: boolean
   showChangelog: boolean
   desktopPositionedFor: Viewport | null
@@ -18,8 +16,6 @@ export interface PersState {
 export const kPersStateDefaults: PersState = {
   screen: kAppScreens.Main,
   autoLaunch: true,
-  matchStart: true,
-  matchEndAction: kMatchEndActions.Show,
   notifications: true,
   showChangelog: true,
   desktopPositionedFor: null,

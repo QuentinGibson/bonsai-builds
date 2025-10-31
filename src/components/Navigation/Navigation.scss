@@ -59,14 +59,6 @@
     //   mask-image: url('../../images/nav-home.svg');
     // }
 
-    &.menu-a:after {
-      mask-image: url('../../images/nav-a.svg');
-    }
-
-    &.menu-b:after {
-      mask-image: url('../../images/nav-b.svg');
-    }
-
     &:hover:after {
       background-color: var(--window-icon-secondary);
     }

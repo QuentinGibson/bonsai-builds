@@ -27,7 +27,7 @@ export type LoadingProps = {
 export function Loading({ className }: LoadingProps) {
   const eventBus = useEventBus()
 
-  const { hotkeyLoading, status, statsReady } = useContext(CommonStoreContext)
+  const { hotkeyLoading, status } = useContext(CommonStoreContext)
 
   const dragMove = (e: React.MouseEvent) => {
     if (e.button === 0) {
@@ -47,10 +47,6 @@ export function Loading({ className }: LoadingProps) {
     eventBus.emit('openDiscord')
   }
 
-  const tryAgain = () => {
-    eventBus.emit('tryAgain')
-  }
-
   useEffect(() => {
     eventBus.emit('positionWindow', kWindowNames.loading)
   }, [eventBus])
@@ -59,11 +55,7 @@ export function Loading({ className }: LoadingProps) {
     switch (status) {
       default:
       case kAppStatus.Normal:
-        if (statsReady) {
-          return renderContentReady()
-        } else {
-          return renderContentLoading()
-        }
+        return renderContentLoading()
       case kAppStatus.Warning:
         return renderContentWarning()
       case kAppStatus.Error:
@@ -73,23 +65,15 @@ export function Loading({ className }: LoadingProps) {
 
   const renderContentLoading = () => (
     <div className="content content-loading">
-      <h3>Loading&hellip;</h3>
-      <p>Builds, tips, jokes, etc.</p>
-    </div>
-  )
-
-  const renderContentReady = () => (
-    <div className="content content-ready">
-      <h3>Value</h3>
-      <p>Builds, tips, jokes, etc.</p>
+      <h3>Loading skill tree data...</h3>
+      <p>Preparing your build planner</p>
     </div>
   )
 
   const renderContentWarning = () => (
     <div className="content content-warning">
-      <h3>Title</h3>
-      <p>Please click the &quot;Try again&quot; button</p>
-      <button className="action" onClick={tryAgain}>Try again</button>
+      <h3>Connection Issues</h3>
+      <p>Having trouble loading data. Please check your connection.</p>
     </div>
   )
 

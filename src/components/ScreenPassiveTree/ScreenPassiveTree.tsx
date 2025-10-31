@@ -1,11 +1,8 @@
-//TODO: Adding new build set and breakpoints are bugged
-//The overwolf alert handler does not handle the text input well
-//rewrite into a popup using the popup class
-//reference feedback or bug report popup for making a new popup
-
 import { useEffect, useRef } from "react";
 import { classNames } from "../../utils";
 import { PassiveTreeManager } from "./passiveTreeLogic";
+import { useEventBus } from "../../hooks/use-event-bus";
+import { kAppPopups } from "../../config/enums";
 
 import "./ScreenPassiveTree.scss";
 
@@ -16,18 +13,69 @@ export type ScreenPassiveTreeProps = {
 export function ScreenPassiveTree({ className }: ScreenPassiveTreeProps) {
 	const treeContainerRef = useRef<HTMLDivElement>(null);
 	const treeManagerRef = useRef<PassiveTreeManager | null>(null);
+	const eventBus = useEventBus();
 
 	useEffect(() => {
+		const handleCreateBuildSet = (name: string) => {
+			if (treeManagerRef.current) {
+				treeManagerRef.current.handleCreateBuildSet(name);
+			}
+		};
+
+		const handleCreateBreakpoint = (data: { name: string; level: number }) => {
+			if (treeManagerRef.current) {
+				treeManagerRef.current.handleCreateBreakpoint(data.name, data.level);
+			}
+		};
+
+		const handleEditBuildSet = (data: { id: string; name: string }) => {
+			if (treeManagerRef.current) {
+				treeManagerRef.current.handleEditBuildSet(data.id, data.name);
+			}
+		};
+
+		const handleEditBreakpoint = (data: { buildSetId: string; breakpointId: string; name: string; level: number }) => {
+			if (treeManagerRef.current) {
+				treeManagerRef.current.handleEditBreakpoint(data.buildSetId, data.breakpointId, data.name, data.level);
+			}
+		};
+
+		const handleDeleteBuildSet = (id: string) => {
+			if (treeManagerRef.current) {
+				treeManagerRef.current.handleDeleteBuildSet(id);
+			}
+		};
+
+		const handleDeleteBreakpoint = (data: { buildSetId: string; breakpointId: string }) => {
+			if (treeManagerRef.current) {
+				treeManagerRef.current.handleDeleteBreakpoint(data.buildSetId, data.breakpointId);
+			}
+		};
+
 		if (treeContainerRef.current) {
-			treeManagerRef.current = new PassiveTreeManager();
+			treeManagerRef.current = new PassiveTreeManager(
+				() => eventBus.emit('setPopup', kAppPopups.AddBuildSet),
+				() => eventBus.emit('setPopup', kAppPopups.AddBreakpoint),
+				eventBus
+			);
 			treeManagerRef.current.initialize(treeContainerRef.current);
 		}
 
+		// Listen for events from popups
+		eventBus.on({
+			createBuildSet: handleCreateBuildSet,
+			createBreakpoint: handleCreateBreakpoint,
+			editBuildSet: handleEditBuildSet,
+			editBreakpoint: handleEditBreakpoint,
+			deleteBuildSet: handleDeleteBuildSet,
+			deleteBreakpoint: handleDeleteBreakpoint
+		});
+
 		return () => {
-			// Cleanup if needed
+			// Cleanup
 			treeManagerRef.current = null;
 		};
-	}, []);
+	}, [eventBus]);
 
 	return (
 		<div className={classNames("ScreenPassiveTree", className)}>

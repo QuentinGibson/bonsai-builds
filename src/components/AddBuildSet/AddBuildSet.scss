@@ -1,0 +1,117 @@
+.AddBuildSet {
+  display: flex;
+  flex-direction: column;
+  min-height: 230px;
+
+  h3 {
+    display: flex;
+    align-items: center;
+    position: relative;
+    margin-bottom: 24px;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 28px;
+    letter-spacing: 0.44px;
+
+    &::before {
+      content: '';
+      display: block;
+      margin-right: 8px;
+      width: 24px;
+      height: 24px;
+      background: url('../../images/bonsai-logo-opt.svg') center center no-repeat;
+      background-size: contain;
+    }
+  }
+
+  .content {
+    margin-bottom: 40px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-text-secondary);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.56px;
+  }
+
+  .text {
+    display: block;
+    width: 100%;
+    min-height: 32px;
+    padding: 5px 9px;
+    line-height: 20px;
+    border: 1px solid var(--border-border-tertiary);
+    background: var(--surface-surface-secondary);
+    color: var(--text-text-primary);
+    caret-color: var(--surface-surface-brand);
+    font-size: 14px;
+    letter-spacing: 0.56px;
+    transition: all 150ms ease-in-out;
+
+    &:hover,
+    &:focus {
+      border-color: var(--border-border-primary);
+    }
+
+    &.invalid {
+      border-color: var(--status-error);
+    }
+
+    &::placeholder {
+      color: #9F9F9F;
+      opacity: 1;
+    }
+  }
+
+  .name-length {
+    margin-top: 4px;
+    color: var(--text-text-tertiary);
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 0.48px;
+    text-align: right;
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    position: relative;
+    margin-top: auto;
+    border-top: 1px solid var(--border-border-quaternary);
+    padding-top: 24px;
+  }
+
+  .action {
+    padding: 6px 16px;
+    line-height: 20px;
+    color: var(--text-text-primary);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.56px;
+    transition: background-color 150ms ease-in-out;
+
+    &:disabled {
+      opacity: 0.4;
+      background: var(--hover-hover-tertiary);
+    }
+
+    &.close {
+      &:hover {
+        background-color: var(--hover-hover-secondary-dark);
+      }
+    }
+
+    &.submit {
+      background-color: var(--surface-surface-quaternary);
+
+      &:hover:not(:disabled) {
+        background-color: var(--hover-hover-quaternary);
+      }
+    }
+  }
+}

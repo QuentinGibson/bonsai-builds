@@ -21,8 +21,6 @@ import { Navigation } from "../Navigation/Navigation";
 import { Popup } from "../Popup/Popup";
 import { Premium } from "../Premium/Premium";
 import { RootWrapper } from "../RootWrapper/RootWrapper";
-import { ScreenA } from "../ScreenA/ScreenA";
-import { ScreenB } from "../ScreenB/ScreenB";
 import { ScreenError } from "../ScreenError/ScreenError";
 import { ScreenPassiveTree } from "../ScreenPassiveTree/ScreenPassiveTree";
 import { Settings } from "../Settings/Settings";
@@ -55,10 +53,6 @@ export function Desktop({ className }: DesktopProps) {
 		switch (screen) {
 			case kAppScreens.Main:
 				return ScreenPassiveTree;
-			case kAppScreens.A:
-				return ScreenA;
-			case kAppScreens.B:
-				return ScreenB;
 			case kAppScreens.Settings:
 				return Settings;
 			case kAppScreens.Premium:

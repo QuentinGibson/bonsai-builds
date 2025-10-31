@@ -8,8 +8,6 @@ export const enum kWindowNames {
 
 export const enum kAppScreens {
   Main,
-  A,
-  B,
   Premium,
   Settings
 }
@@ -23,7 +21,11 @@ export const enum kAppStatus {
 export const enum kAppPopups {
   Changelog,
   BugReport,
-  Feedback
+  Feedback,
+  AddBuildSet,
+  AddBreakpoint,
+  EditBuildSet,
+  EditBreakpoint
 }
 
 export const enum kNoticeActions {
@@ -33,9 +35,4 @@ export const enum kNoticeActions {
 export const enum kNoticeIcons {
   StatusWarning,
   StatusError
-}
-
-export const enum kMatchEndActions {
-  None,
-  Show
 }

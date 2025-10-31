@@ -11,7 +11,6 @@ export interface CommonState {
   launcherRunning: boolean
   gameRunning: boolean
   gameFocused: boolean
-  statsReady: boolean
   viewport: Viewport | null
   notices: Notice[]
   toasts: Toast[]
@@ -27,7 +26,6 @@ export const kCommonStoreDefauts: CommonState = {
   launcherRunning: false,
   gameRunning: false,
   gameFocused: false,
-  statsReady: false,
   viewport: null,
   notices: [],
   toasts: [],

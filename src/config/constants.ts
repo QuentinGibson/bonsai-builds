@@ -1,5 +1,3 @@
-//TODO: Set this constants to something appropiate
-
 import { kNoticeActions, kNoticeIcons } from "./enums";
 import type { Notice, Toast } from "./types";
 
@@ -13,12 +11,15 @@ export const kEventBusName = "EventBus";
 
 export const kDefaultLocale = "en-GB";
 
-export const kDiscordUrl = "https://discord.gg/qgSYEYyXZz";
+export const kDiscordUrl = "https://discord.gg/cC6UcM9H";
 
-export const kGameFeatures = ["match_info", "match"];
+// Path of Exile 2 configuration
+export const kPoe2GameId = 24886;
 
-export const kLeagueLauncherId = 10902;
-export const kLeagueGameId = 5426;
+// League of Legends constants (legacy - to be removed)
+// export const kGameFeatures = ["match_info", "match"];
+// export const kLeagueLauncherId = 10902;
+// export const kLeagueGameId = 5426;
 
 export const kMainWidth = 1450;
 export const kMainHeight = 800;

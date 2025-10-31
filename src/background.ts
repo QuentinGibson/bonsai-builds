@@ -1,7 +1,6 @@
 import {
 	delay,
 	EventEmitter,
-	GameEvents,
 	GameStatus,
 	type HotkeyChangedEvent,
 	HotkeyService,
@@ -14,34 +13,23 @@ import {
 import {
 	kDiscordUrl,
 	kEventBusName,
-	kGameFeatures,
 	kHotkeyApp,
 	kHotkeyLoading,
 	kHotkeyServiceName,
-	kLeagueGameId,
-	kLeagueLauncherId,
 	kLoadingHeight,
 	kLoadingLeft,
 	kLoadingTop,
 	kLoadingWidth,
 	kMainHeight,
 	kMainWidth,
-	kNoticeError,
-	kNoticeGameModeUnsupported,
-	kNoticeStatsReady,
 	kNoticesHeight,
 	kNoticesWidth,
-	kNoticeWarning,
+	kPoe2GameId,
 	kToastBugReportSubmitted,
 	kToastFeedbackSubmitted,
 } from "./config/constants";
-import { kAppStatus, kMatchEndActions, kWindowNames } from "./config/enums";
-import type {
-	EventBusEvents,
-	GameEventTypes,
-	Notice,
-	Toast,
-} from "./config/types";
+import { kWindowNames } from "./config/enums";
+import type { EventBusEvents, Notice, Toast } from "./config/types";
 import { makeCommonStore } from "./store/common";
 import { makePersStore } from "./store/pers";
 
@@ -49,10 +37,6 @@ class BackgroundController {
 	readonly #eventBus = new EventEmitter<EventBusEvents>();
 	readonly #launcherStatus = new LauncherStatus();
 	readonly #gameStatus = new GameStatus();
-	readonly #gameEvents = new GameEvents<GameEventTypes>(
-		kGameFeatures,
-		this.#gameStatus,
-	);
 	readonly #hotkey = new HotkeyService();
 	readonly #state = makeCommonStore();
 	readonly #persState = makePersStore();
@@ -64,20 +48,10 @@ class BackgroundController {
 
 	#uid = 0;
 
-	#isInMatch = false;
-
-	get #startedWithLauncher() {
-		return (
-			window.location.search.includes("source=gamelaunchevent") &&
-			window.location.search.includes(`gameid=${kLeagueLauncherId}`)
-		);
-	}
-
 	get #startedWithGame() {
 		return (
 			window.location.search.includes("source=gamelaunchevent") &&
-			window.location.search.includes("gameid=") &&
-			!window.location.search.includes(`gameid=${kLeagueLauncherId}`)
+			window.location.search.includes(`gameid=${kPoe2GameId}`)
 		);
 	}
 
@@ -115,7 +89,6 @@ class BackgroundController {
 			triggerLaunch: () => this.#openMainWindow(),
 			closeNotice: (id) => this.#closeNotice(id),
 			closeApp: () => this.#closeApp(),
-			tryAgain: () => this.#tryAgain(),
 			closeToast: (id) => this.#closeToast(id),
 			submitFeedback: () => this.#submitFeedback(),
 			submitBugReport: () => this.#submitBugReport(),
@@ -146,12 +119,12 @@ class BackgroundController {
 			this.#openMainWindow(e.origin);
 		});
 
-		if (this.#startedWithLauncher || this.#startedWithGame) {
+		if (this.#startedWithGame) {
 			if (!this.#persState.autoLaunch) {
 				await this.#closeApp();
 			}
 		} else {
-			console.log("Front App started without game or launcher");
+			console.log("Front App started without game");
 			await this.#openMainWindow();
 		}
 
@@ -177,33 +150,66 @@ class BackgroundController {
 	}
 
 	async #initHotkeys() {
-		this.#state.hotkey = this.#hotkey.getHotkeyBinding(kHotkeyApp);
-		this.#state.hotkeyLoading = this.#hotkey.getHotkeyBinding(kHotkeyLoading);
+		// Use overwolf.settings.hotkeys.get() like the sample app
+		return new Promise<void>((resolve) => {
+			overwolf.settings.hotkeys.get((result) => {
+				console.log(
+					"initHotkeys(): raw result:",
+					JSON.stringify(result, null, 2),
+				);
 
-		if (!this.#state.hotkey) {
-			console.log("setDefaultHotkeys(): assigning default app hotkey");
+				if (!result || !result.success) {
+					console.error("Failed to get hotkeys. Error:", result?.error);
+					console.error("Full result:", result);
+					// Set defaults and continue
+					this.#state.hotkey = "Ctrl+T";
+					this.#state.hotkeyLoading = "Ctrl+Shift+T";
+					resolve();
+					return;
+				}
 
-			await this.#hotkey.assignHotkey({
-				name: kHotkeyApp,
-				virtualKey: 84,
-				modifiers: {
-					ctrl: true,
-				},
+				if (!result.hotkeys) {
+					console.error("No hotkeys array in result");
+					this.#state.hotkey = "Ctrl+T";
+					this.#state.hotkeyLoading = "Ctrl+Shift+T";
+					resolve();
+					return;
+				}
+
+				console.log("initHotkeys(): all hotkeys:", result.hotkeys);
+
+				// Find our hotkeys - they may be in global or games section
+				const appHotkey = result.hotkeys.find(
+					(h: any) => h.name === kHotkeyApp,
+				);
+				const loadingHotkey = result.hotkeys.find(
+					(h: any) => h.name === kHotkeyLoading,
+				);
+
+				if (appHotkey) {
+					// Check game-specific binding first, then global
+					const gameBinding = appHotkey.games?.[kPoe2GameId];
+					this.#state.hotkey = gameBinding || appHotkey.binding || "Ctrl+T";
+					console.log("App hotkey found:", this.#state.hotkey);
+				} else {
+					console.warn("App hotkey not found in manifest");
+					this.#state.hotkey = "Ctrl+T";
+				}
+
+				if (loadingHotkey) {
+					// Check game-specific binding first, then global
+					const gameBinding = loadingHotkey.games?.[kPoe2GameId];
+					this.#state.hotkeyLoading =
+						gameBinding || loadingHotkey.binding || "Ctrl+Shift+T";
+					console.log("Loading hotkey found:", this.#state.hotkeyLoading);
+				} else {
+					console.warn("Loading hotkey not found in manifest");
+					this.#state.hotkeyLoading = "Ctrl+Shift+T";
+				}
+
+				resolve();
 			});
-		}
-
-		if (!this.#state.hotkeyLoading) {
-			console.log("setDefaultHotkeys(): assigning default loading hotkey");
-
-			await this.#hotkey.assignHotkey({
-				name: kHotkeyLoading,
-				virtualKey: 84,
-				modifiers: {
-					ctrl: true,
-					shift: true,
-				},
-			});
-		}
+		});
 	}
 
 	#onHotkeyChanged(e: HotkeyChangedEvent) {
@@ -261,92 +267,15 @@ class BackgroundController {
 
 		this.#desktopWin.close();
 
-		if (this.#gameStatus.gameID === kLeagueGameId) {
-			await this.#onMatchStart();
-		} else {
-			await this.#registerGameEvents();
-			await this.#showGameLaunchNotice();
-		}
+		await this.#showGameLaunchNotice();
 	}
 
 	async #onGameClosed() {
 		console.log("onGameClosed()", this.#gameStatus.gameID);
 
 		this.#state.gameRunning = false;
-		this.#isInMatch = false;
-
-		this.#gameEvents.stop();
 
 		await Promise.all([this.#ingameWin.close(), this.#loadingWin.close()]);
-
-		if (this.#gameStatus.gameID === kLeagueGameId) {
-			await this.#onMatchEnd();
-		}
-	}
-
-	async #registerGameEvents() {
-		if (this.#gameStatus.gameID === kLeagueGameId) {
-			console.log("registerGameEvents(): game is League, skipping");
-			return;
-		}
-
-		console.log("registerGameEvents()");
-
-		this.#gameEvents.on({
-			"events.match_start": () => this.#onMatchStart(),
-			"events.match_end": () => this.#onMatchEnd(),
-			"events.matchStart": () => this.#onMatchStart(),
-			"events.matchEnd": () => this.#onMatchEnd(),
-		});
-
-		await this.#gameEvents.start();
-	}
-
-	async #tryAgain() {
-		this.#state.status = kAppStatus.Normal;
-		this.#state.statsReady = false;
-
-		await delay(7000);
-
-		this.#state.statsReady = true;
-	}
-
-	async #onMatchStart() {
-		if (!this.#persState.matchStart || this.#isInMatch) {
-			return;
-		}
-
-		console.log("onMatchStart()");
-
-		this.#isInMatch = true;
-
-		await Promise.all([this.#loadingWin.restore(), this.#ingameWin.restore()]);
-
-		await this.#showMatchStartNotice();
-
-		this.#state.statsReady = false;
-
-		await delay(7000);
-
-		this.#state.statsReady = true;
-	}
-
-	async #onMatchEnd() {
-		if (!this.#isInMatch) {
-			return;
-		}
-
-		this.#isInMatch = false;
-
-		console.log("onMatchEnd()");
-
-		if (this.#persState.matchEndAction === kMatchEndActions.Show) {
-			if (this.#gameStatus.isInFocus) {
-				await this.#ingameWin.restore();
-			} else {
-				await this.#desktopWin.restore();
-			}
-		}
 	}
 
 	async #toggleLoadingWindow() {
@@ -380,31 +309,9 @@ class BackgroundController {
 
 		await this.#showNotice({
 			id: "notice-game-launch",
-			message: `App is ready!<br />
-Press <kbd>${this.#state.hotkey}</kbd> to show the app`,
-			devTip: `<h6>Quick Notifications</h6>
-<p>We use notifications to ensure our users are aware of what's happening, or called to act in cases such as recording stopped, in-game stats are ready, a friend logged and more.</p>
-<p>We recommend to auto-terminate quick notifications after a few seconds, especially in games where mouse cursor is hidden (like First Person Shooters).</p>`,
+			message: `BonsaiBuild is ready!<br />
+Press <kbd>${this.#state.hotkey}</kbd> to show the skill tree`,
 		});
-	}
-
-	async #showMatchStartNotice() {
-		if (!this.#persState.notifications) {
-			return;
-		}
-
-		switch (this.#state.status) {
-			case kAppStatus.Error:
-				await this.#showNotice(kNoticeError);
-				break;
-			case kAppStatus.Warning:
-				await this.#showNotice(kNoticeWarning);
-				break;
-			default:
-				await this.#showNotice(kNoticeStatsReady);
-		}
-
-		await this.#showNotice(kNoticeGameModeUnsupported);
 	}
 
 	async #showNotice(notice: Notice) {
