@@ -89,10 +89,6 @@ export function HotkeyEditor({ hotkeyName, className }: HotkeyEditorProps) {
 
 	const { binding: hotkeyBinding, assign } = useHotkey(hotkeyName);
 
-	useEffect(() => {
-		console.log(`Binding for ${hotkeyName} in component: ${hotkeyBinding}`);
-	}, [hotkeyBinding, hotkeyName]);
-
 	const [editing, setEditing] = useState(false),
 		[alt, setAlt] = useState(false),
 		[ctrl, setCtrl] = useState(false),

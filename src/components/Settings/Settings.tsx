@@ -3,6 +3,7 @@ import { kHotkeyApp, kHotkeyLoading } from "../../config/constants";
 import { CommonStoreContext } from "../../hooks/common-context";
 import { PersStoreContext } from "../../hooks/pers-context";
 import { useEventBus } from "../../hooks/use-event-bus";
+import { useOverwolfUser } from "../../hooks/use-overwolf-user";
 import type { PersState } from "../../store/pers";
 import { classNames } from "../../utils";
 
@@ -17,6 +18,7 @@ export type SettingsProps = {
 
 export function Settings({ className }: SettingsProps) {
 	const eventBus = useEventBus();
+	const user = useOverwolfUser();
 
 	const { version } = useContext(CommonStoreContext);
 
@@ -136,6 +138,16 @@ export function Settings({ className }: SettingsProps) {
 				>
 					Allow app notifications
 				</Switch>
+				<div className="setting-field setting-field-hotkey">
+					<ul>
+						<li>UserName: {user.user?.username}</li>
+						<li>
+							Avatar: <img src={user.user?.avatar} alt="avatar-ui" />
+						</li>
+						<li>Display Name: {user.user?.displayName}</li>
+						<li>UserId: {user.user?.userId}</li>
+					</ul>
+				</div>
 
 				<div className="setting-field setting-field-hotkey">
 					Show/Hide App
