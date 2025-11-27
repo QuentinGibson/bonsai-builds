@@ -118,13 +118,13 @@ This Overwolf application was built as a UI/UX example with League of Legends de
 
 ## Progress Tracking
 
-- [ ] Step 1: Update game configuration
+- [x] Step 1: Update game configuration
 - [ ] Step 2: Remove demo screens
-- [ ] Step 3: Clean up background logic
+- [x] Step 3: Clean up background logic
 - [ ] Step 4: Rewrite FTUE
 - [ ] Step 5: Clean up store/state (optional)
 - [ ] Step 6: Remove unused demo assets (optional)
-- [ ] Step 7: Update monetization (optional)
+- [x] Step 7: Update monetization (optional)
 
 ---
 
