@@ -1,15 +1,20 @@
 .FTUE {
-  position: relative;
-  height: 100vh;
-  background: var(--surface-surface-pure);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  pointer-events: none;
 
   .close {
     position: absolute;
     top: 0;
     right: 0;
-    z-index: 11;
+    z-index: 1004;
     width: 40px;
     height: 40px;
+    pointer-events: all;
     transition: background-color 150ms ease-in-out;
 
     &::before {
@@ -38,35 +43,71 @@
     left: 0;
     right: 0;
     height: 40px;
-    z-index: 10;
+    z-index: 1003;
+    pointer-events: all;
   }
 
-  .slider {
+  .ftue-overlay {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 1001;
+    pointer-events: all;
+    transition: opacity 0.3s ease-in-out;
   }
 
-  .slide {
-    position: relative;
-    height: 100vh;
-    padding: 162px 0 0 120px;
-    background: var(--surface-surface-pure) center center no-repeat;
-    background-size: cover;
+  .ftue-spotlight {
+    position: absolute;
+    z-index: 1002;
+    pointer-events: none;
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.75);
+    border-radius: 8px;
+    transition: all 0.3s ease-in-out;
+  }
 
-    &.slide-1 {
-      background-image: url('../../images/ftue-1-bg.jpg');
+  .ftue-tooltip {
+    position: absolute;
+    z-index: 1003;
+    max-width: 480px;
+    pointer-events: all;
+    transition: all 0.3s ease-in-out;
+
+    &.ftue-tooltip-center {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
 
-    &.slide-2 {
-      background-image: url('../../images/ftue-2-bg.jpg');
+    &.ftue-tooltip-top-left {
+      top: 120px;
+      left: 80px;
     }
 
-    &.slide-3 {
-      background-image: url('../../images/ftue-3-bg.jpg');
+    &.ftue-tooltip-top-right {
+      top: 120px;
+      right: 80px;
     }
+
+    &.ftue-tooltip-bottom-left {
+      bottom: 80px;
+      left: 80px;
+    }
+
+    &.ftue-tooltip-bottom-right {
+      bottom: 80px;
+      right: 80px;
+    }
+  }
+
+  .ftue-tooltip-content {
+    padding: 32px;
+    background: var(--surface-surface-pure);
+    border: 1px solid var(--border-border-secondary);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 
     h2 {
       margin-bottom: 16px;
@@ -78,24 +119,21 @@
     }
 
     p {
-      max-width: 400px;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
       line-height: 28px;
       color: var(--text-text-secondary);
       font-size: 18px;
     }
-
-    .Link {
-      color: var(--text-text-pure);
-
-      &:hover {
-        color: var(--surface-surface-brand);
-      }
-    }
   }
 
-  .next {
-    position: relative;
+  .ftue-tooltip-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .ftue-btn {
+    flex: 1;
     padding: 11px 31px;
     line-height: 24px;
     border: 1px solid var(--border-border-secondary);
@@ -106,8 +144,18 @@
     text-align: center;
     text-transform: uppercase;
     transition: all .15s ease-in-out;
+    cursor: pointer;
 
-    &.next-cta {
+    &.ftue-btn-primary {
+      color: var(--text-text-pure);
+      border-color: var(--border-border-pure);
+    }
+
+    &.ftue-btn-secondary {
+      flex: 0 0 auto;
+    }
+
+    &.ftue-btn-cta {
       color: var(--text-text-pure, #fff);
       border-color: var(--surface-surface-brand, #D34037);
       background: var(--surface-surface-brand, #D34037);
@@ -120,48 +168,44 @@
     }
   }
 
-  .slider-pagination {
-    position: absolute;
-    bottom: 100px;
-    left: 120px;
-    z-index: 10;
+  .ftue-progress {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
+    justify-content: center;
     gap: 8px;
+  }
 
-    li {
-      display: block;
+  .ftue-progress-dot {
+    display: block;
+    width: 12px;
+    height: 12px;
+    padding: 0;
+    border: 2px solid var(--icon-icon-primary);
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    transition: background-color .15s ease-in-out;
+
+    &.active {
+      background-color: var(--icon-icon-primary);
     }
 
-    button {
-      display: block;
-      width: 12px;
-      height: 12px;
-      border: 2px solid var(--icon-icon-primary);
-      border-radius: 50%;
-      cursor: pointer;
-      transition: background-color .15s ease-in-out;
-
-      &.is-active {
-        background-color: var(--icon-icon-primary);
-      }
-
-      &:not(.is-active):hover {
-        background-color: var(--hover-hover-secondary-dark);
-      }
+    &:not(.active):hover {
+      background-color: var(--hover-hover-secondary-dark);
     }
   }
 
   .skip {
     position: absolute;
-    right: 88px;
-    bottom: 86px;
-    z-index: 10;
+    right: 40px;
+    bottom: 40px;
+    z-index: 1003;
     height: 32px;
     padding: 6px 16px;
     font-weight: 600;
     color: var(--text-text-primary, #DFDFDF);
     cursor: pointer;
+    pointer-events: all;
     transition:
       color .15s ease-in-out,
       background-color .15s ease-in-out;

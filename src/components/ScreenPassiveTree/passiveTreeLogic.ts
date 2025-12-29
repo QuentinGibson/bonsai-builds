@@ -363,8 +363,49 @@ export class PassiveTreeManager {
 
   private handleWheel(e: WheelEvent) {
     e.preventDefault()
-    const delta = e.deltaY > 0 ? -0.1 : 0.1
+
+    if (!this.svg) return
+
+    // Get mouse position relative to SVG
+    const rect = this.svg.getBoundingClientRect()
+    const mouseX = e.clientX - rect.left
+    const mouseY = e.clientY - rect.top
+
+    // Convert to normalized coordinates (0 to 1)
+    const normX = mouseX / rect.width
+    const normY = mouseY / rect.height
+
+    const baseViewBox = {
+      x: -11326.103852910494,
+      y: -11389.628444746082,
+      width: 23256.18556701031,
+      height: 20315.9793814433
+    }
+
+    // Calculate the point in SVG coordinates that the mouse is currently over
+    const oldWidth = baseViewBox.width / this.zoom
+    const oldHeight = baseViewBox.height / this.zoom
+    const svgX = (baseViewBox.x - this.panX) + normX * oldWidth
+    const svgY = (baseViewBox.y - this.panY) + normY * oldHeight
+
+    // Apply zoom
+    const delta = e.deltaY > 0 ? -0.3 : 0.3
+    const oldZoom = this.zoom
     this.zoom = Math.max(0.5, Math.min(10.0, this.zoom + delta))
+
+    // Calculate new dimensions
+    const newWidth = baseViewBox.width / this.zoom
+    const newHeight = baseViewBox.height / this.zoom
+
+    // Adjust pan so the same SVG point stays under the mouse
+    this.panX = (baseViewBox.x + normX * newWidth - svgX)
+    this.panY = (baseViewBox.y + normY * newHeight - svgY)
+
+    // Apply pan limits
+    const maxPan = 30000
+    this.panX = Math.max(-maxPan, Math.min(maxPan, this.panX))
+    this.panY = Math.max(-maxPan, Math.min(maxPan, this.panY))
+
     this.updateViewBox()
   }
 
@@ -405,6 +446,11 @@ export class PassiveTreeManager {
         }
       } else {
         // Allocation
+        // Prevent allocation if no starting class is selected
+        if (!this.startingNodeId || this.startingNodeId === '') {
+          return
+        }
+
         if (isAscNode) {
           if (!this.ascendancyStartingNodeId) return
           if (this.allocatedAscendancyNodes.size - 1 >= this.maxAscendancyPoints) return
@@ -860,6 +906,21 @@ export class PassiveTreeManager {
         this.updateAllConnections()
       })
     }
+
+    // Reset camera button
+    const resetCameraBtn = document.getElementById('reset-camera-btn')
+    if (resetCameraBtn) {
+      resetCameraBtn.addEventListener('click', () => {
+        this.resetCamera()
+      })
+    }
+  }
+
+  private resetCamera() {
+    this.zoom = 1.0
+    this.panX = 0
+    this.panY = 0
+    this.updateViewBox()
   }
 
   private setupBuildManagement() {

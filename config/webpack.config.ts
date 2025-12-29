@@ -8,6 +8,8 @@ import type { Configuration } from "webpack";
 import { kAppTitle, kBuildPath, kWindowNames } from "./constants";
 import { OverwolfWebpackPlugin } from "./overwolf.webpack";
 
+const tailwindcss = require("tailwindcss/plugin");
+
 interface EnvArg {
 	production?: boolean;
 	makeOPK?: boolean;
@@ -43,7 +45,7 @@ const makePostCSSLoader = () => ({
 	loader: "postcss-loader",
 	options: {
 		postcssOptions: {
-			plugins: [autoprefixer],
+			plugins: [tailwindcss, autoprefixer],
 		},
 	},
 });

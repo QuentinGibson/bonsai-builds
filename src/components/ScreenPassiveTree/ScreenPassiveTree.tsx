@@ -130,6 +130,12 @@ export function ScreenPassiveTree({ className }: ScreenPassiveTreeProps) {
 							</select>
 						</div>
 
+						<div className="class-selection">
+							<button id="reset-camera-btn" className="reset-camera-btn">
+								Reset Camera
+							</button>
+						</div>
+
 						<div className="build-management">
 							<h4>Build Management</h4>
 

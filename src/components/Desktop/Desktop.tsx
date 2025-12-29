@@ -70,10 +70,6 @@ export function Desktop({ className }: DesktopProps) {
 		eventBus.emit("positionWindow", kWindowNames.desktop);
 	}, [eventBus]);
 
-	if (!ftueSeen) {
-		return <FTUE />;
-	}
-
 	return (
 		<div className={classNames("Desktop", className)}>
 			<DesktopHeader />
@@ -97,6 +93,9 @@ export function Desktop({ className }: DesktopProps) {
 
 			<AdPremium className="desktop-ad-premium" />
 			<Toaster className="desktop-toaster" />
+
+			{!ftueSeen && <FTUE />}
+			{/* <FTUE /> */}
 		</div>
 	);
 }

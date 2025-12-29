@@ -8,7 +8,7 @@
     "minimum-overwolf-version": "0.165.0",
     "author": "quentmadeit",
     "icon": "assets-static/bonsai-dock.png",
-    "icon_gray": "assets-static/dock-gray.png",
+    "icon_gray": "assets-static/bonsai-dock-grayscale.png",
     "launcher_icon": "assets-static/launcher.ico",
     "window_icon": "assets-static/bonsai-dock.png"
   },

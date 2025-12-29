@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { kHotkeyApp, kHotkeyLoading } from "../../config/constants";
+import { kHotkeyApp } from "../../config/constants";
 import { CommonStoreContext } from "../../hooks/common-context";
 import { PersStoreContext } from "../../hooks/pers-context";
 import { useEventBus } from "../../hooks/use-event-bus";
@@ -10,7 +10,6 @@ import { classNames } from "../../utils";
 import "./Settings.scss";
 
 import { HotkeyEditor } from "../HotkeyEditor/HotkeyEditor";
-import { Switch } from "../Switch/Switch";
 
 export type SettingsProps = {
 	className?: string;
@@ -18,13 +17,13 @@ export type SettingsProps = {
 
 export function Settings({ className }: SettingsProps) {
 	const eventBus = useEventBus();
-	const user = useOverwolfUser();
+	const _user = useOverwolfUser();
 
 	const { version } = useContext(CommonStoreContext);
 
 	const { autoLaunch, notifications } = useContext(PersStoreContext);
 
-	const setSetting = <T extends keyof PersState>(
+	const _setSetting = <T extends keyof PersState>(
 		key: T,
 		value: PersState[T],
 	) => {
@@ -131,23 +130,27 @@ export function Settings({ className }: SettingsProps) {
 				{/**/}
 				<h3>General Settings:</h3>
 
-				<Switch
-					className="setting-field"
-					value={notifications}
-					onChange={(v) => setSetting("notifications", v)}
-				>
-					Allow app notifications
-				</Switch>
-				<div className="setting-field setting-field-hotkey">
-					<ul>
-						<li>UserName: {user.user?.username}</li>
-						<li>
-							Avatar: <img src={user.user?.avatar} alt="avatar-ui" />
-						</li>
-						<li>Display Name: {user.user?.displayName}</li>
-						<li>UserId: {user.user?.userId}</li>
-					</ul>
-				</div>
+				{/* <Switch */}
+				{/* 	className="setting-field" */}
+				{/* 	value={notifications} */}
+				{/* 	onChange={(v) => setSetting("notifications", v)} */}
+				{/* > */}
+				{/* 	Allow app notifications */}
+				{/* </Switch> */}
+
+				{/* NOTE: This is how to get user infomation */}
+
+				{/* <div className="setting-field setting-field-hotkey"> */}
+				{/* 	<ul> */}
+				{/* 		<li>UserName: {user.user?.username}</li> */}
+				{/* 		<li> */}
+				{/* 			Avatar: <img src={user.user?.avatar} alt="avatar-ui" /> */}
+				{/* 		</li> */}
+				{/* 		<li>Display Name: {user.user?.displayName}</li> */}
+				{/* 		<li>UserId: {user.user?.userId}</li> */}
+				{/* 	</ul> */}
+				{/* </div> */}
+				{/**/}
 
 				<div className="setting-field setting-field-hotkey">
 					Show/Hide App
@@ -179,10 +182,10 @@ export function Settings({ className }: SettingsProps) {
 					{/* </Tip> */}
 				</div>
 
-				<div className="setting-field setting-field-hotkey">
-					Show/Hide loading screen
-					<HotkeyEditor hotkeyName={kHotkeyLoading} />
-				</div>
+				{/* <div className="setting-field setting-field-hotkey"> */}
+				{/* 	Show/Hide loading screen */}
+				{/* 	<HotkeyEditor hotkeyName={kHotkeyLoading} /> */}
+				{/* </div> */}
 
 				<div className="setting-version">
 					Version {version}
