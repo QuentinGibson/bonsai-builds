@@ -43,7 +43,9 @@ export function Ad({ className }: AdProps) {
 			},
 			onError: (_owAd, error) => {
 				console.error("Ad error:", error);
-				setAdError("Ad failed to load");
+				setAdError(error?.message || "Ad failed to load");
+				if (!adsServiceRef.current) return;
+				adsServiceRef.current.destroy();
 			},
 		});
 
@@ -57,6 +59,10 @@ export function Ad({ className }: AdProps) {
 		};
 	}, []);
 
+	if (adError) {
+		return null;
+	}
+
 	return (
 		<div className={classNames("Ad", className)}>
 			<div
@@ -64,7 +70,6 @@ export function Ad({ className }: AdProps) {
 				ref={adContainerRef}
 				className="ad-container"
 			/>
-			{adError && <div className="ad-error">{adError}</div>}
 		</div>
 	);
 }

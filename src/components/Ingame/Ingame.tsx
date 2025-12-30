@@ -1,84 +1,83 @@
-import { useContext, useEffect, useMemo } from 'react'
-import { createRoot } from 'react-dom/client'
+import { useContext, useEffect, useMemo } from "react";
+import { createRoot } from "react-dom/client";
 import { CSSTransition, SwitchTransition } from "react-transition-group";
-
-import { classNames } from '../../utils'
-import { kAppScreens, kAppStatus, kWindowNames } from '../../config/enums'
-import { useEventBus } from '../../hooks/use-event-bus'
+import { kAppScreens, kAppStatus, kWindowNames } from "../../config/enums";
 import { CommonStoreContext } from "../../hooks/common-context";
+import { useEventBus } from "../../hooks/use-event-bus";
+import { classNames } from "../../utils";
 
-import './Ingame.scss'
+import "./Ingame.scss";
 
-import { AdPremium } from '../AdPremium/AdPremium'
-import { IngameHeader } from '../IngameHeader/IngameHeader'
+import { AdPremium } from "../AdPremium/AdPremium";
+import { DesktopHeader } from "../DesktopHeader/DesktopHeader";
 import { Navigation } from "../Navigation/Navigation";
-import { Popup } from '../Popup/Popup'
+import { Popup } from "../Popup/Popup";
 import { Premium } from "../Premium/Premium";
-import { RootWrapper } from '../RootWrapper/RootWrapper'
+import { RootWrapper } from "../RootWrapper/RootWrapper";
 import { ScreenError } from "../ScreenError/ScreenError";
 import { ScreenPassiveTree } from "../ScreenPassiveTree/ScreenPassiveTree";
 import { Settings } from "../Settings/Settings";
-import { Toaster } from '../Toaster/Toaster'
+import { Toaster } from "../Toaster/Toaster";
 
 export function renderIngame(element: Element | DocumentFragment) {
-  createRoot(element).render(
-    <RootWrapper name="Ingame">
-      <Ingame />
-    </RootWrapper>
-  )
+	createRoot(element).render(
+		<RootWrapper name="Ingame">
+			<Ingame />
+		</RootWrapper>,
+	);
 }
 
 export type IngameProps = {
-  className?: string
-}
+	className?: string;
+};
 
 export function Ingame({ className }: IngameProps) {
-  const eventBus = useEventBus()
+	const eventBus = useEventBus();
 
-  const { screen, status } = useContext(CommonStoreContext);
+	const { screen, status } = useContext(CommonStoreContext);
 
-  const ScreenComponent = useMemo(() => {
-    if (status === kAppStatus.Error) {
-      return ScreenError;
-    }
+	const ScreenComponent = useMemo(() => {
+		if (status === kAppStatus.Error) {
+			return ScreenError;
+		}
 
-    switch (screen) {
-      case kAppScreens.Main:
-        return ScreenPassiveTree;
-      case kAppScreens.Settings:
-        return Settings;
-      case kAppScreens.Premium:
-        return Premium;
-    }
-  }, [screen, status]);
+		switch (screen) {
+			case kAppScreens.Main:
+				return ScreenPassiveTree;
+			case kAppScreens.Settings:
+				return Settings;
+			case kAppScreens.Premium:
+				return Premium;
+		}
+	}, [screen, status]);
 
-  useEffect(() => {
-    eventBus.emit('positionWindow', kWindowNames.ingame)
-  }, [eventBus])
+	useEffect(() => {
+		eventBus.emit("positionWindow", kWindowNames.ingame);
+	}, [eventBus]);
 
-  return (
-    <div className={classNames('Ingame', className)}>
-      <IngameHeader />
+	return (
+		<div className={classNames("Ingame", className)}>
+			<DesktopHeader />
 
-      <Navigation />
+			<Navigation />
 
-      <SwitchTransition mode="out-in">
-        <CSSTransition
-          key={ScreenComponent.name}
-          classNames="ingame-screen-fade"
-          timeout={150}
-          mountOnEnter={true}
-          unmountOnExit={true}
-          appear={true}
-        >
-          <ScreenComponent className="ingame-screen" />
-        </CSSTransition>
-      </SwitchTransition>
+			<SwitchTransition mode="out-in">
+				<CSSTransition
+					key={ScreenComponent.name}
+					classNames="ingame-screen-fade"
+					timeout={150}
+					mountOnEnter={true}
+					unmountOnExit={true}
+					appear={true}
+				>
+					<ScreenComponent className="ingame-screen" />
+				</CSSTransition>
+			</SwitchTransition>
 
-      <Popup />
+			<Popup />
 
-      <AdPremium className="ingame-ad-premium" />
-      <Toaster className="ingame-toaster" />
-    </div>
-  )
+			<AdPremium className="ingame-ad-premium" />
+			<Toaster className="ingame-toaster" />
+		</div>
+	);
 }
