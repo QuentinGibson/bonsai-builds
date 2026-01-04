@@ -90,6 +90,7 @@ export function DesktopHeader({ className }: DesktopHeaderProps) {
 	return (
 		<header
 			className={classNames("DesktopHeader", className)}
+			id="DesktopHeader"
 			onMouseDown={drag}
 		>
 			{/* <Tip */}

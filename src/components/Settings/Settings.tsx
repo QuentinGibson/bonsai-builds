@@ -204,6 +204,10 @@ export function Settings({ className }: SettingsProps) {
 					{/* </Tip> */}
 				</div>
 			</div>
+
+			<aside className="secondary">
+				{/* Placeholder for ads - they are positioned absolutely */}
+			</aside>
 		</div>
 	);
 }

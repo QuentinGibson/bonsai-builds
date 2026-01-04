@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { kWindowNames } from "../../config/enums";
 import { useEventBus } from "../../hooks/use-event-bus";
 import { classNames } from "../../utils";
@@ -13,36 +13,46 @@ type Step = {
 	title: string;
 	description: string;
 	highlightSelector?: string;
-	position: "center" | "top-left" | "top-right" | "bottom-left" | "bottom-right";
+	position:
+		| "center"
+		| "top-left"
+		| "top-right"
+		| "bottom-left"
+		| "bottom-right";
 };
 
 const TOUR_STEPS: Step[] = [
 	{
 		title: "Welcome to BonsaiBuild",
-		description: "Your companion app for planning and perfecting your Path of Exile 2 character builds. Let's take a quick tour!",
+		description:
+			"Your companion app for planning and perfecting your Path of Exile 2 character builds. Let's take a quick tour!",
 		position: "center",
 	},
 	{
 		title: "Navigation",
-		description: "Use the navigation menu to switch between different sections of the app.",
-		highlightSelector: ".Navigation",
+		description:
+			"Use the navigation menu to switch between different sections of the app.",
+		highlightSelector: "Navigation",
 		position: "top-left",
 	},
 	{
 		title: "Passive Skill Tree",
-		description: "Navigate the full Path of Exile 2 passive skill tree, allocate points, and experiment with different build paths.",
-		highlightSelector: ".ScreenPassiveTree",
+		description:
+			"Navigate the full Path of Exile 2 passive skill tree, allocate points, and experiment with different build paths.",
+		highlightSelector: "ScreenPassiveTree",
 		position: "center",
 	},
 	{
 		title: "Settings & More",
-		description: "Access settings, premium features, and customize your experience from the top bar.",
-		highlightSelector: ".DesktopHeader",
+		description:
+			"Access settings, premium features, and customize your experience from the top bar.",
+		highlightSelector: "DesktopHeader",
 		position: "top-right",
 	},
 	{
 		title: "Ready to Build!",
-		description: "Press Ctrl+T to show/hide the app in-game. Start planning your perfect build!",
+		description:
+			"Press Ctrl+T to show/hide the app in-game. Start planning your perfect build!",
 		position: "center",
 	},
 ];
@@ -88,8 +98,11 @@ export function FTUE({ className }: FTUEProps) {
 	// Update spotlight position when step changes
 	useEffect(() => {
 		if (step.highlightSelector) {
+			if (step.highlightSelector === "Navigation") {
+				console.log(`Current Step Highlight: ${step.highlightSelector}`);
+			}
 			const updateSpotlight = () => {
-				const element = document.querySelector(step.highlightSelector!);
+				const element = document.getElementById(step.highlightSelector!);
 				if (element) {
 					const rect = element.getBoundingClientRect();
 					setSpotlightStyle({
@@ -115,15 +128,17 @@ export function FTUE({ className }: FTUEProps) {
 				clearTimeout(timeoutId);
 			};
 		}
-	}, [currentStep, step.highlightSelector]);
+	}, [step.highlightSelector]);
 
 	return (
 		<div className={classNames("FTUE", className)}>
 			<button className="close" onClick={close} />
 			<div className="drag" onMouseDown={drag} />
 
-			{/* Dark overlay */}
-			<div className="ftue-overlay" onClick={nextStep} />
+			{/* Dark overlay - only show when no spotlight */}
+			{!step.highlightSelector && (
+				<div className="ftue-overlay" onClick={nextStep} />
+			)}
 
 			{/* Spotlight highlight */}
 			{step.highlightSelector && (
@@ -135,19 +150,27 @@ export function FTUE({ className }: FTUEProps) {
 			)}
 
 			{/* Tooltip */}
-			<div className={classNames("ftue-tooltip", `ftue-tooltip-${step.position}`)}>
+			<div
+				className={classNames("ftue-tooltip", `ftue-tooltip-${step.position}`)}
+			>
 				<div className="ftue-tooltip-content">
 					<h2>{step.title}</h2>
 					<p>{step.description}</p>
 
 					<div className="ftue-tooltip-actions">
 						{!isFirstStep && (
-							<button className="ftue-btn ftue-btn-secondary" onClick={prevStep}>
+							<button
+								className="ftue-btn ftue-btn-secondary"
+								onClick={prevStep}
+							>
 								Back
 							</button>
 						)}
 						<button
-							className={classNames("ftue-btn", isLastStep ? "ftue-btn-cta" : "ftue-btn-primary")}
+							className={classNames(
+								"ftue-btn",
+								isLastStep ? "ftue-btn-cta" : "ftue-btn-primary",
+							)}
 							onClick={nextStep}
 						>
 							{isLastStep ? "Get started" : isFirstStep ? "Start tour" : "Next"}
@@ -159,7 +182,9 @@ export function FTUE({ className }: FTUEProps) {
 						{TOUR_STEPS.map((_, index) => (
 							<button
 								key={index}
-								className={classNames("ftue-progress-dot", { active: index === currentStep })}
+								className={classNames("ftue-progress-dot", {
+									active: index === currentStep,
+								})}
 								onClick={() => setCurrentStep(index)}
 								aria-label={`Go to step ${index + 1}`}
 							/>

@@ -2,20 +2,24 @@
   position: relative;
   height: 100vh;
   background: var(--surface-surface-pure);
+  display: grid;
+  grid-template-columns: 116px 1fr;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "header header"
+    "navigation content";
+
+  .DesktopHeader {
+    grid-area: header;
+  }
 
   .Navigation {
-    position: absolute;
-    left: 0;
-    top: 30px;
-    bottom: 0;
+    grid-area: navigation;
+    overflow: hidden;
   }
 
   .desktop-screen {
-    position: absolute;
-    top: 30px;
-    left: 116px;
-    right: 0;
-    bottom: 0;
+    grid-area: content;
     overflow: hidden;
   }
 
@@ -50,7 +54,7 @@
 
   .desktop-toaster {
     position: absolute;
-    left: 130px;
+    left: calc(116px + 14px);
     right: 430px;
     bottom: 40px;
     margin: auto;
@@ -58,9 +62,14 @@
   }
 
   .desktop-ad-premium {
-    position: absolute;
+    position: fixed;
     right: 15px;
     bottom: 15px;
     z-index: 2;
+    pointer-events: none;
+
+    > * {
+      pointer-events: all;
+    }
   }
 }

@@ -78,7 +78,7 @@ export function ScreenPassiveTree({ className }: ScreenPassiveTreeProps) {
 	}, [eventBus]);
 
 	return (
-		<div className={classNames("ScreenPassiveTree", className)}>
+		<div className={classNames("ScreenPassiveTree", className)} id="ScreenPassiveTree">
 			<div className="primary">
 				<div id="tree-container" ref={treeContainerRef}></div>
 				<div id="node-tooltip" style={{ display: "none" }}>

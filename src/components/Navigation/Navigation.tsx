@@ -21,7 +21,7 @@ export function Navigation({ className }: NavigationProps) {
 	};
 
 	return (
-		<div className={classNames("menu-navigation", className)}>
+		<div className={classNames("menu-navigation", className)} id="Navigation">
 			<button
 				className={classNames("menu-item", {
 					selected: screen === kAppScreens.Main,
