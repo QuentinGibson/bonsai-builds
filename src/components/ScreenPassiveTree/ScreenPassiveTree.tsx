@@ -113,13 +113,14 @@ export function ScreenPassiveTree({ className }: ScreenPassiveTreeProps) {
 							<label htmlFor="class-dropdown">Starting Class</label>
 							<select id="class-dropdown">
 								<option value="">-- Select Class --</option>
+								<option value="47175">Warrior</option>
+								<option value="50459">Ranger</option>
+								<option value="50459">Huntress</option>
 								<option value="50986">Mercenary</option>
 								<option value="54447">Sorceress</option>
 								<option value="54447">Witch</option>
-								<option value="50459">Ranger</option>
-								<option value="50459">Huntress</option>
-								<option value="47175">Warrior</option>
 								<option value="44683">Monk</option>
+								<option value="61525">Druid</option>
 							</select>
 						</div>
 

@@ -50,102 +50,87 @@ export class PassiveTreeManager {
     this.eventBus = eventBus
   }
 
-  // Ascendancy data - full data from original
+  // Ascendancy data - generated from PoB 0.4.0d tree.json
+  // Main tree scaled 1.5× so center is clear; transforms negate each
+  // cluster's center, placing them at (0,0) in the middle of the tree.
   private readonly ascendancyData: Record<string, { nodes: string[], transform: string }> = {
-    'Druid1': { nodes: ['378', '4197', '5571', '11335', '15275', '21284', '25092', '30904', '32905', '34313', '37782', '39659', '42761', '47190', '52374', '55135', '56505'], transform: 'translate(20902.97, 2104.17)' },
-    'Druid2': { nodes: ['1855', '16204', '26063', '28022', '28745', '33824', '35535', '35762', '35920', '42253', '46654', '54512', '56933', '58646', '61722', '61983', '62523'], transform: 'translate(18777.23, 2154.21)' },
-    'Druid3': { nodes: ['2573', '6830', '12816', '13752', '19259', '20041', '28429', '31579', '33582', '35311', '35388', '39614', '39772', '44207', '55382', '59091', '60599'], transform: 'translate(16901.77, 2885.56)' },
-    'Duelist1': { nodes: ['7046', '12098', '23826', '25913', '31717', '32222', '38949', '40407', '48546', '57256', '57973', '59474', '61500', '61889', '62386', '62674', '63843'], transform: 'translate(-707.75, -16494.29)' },
-    'Duelist2': { nodes: ['3731', '7040', '14460', '15395', '19198', '29718', '30474', '36189', '39210', '39383', '40002', '40226', '52006', '55891', '60122', '60949', '62406'], transform: 'translate(185.29, -18157.20)' },
-    'Duelist3': { nodes: ['429', '467', '2375', '3198', '3610', '10889', '16700', '27311', '33436', '35088', '36503', '40548', '42683', '43326', '47676', '48446', '62573'], transform: 'translate(-2366.69, -18279.04)' },
-    'Huntress1': { nodes: ['528', '2702', '3065', '5563', '6109', '7979', '9294', '19233', '35033', '35187', '41008', '41736', '42441', '43095', '46071', '47312', '55796', '60662', '63254'], transform: 'translate(-18575.13, -5199.97)' },
-    'Huntress2': { nodes: ['765', '4367', '5733', '21519', '26294', '27773', '27841', '28254', '37769', '39887', '41085', '41401', '45228', '46070', '56489', '62424', '62702', '62743', '63493'], transform: 'translate(-18114.96, -6951.15)' },
-    'Huntress3': { nodes: ['3223', '4891', '7068', '11776', '17058', '18280', '22661', '30233', '34785', '36365', '37046', '37972', '42017', '58149', '58574', '60859', '62804'], transform: 'translate(-20964.17, -7459.53)' },
-    'Marauder1': { nodes: ['8532', '9842', '12004', '12389', '13216', '13434', '14199', '16732', '28460', '28814', '31553', '33810', '34881', '41136', '42816', '62672', '65136'], transform: 'translate(15638.85, -7553.92)' },
-    'Marauder2': { nodes: ['4615', '6207', '6799', '12261', '14143', '21343', '21651', '25495', '28539', '31425', '36598', '40246', '40358', '43012', '44561', '54579', '65098'], transform: 'translate(16899.11, -9526.40)' },
-    'Marauder3': { nodes: ['11674', '12411', '12826', '18068', '18654', '21773', '23647', '23860', '30817', '31558', '38626', '47642', '47952', '51916', '52088', '61057', '63748'], transform: 'translate(14544.79, -9493.43)' },
-    'Mercenary1': { nodes: ['762', '1988', '4086', '4245', '10371', '12054', '15044', '16249', '24696', '29162', '30151', '32560', '32637', '36252', '37523', '42845', '44371', '44746', '46522', '54838', '54892'], transform: 'translate(5755.04, -16850.34)' },
-    'Mercenary2': { nodes: ['3704', '6935', '7120', '8272', '17646', '20830', '25172', '32559', '34501', '37078', '38601', '40719', '43131', '46535', '51737', '61897', '61973'], transform: 'translate(7039.73, -19148.85)' },
-    'Mercenary3': { nodes: ['1442', '3084', '11641', '14429', '18146', '30996', '32952', '34882', '36728', '36822', '37397', '45248', '53108', '53762', '55536', '55582', '57819', '58591', '60287', '63259'], transform: 'translate(4549.85, -19004.77)' },
-    'Monk1': { nodes: ['1739', '11495', '17356', '19370', '20437', '34081', '36643', '37604', '39552', '39595', '41751', '51546', '52295', '53280', '57449', '61586', '65228'], transform: 'translate(-14877.93, 5829.63)' },
-    'Monk2': { nodes: ['7621', '8143', '9994', '12876', '13065', '16100', '17268', '23415', '23587', '25434', '27686', '29133', '44357', '52448', '55611', '57181', '63236', '63713', '64031', '65173'], transform: 'translate(-14707.01, 3219.70)' },
-    'Monk3': { nodes: ['74', '664', '1347', '3781', '11771', '17923', '18826', '24475', '25779', '25781', '25885', '26283', '31116', '32771', '34817', '36788', '41076', '47344', '50098', '52395', '56331', '59759'], transform: 'translate(-17152.45, 4581.62)' },
-    'Ranger1': { nodes: ['30', '3987', '5817', '12033', '23508', '24226', '24295', '29871', '35801', '37336', '39723', '41875', '42416', '46854', '46990', '49165', '59542', '59913', '61461'], transform: 'translate(-14764.13, -4868.33)' },
-    'Ranger2': { nodes: ['2373', '5363', '7336', '9529', '11023', '14957', '21719', '24665', '30837', '33201', '34963', '42936', '43835', '47937', '48655', '50878', '55373'], transform: 'translate(-13334.08, -6839.73)' },
-    'Ranger3': { nodes: ['16', '40', '1583', '4495', '9710', '9798', '12183', '12795', '13675', '14508', '16433', '18940', '24868', '29074', '33736', '36676', '38004', '39292', '41619', '46454', '49503', '56618', '57141', '57253', '58379', '61804', '61991'], transform: 'translate(-16059.38, -7450)' },
-    'Shadow1': { nodes: ['1053', '5162', '10414', '11312', '12799', '19530', '20159', '22050', '25344', '29307', '30998', '33215', '36460', '42596', '43404', '49159', '63282'], transform: 'translate(-13620.01, 10352.87)' },
-    'Shadow2': { nodes: ['1226', '1894', '4991', '13317', '15622', '27091', '29322', '30803', '36668', '37563', '38263', '42151', '45406', '52001', '56451', '58418', '60377'], transform: 'translate(-11961.38, 8422.80)' },
-    'Shadow3': { nodes: ['2357', '6971', '9707', '12504', '13794', '28353', '30024', '30145', '37921', '38102', '42657', '45769', '48915', '50198', '59432', '62818', '64016'], transform: 'translate(-14416.30, 8512.86)' },
-    'Sorceress1': { nodes: ['2857', '7246', '7998', '8867', '12488', '12882', '13673', '18849', '25618', '29398', '38578', '39204', '39640', '40721', '42522', '44484', '49189', '49759', '61985', '64789', '65413'], transform: 'translate(3808.09, 16481.53)' },
-    'Sorceress2': { nodes: ['1579', '3605', '10731', '10987', '18678', '22147', '26638', '27990', '28153', '32856', '42035', '43128', '49049', '50219', '54194', '58747', '63002'], transform: 'translate(5769.88, 14953.65)' },
-    'Sorceress3': { nodes: ['2810', '8305', '9843', '10561', '13289', '14131', '20701', '23265', '25653', '25683', '25919', '30265', '32705', '34207', '35880', '36096', '36109', '36891', '42034', '43426', '45602', '46091', '54042', '56783', '56857', '64200', '64223', '64591'], transform: 'translate(2746.37, 14654.52)' },
-    'Templar1': { nodes: ['2275', '4986', '13663', '15918', '21974', '23443', '23732', '25881', '33239', '35715', '35998', '41311', '44889', '46103', '47526', '63633', '63764'], transform: 'translate(22256.96, 6513.50)' },
-    'Templar2': { nodes: ['443', '2187', '9216', '15462', '18096', '20211', '21676', '23641', '26353', '28385', '32191', '45846', '47628', '49398', '51455', '54063', '62882'], transform: 'translate(19756.13, 6783.25)' },
-    'Templar3': { nodes: ['950', '7659', '10763', '12040', '21448', '27155', '31686', '38100', '41624', '48905', '48936', '51122', '51742', '55300', '56468', '59905', '65044'], transform: 'translate(17296.97, 6653.86)' },
-    'Warrior1': { nodes: ['3762', '12000', '13715', '19424', '24807', '27418', '29323', '30115', '32534', '35453', '38014', '42275', '51690', '56842', '59372', '59540', '60634'], transform: 'translate(17797.64, -3715.46)' },
-    'Warrior2': { nodes: ['1994', '6127', '10072', '18585', '23005', '25935', '33812', '36659', '38769', '39365', '39411', '40915', '47097', '48682', '49380', '52068', '58704'], transform: 'translate(20752.06, -4674.49)' },
-    'Warrior3': { nodes: ['110', '5386', '5852', '8525', '9988', '9997', '13772', '14960', '16276', '20195', '20895', '22541', '22908', '25438', '47184', '47236', '48537', '49340', '57959', '60298', '60913', '61039', '63401', '64962'], transform: 'translate(21205.86, -7255.40)' },
-    'Witch1': { nodes: ['770', '7793', '8854', '10694', '13174', '17754', '18158', '18348', '19482', '23880', '24039', '24135', '25239', '32699', '34419', '36564', '39470', '46016', '46644', '61267', '63484', '63894', '64379'], transform: 'translate(306.38, 17711.22)' },
-    'Witch2': { nodes: ['3165', '8415', '23416', '26282', '26383', '27667', '30071', '30117', '31223', '47442', '48551', '50192', '52703', '56162', '59342', '59822', '62388', '65518'], transform: 'translate(-2442.15, 17658.99)' },
-    'Witch3': { nodes: ['59', '2516', '2877', '2995', '8611', '17788', '20772', '23352', '23710', '26085', '28431', '33141', '33570', '36696', '39241', '51142', '58751', '58932', '62797'], transform: 'translate(-5240.12, 17902.15)' }
+    'Deadeye': { nodes: ['30', '3987', '5817', '12033', '23508', '24226', '24295', '29871', '35801', '37336', '39723', '41875', '42416', '46854', '46990', '49165', '59542', '59913', '61461'], transform: 'translate(-15794.84, -3546.05)' },
+    'Pathfinder': { nodes: ['16', '40', '1583', '9710', '9798', '12183', '12795', '14508', '16433', '18940', '24868', '29074', '33736', '36676', '38004', '39292', '41619', '46454', '49503', '56618', '57141', '57253', '58379', '61991'], transform: 'translate(-14882.62, -6487.42)' },
+    'Amazon': { nodes: ['528', '2702', '3065', '5563', '6109', '7979', '9294', '19233', '35033', '35187', '41008', '41736', '42441', '43095', '46071', '47312', '55796', '60662', '63254'], transform: 'translate(-12808.37, -9364.84)' },
+    'Ritualist': { nodes: ['3223', '4891', '7068', '11776', '17058', '18280', '22661', '30233', '34785', '36365', '37046', '37972', '42017', '58149', '58574', '60859', '62804'], transform: 'translate(-10845.71, -11735.18)' },
+    'Titan': { nodes: ['3762', '12000', '13715', '19424', '24807', '27418', '29323', '30115', '32534', '35453', '38014', '42275', '51690', '56842', '59372', '59540', '60634'], transform: 'translate(11977.41, -10636.41)' },
+    'Warbringer': { nodes: ['1994', '6127', '10072', '18585', '23005', '25935', '33812', '36659', '38769', '39365', '39411', '40915', '47097', '48682', '49380', '52068', '58704'], transform: 'translate(14246.82, -7955.35)' },
+    'Smith of Kitava': { nodes: ['110', '5386', '5852', '8525', '9988', '9997', '13772', '14960', '16276', '20195', '20895', '22541', '22908', '25438', '47184', '47236', '48537', '49340', '57959', '60298', '60913', '61039', '63401', '64962'], transform: 'translate(15205.33, -5282.12)' },
+    'Tactician': { nodes: ['762', '1988', '4086', '4245', '10371', '12054', '15044', '16249', '24696', '29162', '30151', '32560', '32637', '36252', '37523', '42845', '44371', '44746', '46522', '54838', '54892'], transform: 'translate(-3277.38, -15697.95)' },
+    'Witchhunter': { nodes: ['3704', '6935', '7120', '8272', '17646', '20830', '25172', '32559', '34501', '37078', '38601', '40719', '43131', '46535', '51737', '61897', '61973'], transform: 'translate(-26.88, -16189.06)' },
+    'Gemling Legionnaire': { nodes: ['1442', '3084', '11641', '14429', '18146', '30996', '32952', '34882', '36728', '36822', '37397', '45248', '53108', '53762', '55536', '55582', '57819', '58591', '60287', '63259'], transform: 'translate(3250.95, -15406.05)' },
+    'Oracle': { nodes: ['378', '4197', '5571', '11335', '15275', '21284', '25092', '30904', '32905', '34313', '37782', '39659', '42761', '47190', '52374', '55135', '56505'], transform: 'translate(14279.65, 6881.06)' },
+    'Shaman': { nodes: ['1855', '16204', '26063', '28022', '28745', '33824', '35535', '35762', '35920', '42253', '46654', '54512', '56933', '58646', '61722', '61983', '62523'], transform: 'translate(12279.12, 9183.00)' },
+    'Infernalist': { nodes: ['770', '7793', '8854', '10694', '13174', '17754', '18158', '18348', '19482', '23880', '24039', '24135', '25239', '32699', '34419', '36564', '39470', '46016', '46644', '61267', '63484', '63894', '64379'], transform: 'translate(9444.91, 13185.83)' },
+    'Blood Mage': { nodes: ['3165', '8415', '23416', '26282', '26383', '27667', '30071', '30117', '31223', '47442', '48551', '50192', '52703', '56162', '59342', '59822', '62388', '65518'], transform: 'translate(6319.78, 14714.00)' },
+    'Lich': { nodes: ['59', '2516', '2877', '2995', '8611', '17788', '20772', '23352', '23710', '26085', '28431', '33141', '33570', '36696', '39241', '51142', '58751', '58932', '62797'], transform: 'translate(3396.68, 15843.95)' },
+    'Stormweaver': { nodes: ['2857', '7246', '7998', '8867', '12488', '12882', '13673', '18849', '25618', '29398', '38578', '39204', '39640', '40721', '42522', '44484', '49189', '49759', '61985', '64789', '65413'], transform: 'translate(-0.00, 16231.29)' },
+    'Chronomancer': { nodes: ['1579', '3605', '10731', '10987', '18678', '22147', '26638', '27990', '28153', '32856', '42035', '43128', '49049', '50219', '54194', '58747', '63002'], transform: 'translate(-3230.06, 15709.82)' },
+    'Disciple of Varashta': { nodes: ['2810', '8305', '9843', '10561', '13289', '14131', '20701', '23265', '25653', '25683', '30265', '32705', '34207', '35880', '36109', '36891', '43426', '45602', '46091', '56783', '56857', '64223', '64591'], transform: 'translate(-6262.26, 14753.35)' },
+    'Invoker': { nodes: ['7621', '8143', '9994', '12876', '13065', '16100', '17268', '23415', '23587', '25434', '27686', '29133', '44357', '52448', '55611', '57181', '63236', '63713', '64031', '65173'], transform: 'translate(-13267.15, 9481.90)' },
+    'Acolyte of Chayula': { nodes: ['74', '664', '1347', '3781', '11771', '17923', '18826', '24475', '25779', '25781', '25885', '26283', '31116', '32771', '34817', '36788', '41076', '47344', '50098', '52395', '56331', '59759'], transform: 'translate(-14833.95, 6460.32)' }
   }
 
   private readonly classAscendancies: Record<string, string[]> = {
-    'Warrior': ['Warrior1', 'Warrior2', 'Warrior3'],
-    'Witch': ['Witch1', 'Witch2', 'Witch3'],
-    'Ranger': ['Ranger1', 'Ranger2', 'Ranger3'],
-    'Huntress': ['Huntress1', 'Huntress2', 'Huntress3'],
-    'Mercenary': ['Mercenary1', 'Mercenary2', 'Mercenary3'],
-    'Sorceress': ['Sorceress1', 'Sorceress2', 'Sorceress3'],
-    'Monk': ['Monk1', 'Monk2', 'Monk3']
+    'Warrior': ['Titan', 'Warbringer', 'Smith of Kitava'],
+    'Ranger': ['Deadeye', 'Pathfinder'],
+    'Huntress': ['Amazon', 'Ritualist'],
+    'Mercenary': ['Tactician', 'Witchhunter', 'Gemling Legionnaire'],
+    'Sorceress': ['Stormweaver', 'Chronomancer', 'Disciple of Varashta'],
+    'Witch': ['Infernalist', 'Blood Mage', 'Lich'],
+    'Monk': ['Invoker', 'Acolyte of Chayula'],
+    'Druid': ['Oracle', 'Shaman']
   }
 
   private readonly ascendancyNames: Record<string, string> = {
-    'Warrior1': 'Titan',
-    'Warrior2': 'Warbringer',
-    'Warrior3': 'Smith of Kitava',
-    'Witch1': 'Infernalist',
-    'Witch2': 'Blood Mage',
-    'Witch3': 'Necromancer',
-    'Ranger1': 'Deadeye',
-    'Ranger2': 'Arcane Archer',
-    'Ranger3': 'Pathfinder',
-    'Huntress1': 'Amazon',
-    'Huntress2': 'Beastmaster',
-    'Huntress3': 'Ritualist',
-    'Mercenary1': 'Tactician',
-    'Mercenary2': 'Witchhunter',
-    'Mercenary3': 'Gemling Legionnaire',
-    'Sorceress1': 'Stormweaver',
-    'Sorceress2': 'Chronomancer',
-    'Sorceress3': 'Disciple of the Djinn',
-    'Monk1': 'Martial Artist',
-    'Monk2': 'Invoker',
-    'Monk3': 'Acolyte of Chayula'
+    'Deadeye': 'Deadeye',
+    'Pathfinder': 'Pathfinder',
+    'Amazon': 'Amazon',
+    'Ritualist': 'Ritualist',
+    'Titan': 'Titan',
+    'Warbringer': 'Warbringer',
+    'Smith of Kitava': 'Smith of Kitava',
+    'Tactician': 'Tactician',
+    'Witchhunter': 'Witchhunter',
+    'Gemling Legionnaire': 'Gemling Legionnaire',
+    'Oracle': 'Oracle',
+    'Shaman': 'Shaman',
+    'Infernalist': 'Infernalist',
+    'Blood Mage': 'Blood Mage',
+    'Lich': 'Lich',
+    'Stormweaver': 'Stormweaver',
+    'Chronomancer': 'Chronomancer',
+    'Disciple of Varashta': 'Disciple of Varashta',
+    'Invoker': 'Invoker',
+    'Acolyte of Chayula': 'Acolyte of Chayula'
   }
 
   private readonly ascendancyStartNodes: Record<string, string> = {
-    'Warrior1': '32534',
-    'Warrior2': '33812',
-    'Warrior3': '5852',
-    'Witch1': '32699',
-    'Witch2': '59822',
-    'Witch3': '23710',
-    'Ranger1': '46990',
-    'Ranger2': '24665',
-    'Ranger3': '1583',
-    'Huntress1': '41736',
-    'Huntress2': '63493',
-    'Huntress3': '36365',
-    'Mercenary1': '36252',
-    'Mercenary2': '7120',
-    'Mercenary3': '55536',
-    'Sorceress1': '40721',
-    'Sorceress2': '22147',
-    'Sorceress3': '8305',
-    'Monk1': '11495',
-    'Monk2': '9994',
-    'Monk3': '74'
+    'Deadeye': '46990',
+    'Pathfinder': '1583',
+    'Amazon': '41736',
+    'Ritualist': '36365',
+    'Titan': '32534',
+    'Warbringer': '33812',
+    'Smith of Kitava': '5852',
+    'Tactician': '36252',
+    'Witchhunter': '7120',
+    'Gemling Legionnaire': '55536',
+    'Oracle': '42761',
+    'Shaman': '35535',
+    'Infernalist': '32699',
+    'Blood Mage': '59822',
+    'Lich': '23710',
+    'Stormweaver': '40721',
+    'Chronomancer': '22147',
+    'Disciple of Varashta': '8305',
+    'Invoker': '9994',
+    'Acolyte of Chayula': '74'
   }
 
   async initialize(container: HTMLElement) {
@@ -318,10 +303,10 @@ export class PassiveTreeManager {
     if (!this.svg) return
 
     const baseViewBox = {
-      x: -11326.103852910494,
-      y: -11389.628444746082,
-      width: 23256.18556701031,
-      height: 20315.9793814433
+      x: -27125,
+      y: -26721,
+      width: 54401,
+      height: 54020
     }
 
     const width = baseViewBox.width / this.zoom
@@ -347,7 +332,7 @@ export class PassiveTreeManager {
       this.panX += dx * 50 / this.zoom
       this.panY += dy * 50 / this.zoom
 
-      const maxPan = 30000
+      const maxPan = 45000
       this.panX = Math.max(-maxPan, Math.min(maxPan, this.panX))
       this.panY = Math.max(-maxPan, Math.min(maxPan, this.panY))
 
@@ -376,10 +361,10 @@ export class PassiveTreeManager {
     const normY = mouseY / rect.height
 
     const baseViewBox = {
-      x: -11326.103852910494,
-      y: -11389.628444746082,
-      width: 23256.18556701031,
-      height: 20315.9793814433
+      x: -27125,
+      y: -26721,
+      width: 54401,
+      height: 54020
     }
 
     // Calculate the point in SVG coordinates that the mouse is currently over
@@ -402,7 +387,7 @@ export class PassiveTreeManager {
     this.panY = (baseViewBox.y + normY * newHeight - svgY)
 
     // Apply pan limits
-    const maxPan = 30000
+    const maxPan = 45000
     this.panX = Math.max(-maxPan, Math.min(maxPan, this.panX))
     this.panY = Math.max(-maxPan, Math.min(maxPan, this.panY))
 
@@ -815,7 +800,7 @@ export class PassiveTreeManager {
         this.currentSelectedAscendancy = null
 
         Object.keys(this.ascendancyData).forEach(ascName => {
-          const group = this.svg!.querySelector(`#ascendancy-${ascName}`)
+          const group = this.svg!.querySelector(`[id="ascendancy-${ascName}"]`)
           if (group) (group as HTMLElement).style.display = 'none'
         })
 
@@ -876,13 +861,13 @@ export class PassiveTreeManager {
 
         // Hide all ascendancies
         Object.keys(this.ascendancyData).forEach(ascName => {
-          const group = this.svg!.querySelector(`#ascendancy-${ascName}`)
+          const group = this.svg!.querySelector(`[id="ascendancy-${ascName}"]`)
           if (group) (group as HTMLElement).style.display = 'none'
         })
 
         // Show selected ascendancy
         if (selectedAscendancy) {
-          const group = this.svg!.querySelector(`#ascendancy-${selectedAscendancy}`)
+          const group = this.svg!.querySelector(`[id="ascendancy-${selectedAscendancy}"]`)
           if (group) {
             (group as HTMLElement).style.display = 'block'
             this.currentSelectedAscendancy = selectedAscendancy
@@ -1265,7 +1250,7 @@ export class PassiveTreeManager {
 
     // Hide all ascendancy groups first
     Object.keys(this.ascendancyData).forEach(ascName => {
-      const group = this.svg?.querySelector(`#ascendancy-${ascName}`)
+      const group = this.svg?.querySelector(`[id="ascendancy-${ascName}"]`)
       if (group) (group as HTMLElement).style.display = 'none'
     })
 
@@ -1274,7 +1259,7 @@ export class PassiveTreeManager {
       ascendancyDropdown.value = this.currentSelectedAscendancy
 
       // Show the selected ascendancy group
-      const group = this.svg?.querySelector(`#ascendancy-${this.currentSelectedAscendancy}`)
+      const group = this.svg?.querySelector(`[id="ascendancy-${this.currentSelectedAscendancy}"]`)
       if (group) {
         (group as HTMLElement).style.display = 'block'
       }
