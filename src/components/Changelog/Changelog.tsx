@@ -30,12 +30,17 @@ export function Changelog({ className, onClose }: ChangelogProps) {
 			<h3>Change Log v.{version}</h3>
 
 			<div className="content">
-				<p>
-					Change log points:
-					<br />
-					In bullets, try to show the main points you would like to pass to your
-					user.
-				</p>
+				<h4>0.4.0d</h4>
+				<ul>
+					<li>Fixed ascendancy trees not displaying for classes with multi-word names (Blood Mage, Smith of Kitava, Gemling Legionnaire, Acolyte of Chayula, Disciple of Varashta)</li>
+				</ul>
+
+				<h4>0.4.0c</h4>
+				<ul>
+					<li>Fixed passive tree errors and added dock image</li>
+					<li>Fixed errors on checklist</li>
+					<li>Fixed ad errors</li>
+				</ul>
 			</div>
 
 			<div className="actions">
