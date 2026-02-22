@@ -2,9 +2,10 @@
   display: flex;
   align-items: center;
   position: relative;
-  height: 30px;
-  padding-left: 8px;
-  background: #004A12;
+  height: 34px;
+  padding-left: 12px;
+  background: #0a0806;
+  border-bottom: 1px solid rgba(200, 149, 45, 0.2);
 
   &::before {
     content: '';
@@ -16,6 +17,8 @@
     background: url('../../images/bonsai-logo-opt.svg') no-repeat 0 center;
     background-size: contain;
     pointer-events: none;
+    opacity: 0.92;
+    filter: drop-shadow(0 0 6px rgba(200, 149, 45, 0.18));
   }
 
   .status {
@@ -41,18 +44,19 @@
     margin-left: auto;
     margin-right: 123px;
     color: var(--text-text-tertiary);
-    font-size: 14px;
+    font-size: 11px;
     font-weight: 600;
-    line-height: 20px;
-    letter-spacing: .56px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    font-family: var(--font-display);
     transition: color 150ms ease-in-out;
 
     &::before {
       content: '';
       display: block;
-      width: 20px;
-      height: 20px;
-      margin-right: 8px;
+      width: 16px;
+      height: 16px;
+      margin-right: 6px;
       background-color: var(--text-text-tertiary);
       mask: url('../../images/window-feedback.svg') no-repeat center center;
       mask-size: contain;
@@ -60,10 +64,10 @@
     }
 
     &:hover {
-      color: var(--text-text-secondary);
+      color: var(--accent-gold);
 
       &::before {
-        background-color: var(--text-text-secondary);
+        background-color: var(--accent-gold);
       }
     }
   }
@@ -83,15 +87,15 @@
       bottom: 0;
       margin: auto;
       width: 1px;
-      height: 20px;
-      background-color: var(--border-border-tertiary);
+      height: 18px;
+      background-color: rgba(200, 149, 45, 0.2);
     }
   }
 
   .window-control {
     position: relative;
     width: 30px;
-    height: 30px;
+    height: 34px;
     transition: background-color 150ms ease-in-out;
 
     &::before {
@@ -100,7 +104,7 @@
       width: 100%;
       height: 100%;
       mask: center center no-repeat;
-      mask-size: 20px;
+      mask-size: 18px;
       background-color: var(--window-icon-secondary);
       transition: background-color 150ms ease-in-out;
     }
@@ -109,7 +113,7 @@
       background-color: var(--hover-hover-secondary-dark);
 
       &::before {
-        background-color: var(--window-icon-primary);
+        background-color: var(--accent-gold);
       }
     }
 
@@ -135,7 +139,7 @@
       }
 
       &:hover {
-        background-color: var(--dev-console-codes-primary-primary-color);
+        background-color: var(--surface-surface-brand);
 
         &::before {
           background: var(--window-icon-pure);
@@ -149,25 +153,32 @@
     top: 100%;
     right: 60px;
     z-index: 10000001;
-    border: 1px solid var(--border-border-tertiary);
-    background-color: var(--surface-surface-tertiary);
+    border: 1px solid rgba(200, 149, 45, 0.25);
+    background-color: #1a1710;
     visibility: hidden;
     opacity: 0;
     transition: all 150ms ease-in-out;
+    min-width: 120px;
 
     button {
       position: relative;
       width: 100%;
-      padding: 8px 12px;
-      transition: background-color 150ms ease-in-out;
+      padding: 8px 14px;
+      font-size: 11px;
+      font-family: var(--font-display);
+      letter-spacing: 0.8px;
+      color: var(--text-text-tertiary);
+      text-transform: uppercase;
+      transition: all 150ms ease-in-out;
 
       &:hover {
-        background-color: var(--hover-hover-secondary-dark);
+        background-color: rgba(200, 149, 45, 0.1);
+        color: var(--accent-gold);
       }
     }
   }
 
-  .window-control.help:hover~.help-dropdown,
+  .window-control.help:hover ~ .help-dropdown,
   .help-dropdown:hover {
     visibility: visible;
     opacity: 1;

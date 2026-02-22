@@ -24,7 +24,7 @@ export function Popup() {
   const { popup } = useContext(CommonStoreContext)
 
   // State for edit popups
-  const [editBuildSetData, setEditBuildSetData] = useState<{ id: string; name: string } | null>(null)
+  const [editBuildSetData, setEditBuildSetData] = useState<{ id: string; name: string; ascendancy: string | null } | null>(null)
   const [editBreakpointData, setEditBreakpointData] = useState<{ buildSetId: string; breakpointId: string; name: string; level: number } | null>(null)
 
   const setPopup = useCallback((popup: kAppPopups | null) => {
@@ -66,9 +66,10 @@ export function Popup() {
         if (editBuildSetData) {
           el = <EditBuildSet
             currentName={editBuildSetData.name}
+            currentAscendancy={editBuildSetData.ascendancy}
             onClose={() => setPopup(null)}
-            onSubmit={(name) => {
-              eventBus.emit('editBuildSet', { id: editBuildSetData.id, name })
+            onSubmit={(name, ascendancy) => {
+              eventBus.emit('editBuildSet', { id: editBuildSetData.id, name, ascendancy })
             }}
           />
         }
@@ -135,7 +136,7 @@ export function Popup() {
 
   // Listen for edit popup events
   useEffect(() => {
-    const handleOpenEditBuildSet = (data: { id: string; name: string }) => {
+    const handleOpenEditBuildSet = (data: { id: string; name: string; ascendancy: string | null }) => {
       setEditBuildSetData(data)
       setPopup(kAppPopups.EditBuildSet)
     }

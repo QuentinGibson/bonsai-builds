@@ -74,6 +74,33 @@
     }
   }
 
+  .select {
+    display: block;
+    width: 100%;
+    min-height: 32px;
+    padding: 5px 9px;
+    line-height: 20px;
+    border: 1px solid var(--border-border-tertiary);
+    background: var(--surface-surface-secondary);
+    color: var(--text-text-primary);
+    font-size: 14px;
+    letter-spacing: 0.56px;
+    cursor: pointer;
+    transition: border-color 150ms ease-in-out;
+
+    &:hover,
+    &:focus {
+      border-color: var(--border-border-primary);
+      outline: none;
+    }
+
+    option,
+    optgroup {
+      background: var(--surface-surface-secondary);
+      color: var(--text-text-primary);
+    }
+  }
+
   .char-length {
     margin-top: 4px;
     color: var(--text-text-tertiary);

@@ -1,19 +1,95 @@
 .menu-navigation {
   display: flex;
   flex-direction: column;
-  justify-content: start;
+  align-items: stretch;
   width: 100%;
   height: 100%;
+  background: #0a0806;
+  border-right: 1px solid rgba(200, 149, 45, 0.12);
+  padding-top: 6px;
 
   .menu-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 14px 8px 12px;
+    font-size: 8.5px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: #6a5f50;
+    cursor: pointer;
+    transition: color 0.2s ease, background 0.2s ease;
+
+    svg {
+      font-size: 20px;
+      transition: color 0.2s ease;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 18%;
+      height: 64%;
+      width: 2px;
+      background: var(--accent-gold);
+      border-radius: 0 1px 1px 0;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    &:hover {
+      color: var(--accent-gold);
+      background: rgba(200, 149, 45, 0.06);
+
+      svg {
+        color: var(--accent-gold);
+      }
+    }
+
+    &.selected {
+      color: var(--accent-gold);
+      background: rgba(200, 149, 45, 0.07);
+
+      svg {
+        color: var(--accent-gold);
+      }
+
+      &::before {
+        opacity: 1;
+      }
+    }
+  }
+
+  .nav-toggle-btn {
+    margin-top: auto;
     display: flex;
     align-items: center;
-    font-size: 18px;
-    margin-left: 4px;
+    justify-content: center;
+    padding: 10px 8px;
+    font-size: 14px;
+    color: #4a4035;
+    cursor: pointer;
+    transition: color 0.2s ease, background 0.2s ease;
+    border-top: 1px solid rgba(200, 149, 45, 0.08);
 
-  }
-  .menu-icon {
-    display: inline-block;
-    margin-right: 6px;
+    svg {
+      font-size: 14px;
+      transition: color 0.2s ease;
+    }
+
+    &:hover {
+      color: var(--accent-gold);
+      background: rgba(200, 149, 45, 0.06);
+
+      svg {
+        color: var(--accent-gold);
+      }
+    }
   }
 }

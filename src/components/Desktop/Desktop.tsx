@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { CSSTransition, SwitchTransition } from "react-transition-group";
 
@@ -41,6 +41,8 @@ export type DesktopProps = {
 export function Desktop({ className }: DesktopProps) {
 	const eventBus = useEventBus();
 
+	const [navCollapsed, setNavCollapsed] = useState(false);
+
 	const { showChangelog, ftueSeen } = useContext(PersStoreContext);
 
 	const { screen, status } = useContext(CommonStoreContext);
@@ -71,10 +73,13 @@ export function Desktop({ className }: DesktopProps) {
 	}, [eventBus]);
 
 	return (
-		<div className={classNames("Desktop", className)}>
+		<div className={classNames("Desktop", { "nav-collapsed": navCollapsed }, className)}>
 			<DesktopHeader />
 
-			<Navigation />
+			<Navigation
+				collapsed={navCollapsed}
+				onToggle={() => setNavCollapsed((v) => !v)}
+			/>
 
 			<SwitchTransition mode="out-in">
 				<CSSTransition

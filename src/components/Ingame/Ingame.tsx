@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { CSSTransition, SwitchTransition } from "react-transition-group";
 import { kAppScreens, kAppStatus, kWindowNames } from "../../config/enums";
@@ -34,6 +34,8 @@ export type IngameProps = {
 export function Ingame({ className }: IngameProps) {
 	const eventBus = useEventBus();
 
+	const [navCollapsed, setNavCollapsed] = useState(false);
+
 	const { screen, status } = useContext(CommonStoreContext);
 
 	const ScreenComponent = useMemo(() => {
@@ -56,10 +58,13 @@ export function Ingame({ className }: IngameProps) {
 	}, [eventBus]);
 
 	return (
-		<div className={classNames("Ingame", className)}>
+		<div className={classNames("Ingame", { "nav-collapsed": navCollapsed }, className)}>
 			<DesktopHeader />
 
-			<Navigation />
+			<Navigation
+				collapsed={navCollapsed}
+				onToggle={() => setNavCollapsed((v) => !v)}
+			/>
 
 			<SwitchTransition mode="out-in">
 				<CSSTransition

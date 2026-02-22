@@ -11,6 +11,7 @@
 export interface BuildSet {
   id: string
   name: string
+  ascendancy?: string
   createdAt: number
   updatedAt: number
   breakpoints: Breakpoint[]
@@ -79,12 +80,19 @@ class BuildStorageService {
    * Update a build set's name
    */
   async updateBuildSetName(id: string, name: string): Promise<BuildSet | null> {
+    return this.updateBuildSet(id, { name })
+  }
+
+  /**
+   * Update a build set's fields (name, ascendancy, etc.)
+   */
+  async updateBuildSet(id: string, updates: Partial<Pick<BuildSet, 'name' | 'ascendancy'>>): Promise<BuildSet | null> {
     const buildSets = await this.getAllBuildSets()
     const buildSet = buildSets.find(set => set.id === id)
 
     if (!buildSet) return null
 
-    buildSet.name = name
+    Object.assign(buildSet, updates)
     buildSet.updatedAt = Date.now()
 
     await this.saveBuildSets(buildSets)

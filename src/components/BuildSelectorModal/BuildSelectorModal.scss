@@ -1,0 +1,221 @@
+.BuildSelectorModal {
+	position: fixed;
+	inset: 0;
+	z-index: 1000;
+	background: rgba(0, 0, 0, 0.75);
+	backdrop-filter: blur(4px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	.modal-panel {
+		background: #0e0c08;
+		border: 1px solid rgba(200, 149, 45, 0.2);
+		border-radius: 6px;
+		padding: 24px;
+		width: min(820px, 90vw);
+		max-height: 80vh;
+		overflow-y: auto;
+		box-shadow: 0 8px 48px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(200, 149, 45, 0.06);
+
+		&::-webkit-scrollbar {
+			width: 4px;
+		}
+		&::-webkit-scrollbar-thumb {
+			background: rgba(200, 149, 45, 0.2);
+			border-radius: 2px;
+		}
+	}
+
+	.modal-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 20px;
+		padding-bottom: 14px;
+		border-bottom: 1px solid rgba(200, 149, 45, 0.18);
+	}
+
+	.modal-title {
+		font-family: var(--font-display);
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 2.5px;
+		text-transform: uppercase;
+		color: var(--accent-gold);
+	}
+
+	.modal-close {
+		width: 28px;
+		height: 28px;
+		background: transparent;
+		border: 1px solid rgba(200, 149, 45, 0.15);
+		border-radius: 4px;
+		color: rgba(200, 149, 45, 0.5);
+		font-size: 18px;
+		line-height: 1;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.15s ease;
+
+		&:hover {
+			border-color: rgba(200, 149, 45, 0.4);
+			color: var(--accent-gold);
+			background: rgba(200, 149, 45, 0.06);
+		}
+	}
+
+	.modal-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+		gap: 12px;
+	}
+
+	.build-card {
+		position: relative;
+		background: rgba(200, 149, 45, 0.03);
+		border: 1px solid rgba(200, 149, 45, 0.15);
+		border-radius: 5px;
+		padding: 14px 12px 12px;
+		cursor: pointer;
+		transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+		min-height: 88px;
+		display: flex;
+		flex-direction: column;
+		gap: 5px;
+
+		&:hover {
+			border-color: rgba(200, 149, 45, 0.4);
+			background: rgba(200, 149, 45, 0.06);
+		}
+
+		&.active {
+			border-color: rgba(200, 149, 45, 0.65);
+			background: rgba(200, 149, 45, 0.07);
+			box-shadow: 0 0 12px rgba(200, 149, 45, 0.12), inset 0 0 0 1px rgba(200, 149, 45, 0.1);
+		}
+	}
+
+	.card-actions {
+		position: absolute;
+		top: 6px;
+		right: 6px;
+		display: flex;
+		gap: 3px;
+	}
+
+	.card-action-btn {
+		width: 22px;
+		height: 22px;
+		border-radius: 3px;
+		border: 1px solid transparent;
+		background: rgba(10, 8, 6, 0.8);
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.12s ease;
+
+		&.edit-btn {
+			color: rgba(200, 149, 45, 0.6);
+			border-color: rgba(200, 149, 45, 0.2);
+
+			&:hover {
+				color: var(--accent-gold);
+				border-color: rgba(200, 149, 45, 0.5);
+				background: rgba(200, 149, 45, 0.1);
+			}
+		}
+
+		&.delete-btn {
+			color: rgba(192, 57, 43, 0.6);
+			border-color: rgba(192, 57, 43, 0.2);
+
+			&:hover {
+				color: #e74c3c;
+				border-color: rgba(192, 57, 43, 0.5);
+				background: rgba(192, 57, 43, 0.1);
+			}
+		}
+	}
+
+	.card-name {
+		font-family: var(--font-display);
+		font-size: 12px;
+		font-weight: 600;
+		color: #e0d5c0;
+		letter-spacing: 0.3px;
+		padding-right: 40px; // make room for action buttons
+	}
+
+	.card-ascendancy {
+		font-size: 10px;
+		color: rgba(200, 149, 45, 0.7);
+		font-family: var(--font-body);
+
+		&.unset {
+			color: rgba(176, 160, 128, 0.3);
+			font-style: italic;
+		}
+	}
+
+	.card-meta {
+		display: flex;
+		gap: 6px;
+		align-items: center;
+		margin-top: auto;
+	}
+
+	.card-levels {
+		font-size: 9px;
+		color: rgba(176, 160, 128, 0.7);
+		font-family: var(--font-display);
+		letter-spacing: 0.5px;
+	}
+
+	.card-steps {
+		font-size: 9px;
+		color: rgba(176, 160, 128, 0.5);
+		font-family: var(--font-display);
+		letter-spacing: 0.5px;
+	}
+
+	.new-card {
+		border-style: dashed;
+		border-color: rgba(200, 149, 45, 0.2);
+		background: transparent;
+		align-items: center;
+		justify-content: center;
+		gap: 6px;
+
+		&:hover {
+			border-color: rgba(200, 149, 45, 0.45);
+			background: rgba(200, 149, 45, 0.04);
+		}
+	}
+
+	.new-card-icon {
+		font-size: 24px;
+		font-weight: 300;
+		color: rgba(200, 149, 45, 0.4);
+		line-height: 1;
+		transition: color 0.15s ease;
+	}
+
+	.new-card-label {
+		font-family: var(--font-display);
+		font-size: 9px;
+		font-weight: 600;
+		letter-spacing: 1.5px;
+		text-transform: uppercase;
+		color: rgba(200, 149, 45, 0.4);
+		transition: color 0.15s ease;
+	}
+
+	.new-card:hover .new-card-icon,
+	.new-card:hover .new-card-label {
+		color: rgba(200, 149, 45, 0.7);
+	}
+}

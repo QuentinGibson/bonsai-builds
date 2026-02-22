@@ -2,6 +2,12 @@
 
 import { buildStorage, BuildSet } from '../../services/buildStorage'
 
+export type BuildStateSnapshot = {
+  buildSets: BuildSet[]
+  currentBuildSetId: string | null
+  currentBreakpointId: string | null
+}
+
 export interface TreeData {
   nodes: {
     [nodeId: string]: NodeData
@@ -38,16 +44,31 @@ export class PassiveTreeManager {
   private openAddBuildSetPopup: () => void
   private openAddBreakpointPopup: () => void
   private eventBus: any
+  private onStateChange?: (state: BuildStateSnapshot) => void
 
   // Build management
   private buildSets: BuildSet[] = []
   private currentBuildSetId: string | null = null
   private currentBreakpointId: string | null = null
 
-  constructor(openAddBuildSetPopup: () => void, openAddBreakpointPopup: () => void, eventBus: any) {
+  constructor(
+    openAddBuildSetPopup: () => void,
+    openAddBreakpointPopup: () => void,
+    eventBus: any,
+    onStateChange?: (state: BuildStateSnapshot) => void
+  ) {
     this.openAddBuildSetPopup = openAddBuildSetPopup
     this.openAddBreakpointPopup = openAddBreakpointPopup
     this.eventBus = eventBus
+    this.onStateChange = onStateChange
+  }
+
+  private notifyStateChange() {
+    this.onStateChange?.({
+      buildSets: [...this.buildSets],
+      currentBuildSetId: this.currentBuildSetId,
+      currentBreakpointId: this.currentBreakpointId
+    })
   }
 
   // Ascendancy data - generated from PoB 0.4.0d tree.json
@@ -315,6 +336,8 @@ export class PassiveTreeManager {
     const y = baseViewBox.y - this.panY
 
     this.svg.setAttribute('viewBox', `${x} ${y} ${width} ${height}`)
+
+    document.dispatchEvent(new CustomEvent('treezoomchange', { detail: { zoom: this.zoom } }))
   }
 
   private handleMouseDown(e: MouseEvent) {
@@ -892,11 +915,27 @@ export class PassiveTreeManager {
       })
     }
 
-    // Reset camera button
+    // Camera overlay buttons
     const resetCameraBtn = document.getElementById('reset-camera-btn')
     if (resetCameraBtn) {
       resetCameraBtn.addEventListener('click', () => {
         this.resetCamera()
+      })
+    }
+
+    const zoomInBtn = document.getElementById('zoom-in-btn')
+    if (zoomInBtn) {
+      zoomInBtn.addEventListener('click', () => {
+        this.zoom = Math.min(10.0, this.zoom + 0.5)
+        this.updateViewBox()
+      })
+    }
+
+    const zoomOutBtn = document.getElementById('zoom-out-btn')
+    if (zoomOutBtn) {
+      zoomOutBtn.addEventListener('click', () => {
+        this.zoom = Math.max(0.5, this.zoom - 0.5)
+        this.updateViewBox()
       })
     }
   }
@@ -1019,6 +1058,7 @@ export class PassiveTreeManager {
     try {
       this.buildSets = await buildStorage.getAllBuildSets()
       this.updateBuildSetDropdown()
+      this.notifyStateChange()
     } catch (error) {
       console.error('Error loading build sets:', error)
     }
@@ -1051,6 +1091,7 @@ export class PassiveTreeManager {
       this.currentBuildSetId = null
       this.currentBreakpointId = null
       this.updateBreakpointDropdown()
+      this.notifyStateChange()
       return
     }
 
@@ -1066,6 +1107,7 @@ export class PassiveTreeManager {
         await this.loadBreakpoint(this.currentBreakpointId)
       }
     }
+    this.notifyStateChange()
   }
 
   async handleCreateBreakpoint(name: string, level: number) {
@@ -1133,11 +1175,13 @@ export class PassiveTreeManager {
   async handleBreakpointChange(breakpointId: string) {
     if (!breakpointId) {
       this.currentBreakpointId = null
+      this.notifyStateChange()
       return
     }
 
     this.currentBreakpointId = breakpointId
     await this.loadBreakpoint(breakpointId)
+    this.notifyStateChange()
   }
 
   async loadBreakpoint(breakpointId: string) {
@@ -1281,7 +1325,8 @@ export class PassiveTreeManager {
     // Emit event to open edit popup with current data
     this.eventBus.emit('openEditBuildSet', {
       id: buildSet.id,
-      name: buildSet.name
+      name: buildSet.name,
+      ascendancy: buildSet.ascendancy ?? null
     })
   }
 
@@ -1350,9 +1395,14 @@ export class PassiveTreeManager {
     }
   }
 
-  async handleEditBuildSet(id: string, name: string) {
+  async handleEditBuildSet(id: string, name: string, ascendancy?: string | null) {
     try {
-      const updatedBuildSet = await buildStorage.updateBuildSetName(id, name)
+      const updates: { name: string; ascendancy?: string } = { name }
+      if (ascendancy !== undefined) {
+        // null means explicitly cleared; string means set; undefined means don't touch
+        updates.ascendancy = ascendancy ?? undefined
+      }
+      const updatedBuildSet = await buildStorage.updateBuildSet(id, updates)
       if (updatedBuildSet) {
         console.log('Updated build set:', updatedBuildSet)
         await this.loadBuildSets()

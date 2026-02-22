@@ -8,6 +8,8 @@
     left: 0;
     top: 30px;
     bottom: 0;
+    width: 116px;
+    transition: width 0.22s ease;
   }
 
   .ingame-screen {
@@ -17,6 +19,7 @@
     right: 0;
     bottom: 0;
     overflow: hidden;
+    transition: left 0.22s ease;
   }
 
   .ingame-screen-fade {
@@ -62,5 +65,19 @@
     right: 15px;
     bottom: 15px;
     z-index: 2;
+  }
+
+  &.nav-collapsed {
+    .Navigation {
+      width: 40px;
+    }
+
+    .ingame-screen {
+      left: 40px;
+    }
+
+    .ingame-toaster {
+      left: calc(40px + 14px);
+    }
   }
 }

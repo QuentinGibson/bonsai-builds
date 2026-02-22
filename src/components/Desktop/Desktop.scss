@@ -5,6 +5,7 @@
   display: grid;
   grid-template-columns: 116px 1fr;
   grid-template-rows: auto 1fr;
+  transition: grid-template-columns 0.22s ease;
   grid-template-areas:
     "header header"
     "navigation content";
@@ -70,6 +71,14 @@
 
     > * {
       pointer-events: all;
+    }
+  }
+
+  &.nav-collapsed {
+    grid-template-columns: 40px 1fr;
+
+    .desktop-toaster {
+      left: calc(40px + 14px);
     }
   }
 }

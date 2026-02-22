@@ -4,41 +4,46 @@
 // Variables
 
 :root {
-  --text-text-pure: #fff;
-  --text-text-primary: #DFDFDF;
-  --text-text-secondary: #DFDFDF;
-  --text-text-tertiary: #BFBFBF;
-  --dev-console-codes-texts-primary-text-color: #CCC;
-  --surface-surface-brand: #D34037;
-  --surface-surface-brand-hover: #F05C48;
-  --surface-surface-primary: #202020;
-  --surface-surface-secondary: #303030;
-  --surface-surface-tertiary: #404040;
-  --surface-surface-quaternary: #505050;
-  --surface-surface-tooltip: #606060;
-  --icon-icon-primary: #DFDFDF;
-  --icon-icon-secondary: #9F9F9F;
-  --border-border-primary: #DFDFDF;
-  --border-border-secondary: #9F9F9F;
-  --border-border-tertiary: #606060;
-  --border-border-quaternary: #303030;
-  --hover-hover-secondary-dark: rgba(255, 255, 255, 0.08);
-  --hover-hover-tertiary: #505050;
-  --hover-hover-quaternary: #606060;
-  --surface-surface-pure: #000;
-  --surface-surface-tooltip: #606060;
+  --font-display: 'Cinzel', serif;
+  --font-body: 'Lato', sans-serif;
+
+  --text-text-pure: #f5f0e8;
+  --text-text-primary: #e0d5c0;
+  --text-text-secondary: #e0d5c0;
+  --text-text-tertiary: #b0a080;
+  --dev-console-codes-texts-primary-text-color: #c8bfaa;
+  --surface-surface-brand: #c0392b;
+  --surface-surface-brand-hover: #e74c3c;
+  --surface-surface-primary: #16130d;
+  --surface-surface-secondary: #1e1b13;
+  --surface-surface-tertiary: #28241a;
+  --surface-surface-quaternary: #332e22;
+  --surface-surface-tooltip: #3d3828;
+  --icon-icon-primary: #e0d5c0;
+  --icon-icon-secondary: #908070;
+  --border-border-primary: rgba(200, 149, 45, 0.5);
+  --border-border-secondary: rgba(200, 149, 45, 0.3);
+  --border-border-tertiary: rgba(200, 149, 45, 0.15);
+  --border-border-quaternary: rgba(200, 149, 45, 0.07);
+  --hover-hover-secondary-dark: rgba(200, 149, 45, 0.08);
+  --hover-hover-tertiary: #28241a;
+  --hover-hover-quaternary: #332e22;
+  --surface-surface-pure: #0a0806;
   --dev-console-codes-primary-primary-color: var(--surface-surface-brand);
-  --dev-console-codes-surfaces-pure-surface-color: #000;
-  --status-normal: #32A912;
-  --status-warning: #E07000;
-  --status-error: #FC3737;
-  --window-icon-pure: #FFF;
-  --window-icon-primary: #DFDFDF;
-  --window-icon-secondary: #BFBFBF;
+  --dev-console-codes-surfaces-pure-surface-color: #0a0806;
+  --status-normal: #27ae60;
+  --status-warning: #e67e22;
+  --status-error: #e74c3c;
+  --window-icon-pure: #f5f0e8;
+  --window-icon-primary: #e0d5c0;
+  --window-icon-secondary: #b0a080;
+  --accent-gold: #c8952d;
+  --accent-gold-bright: #f0c060;
+  --accent-gold-dim: rgba(200, 149, 45, 0.12);
 }
 
 // Fonts
-@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Montserrat:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@400;700&display=swap');
 
 // Reset
 
