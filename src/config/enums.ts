@@ -9,7 +9,8 @@ export const enum kWindowNames {
 export const enum kAppScreens {
   Main,
   Premium,
-  Settings
+  Settings,
+  Builder
 }
 
 export const enum kAppStatus {

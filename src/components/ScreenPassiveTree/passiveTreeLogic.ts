@@ -50,6 +50,7 @@ export class PassiveTreeManager {
   private buildSets: BuildSet[] = []
   private currentBuildSetId: string | null = null
   private currentBreakpointId: string | null = null
+  private initialized = false // prevents repeated auto-select on every loadBuildSets call
 
   constructor(
     openAddBuildSetPopup: () => void,
@@ -1058,9 +1059,44 @@ export class PassiveTreeManager {
     try {
       this.buildSets = await buildStorage.getAllBuildSets()
       this.updateBuildSetDropdown()
+
+      // On first load (tree initialization), auto-select the build the user had active
+      if (!this.initialized) {
+        this.initialized = true
+        const savedId = buildStorage.getCurrentBuildSetId()
+        if (savedId && this.buildSets.find(b => b.id === savedId)) {
+          await this.handleBuildSetChange(savedId)
+          // Check for a specific breakpoint requested by the Builder "Edit Tree" action
+          const pendingBpId = buildStorage.getPendingBreakpointId()
+          if (pendingBpId) {
+            buildStorage.setPendingBreakpointId(null)
+            await this.handleBreakpointChange(pendingBpId)
+          }
+          return // handleBuildSetChange / handleBreakpointChange calls notifyStateChange
+        }
+      }
+
       this.notifyStateChange()
     } catch (error) {
       console.error('Error loading build sets:', error)
+    }
+  }
+
+  /** Save the current in-memory tree state back to the active breakpoint in storage */
+  async saveCurrentBreakpoint(): Promise<boolean> {
+    if (!this.currentBuildSetId || !this.currentBreakpointId) return false
+    try {
+      await buildStorage.updateBreakpoint(this.currentBuildSetId, this.currentBreakpointId, {
+        allocatedNodes: Array.from(this.allocatedNodes),
+        allocatedAscendancyNodes: Array.from(this.allocatedAscendancyNodes),
+        selectedClass: this.startingNodeId,
+        selectedAscendancy: this.currentSelectedAscendancy,
+      })
+      await this.loadBuildSets()
+      return true
+    } catch (error) {
+      console.error('Error saving breakpoint:', error)
+      return false
     }
   }
 
@@ -1087,27 +1123,56 @@ export class PassiveTreeManager {
 
   async handleBuildSetChange(buildSetId: string) {
     if (!buildSetId) {
-      // User selected "New Build Set"
       this.currentBuildSetId = null
       this.currentBreakpointId = null
+      buildStorage.setCurrentBuildSetId(null)
       this.updateBreakpointDropdown()
       this.notifyStateChange()
       return
     }
 
     this.currentBuildSetId = buildSetId
-    const buildSet = await buildStorage.getBuildSet(buildSetId)
+    buildStorage.setCurrentBuildSetId(buildSetId)
 
+    const buildSet = await buildStorage.getBuildSet(buildSetId)
     if (buildSet) {
       console.log('Loaded build set:', buildSet)
       this.updateBreakpointDropdown()
-      // Auto-select first breakpoint if available
-      if (buildSet.breakpoints.length > 0) {
-        this.currentBreakpointId = buildSet.breakpoints[0].id
+
+      const sorted = [...buildSet.breakpoints].sort((a, b) => a.level - b.level)
+      if (sorted.length > 0) {
+        // Load first breakpoint — it restores class/ascendancy via updateDropdownsFromState
+        this.currentBreakpointId = sorted[0].id
         await this.loadBreakpoint(this.currentBreakpointId)
+      } else if (buildSet.className) {
+        // No breakpoints yet — apply the build-level class/ascendancy directly
+        this.applyBuildClassAndAscendancy(buildSet.className, buildSet.ascendancy ?? null)
       }
     }
     this.notifyStateChange()
+  }
+
+  /** Programmatically drive the hidden class/ascendancy dropdowns so the tree reacts correctly */
+  private applyBuildClassAndAscendancy(className: string, ascendancyKey: string | null) {
+    const classDropdown = document.getElementById('class-dropdown') as HTMLSelectElement | null
+    if (classDropdown) {
+      // Find option by text (needed because Ranger and Huntress share the same nodeId)
+      for (let i = 0; i < classDropdown.options.length; i++) {
+        if (classDropdown.options[i].text === className) {
+          classDropdown.selectedIndex = i
+          break
+        }
+      }
+      classDropdown.dispatchEvent(new Event('change'))
+    }
+
+    if (ascendancyKey) {
+      const ascDropdown = document.getElementById('ascendancy-dropdown') as HTMLSelectElement | null
+      if (ascDropdown) {
+        ascDropdown.value = ascendancyKey
+        ascDropdown.dispatchEvent(new Event('change'))
+      }
+    }
   }
 
   async handleCreateBreakpoint(name: string, level: number) {
@@ -1221,12 +1286,31 @@ export class PassiveTreeManager {
       this.startingNodeId = breakpoint.selectedClass
     }
 
+    // Ensure the starting class node is always physically allocated.
+    // Steps created from the Builder have allocatedNodes:[] but selectedClass set.
+    if (this.startingNodeId && !this.allocatedNodes.has(this.startingNodeId)) {
+      const startNode = this.svg?.querySelector(`#n${this.startingNodeId}`)
+      if (startNode) {
+        startNode.classList.add('allocated')
+        this.allocatedNodes.add(this.startingNodeId)
+      }
+    }
+
     // Restore ascendancy selection
     if (breakpoint.selectedAscendancy) {
       this.currentSelectedAscendancy = breakpoint.selectedAscendancy
       const ascendancyStartNode = this.ascendancyStartNodes[breakpoint.selectedAscendancy]
       if (ascendancyStartNode) {
         this.ascendancyStartingNodeId = ascendancyStartNode
+      }
+    }
+
+    // Ensure the ascendancy starting node is always physically allocated.
+    if (this.ascendancyStartingNodeId && !this.allocatedAscendancyNodes.has(this.ascendancyStartingNodeId)) {
+      const ascStartNode = this.svg?.querySelector(`#n${this.ascendancyStartingNodeId}`)
+      if (ascStartNode) {
+        ascStartNode.classList.add('allocated')
+        this.allocatedAscendancyNodes.add(this.ascendancyStartingNodeId)
       }
     }
 

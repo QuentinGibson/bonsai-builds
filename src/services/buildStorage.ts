@@ -11,7 +11,8 @@
 export interface BuildSet {
   id: string
   name: string
-  ascendancy?: string
+  className?: string   // e.g. "Ranger", "Huntress"
+  ascendancy?: string  // e.g. "Deadeye"
   createdAt: number
   updatedAt: number
   breakpoints: Breakpoint[]
@@ -29,6 +30,8 @@ export interface Breakpoint {
 }
 
 const STORAGE_KEY = 'bonsaibuild_buildsets'
+const CURRENT_BUILD_KEY = 'bonsaibuild_current'
+const PENDING_BREAKPOINT_KEY = 'bonsaibuild_pending_bp'
 
 /**
  * Storage abstraction - currently localStorage, future: Convex API
@@ -83,10 +86,30 @@ class BuildStorageService {
     return this.updateBuildSet(id, { name })
   }
 
+  /** Persist the ID of the build that should auto-load on Tree screen mount */
+  getCurrentBuildSetId(): string | null {
+    return localStorage.getItem(CURRENT_BUILD_KEY)
+  }
+
+  setCurrentBuildSetId(id: string | null): void {
+    if (id) localStorage.setItem(CURRENT_BUILD_KEY, id)
+    else localStorage.removeItem(CURRENT_BUILD_KEY)
+  }
+
+  /** Breakpoint to jump to when the Tree screen next mounts (set from Builder "Edit Tree") */
+  getPendingBreakpointId(): string | null {
+    return localStorage.getItem(PENDING_BREAKPOINT_KEY)
+  }
+
+  setPendingBreakpointId(id: string | null): void {
+    if (id) localStorage.setItem(PENDING_BREAKPOINT_KEY, id)
+    else localStorage.removeItem(PENDING_BREAKPOINT_KEY)
+  }
+
   /**
-   * Update a build set's fields (name, ascendancy, etc.)
+   * Update a build set's fields (name, className, ascendancy, etc.)
    */
-  async updateBuildSet(id: string, updates: Partial<Pick<BuildSet, 'name' | 'ascendancy'>>): Promise<BuildSet | null> {
+  async updateBuildSet(id: string, updates: Partial<Pick<BuildSet, 'name' | 'className' | 'ascendancy'>>): Promise<BuildSet | null> {
     const buildSets = await this.getAllBuildSets()
     const buildSet = buildSets.find(set => set.id === id)
 

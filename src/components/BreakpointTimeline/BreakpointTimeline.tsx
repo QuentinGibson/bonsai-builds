@@ -6,14 +6,12 @@ type Props = {
 	breakpoints: Breakpoint[]; // sorted by level, already from PassiveTreeManager
 	currentBreakpointId: string | null;
 	onSelect: (id: string) => void;
-	onAddStep: () => void;
 };
 
 export function BreakpointTimeline({
 	breakpoints,
 	currentBreakpointId,
 	onSelect,
-	onAddStep,
 }: Props) {
 	const currentIndex = breakpoints.findIndex((bp) => bp.id === currentBreakpointId);
 	const isEmpty = breakpoints.length === 0;
@@ -45,7 +43,7 @@ export function BreakpointTimeline({
 
 			<div className="timeline-track">
 				{isEmpty ? (
-					<span className="timeline-empty">No steps yet — create your first step to track your build progression</span>
+					<span className="timeline-empty">No steps yet — go to the Builder tab to create your first step</span>
 				) : (
 					<>
 						<div className="timeline-line" />
@@ -79,10 +77,6 @@ export function BreakpointTimeline({
 					›
 				</button>
 			)}
-
-			<button className="timeline-add-btn" onClick={onAddStep} title="Create a new step">
-				Create Step
-			</button>
 		</div>
 	);
 }

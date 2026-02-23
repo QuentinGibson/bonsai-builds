@@ -25,6 +25,7 @@ export function ScreenPassiveTree({ className }: ScreenPassiveTreeProps) {
 	const [currentBuildSetId, setCurrentBuildSetId] = useState<string | null>(null);
 	const [currentBreakpointId, setCurrentBreakpointId] = useState<string | null>(null);
 	const [showBuildModal, setShowBuildModal] = useState(false);
+	const [stepSaved, setStepSaved] = useState(false);
 
 	const ZOOM_MIN = 0.5;
 	const ZOOM_MAX = 10.0;
@@ -38,6 +39,16 @@ export function ScreenPassiveTree({ className }: ScreenPassiveTreeProps) {
 			.sort((a, b) => a.level - b.level) ?? [];
 
 	const currentBuildSet = buildSets.find((b) => b.id === currentBuildSetId) ?? null;
+	const currentBreakpoint = currentBuildSet?.breakpoints.find((bp) => bp.id === currentBreakpointId) ?? null;
+
+	const handleSaveStep = async () => {
+		if (!treeManagerRef.current) return;
+		const ok = await treeManagerRef.current.saveCurrentBreakpoint();
+		if (ok) {
+			setStepSaved(true);
+			setTimeout(() => setStepSaved(false), 2000);
+		}
+	};
 
 	useEffect(() => {
 		const handleZoomChange = (e: Event) => {
@@ -162,7 +173,6 @@ export function ScreenPassiveTree({ className }: ScreenPassiveTreeProps) {
 						breakpoints={currentBreakpointSortedList}
 						currentBreakpointId={currentBreakpointId}
 						onSelect={(id) => treeManagerRef.current?.handleBreakpointChange(id)}
-						onAddStep={() => eventBus.emit('setPopup', kAppPopups.AddBreakpoint)}
 					/>
 				)}
 			</div>
@@ -189,7 +199,8 @@ export function ScreenPassiveTree({ className }: ScreenPassiveTreeProps) {
 							</div>
 						</div>
 
-						<div className="class-selection">
+						{/* Hidden — passiveTreeLogic drives these by DOM ID; visible selectors live in ScreenBuilder */}
+						<div className="class-selection" style={{ display: 'none' }}>
 							<label htmlFor="class-dropdown">Starting Class</label>
 							<select id="class-dropdown">
 								<option value="">-- Select Class --</option>
@@ -203,8 +214,7 @@ export function ScreenPassiveTree({ className }: ScreenPassiveTreeProps) {
 								<option value="61525">Druid</option>
 							</select>
 						</div>
-
-						<div className="class-selection">
+						<div className="class-selection" style={{ display: 'none' }}>
 							<label htmlFor="ascendancy-dropdown">Ascendancy</label>
 							<select id="ascendancy-dropdown">
 								<option value="">-- Select Class First --</option>
@@ -227,6 +237,26 @@ export function ScreenPassiveTree({ className }: ScreenPassiveTreeProps) {
 								Change
 							</button>
 						</div>
+
+						{/* Step save bar — visible when a breakpoint is active */}
+						{currentBreakpointId && (
+							<div className="step-save-bar">
+								<div className="step-save-info">
+									<span className="step-save-label">Step</span>
+									<span className="step-save-name">
+										{currentBreakpoint
+											? `L${currentBreakpoint.level} · ${currentBreakpoint.name || "Unnamed"}`
+											: "—"}
+									</span>
+								</div>
+								<button
+									className={classNames("save-step-btn", { saved: stepSaved })}
+									onClick={handleSaveStep}
+								>
+									{stepSaved ? "✓ Saved" : "Save Step"}
+								</button>
+							</div>
+						)}
 
 						{/* Hidden DOM dropdowns — passiveTreeLogic still reads/writes these */}
 						<div className="build-management">

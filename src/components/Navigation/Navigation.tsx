@@ -4,6 +4,7 @@ import {
 	AiOutlineLeft,
 	AiOutlineRight,
 	AiOutlineSetting,
+	AiOutlineTool,
 } from "react-icons/ai";
 import { kAppScreens } from "../../config/enums";
 import { CommonStoreContext } from "../../hooks/common-context";
@@ -40,6 +41,15 @@ export function Navigation({ className, collapsed, onToggle }: NavigationProps) 
 			>
 				<AiOutlineHome className="menu-icon" />
 				{!collapsed && <span>Tree</span>}
+			</button>
+			<button
+				className={classNames("menu-item", {
+					selected: screen === kAppScreens.Builder,
+				})}
+				onClick={() => setScreen(kAppScreens.Builder)}
+			>
+				<AiOutlineTool className="menu-icon" />
+				{!collapsed && <span>Builder</span>}
 			</button>
 			<button
 				className={classNames("menu-item", {
