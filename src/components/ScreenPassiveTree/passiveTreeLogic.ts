@@ -37,6 +37,7 @@ export class PassiveTreeManager {
   private lastX = 0
   private lastY = 0
   private connectionGraph = new Map<string, string[]>()
+  private allAscendancyNodeIds = new Set<string>()
 
   private readonly maxPoints = 123
   private readonly maxAscendancyPoints = 8
@@ -180,6 +181,11 @@ export class PassiveTreeManager {
 
   private setupTree() {
     if (!this.svg || !this.treeData) return
+
+    // Build the full set of all ascendancy node IDs so main-tree BFS can exclude them
+    Object.values(this.ascendancyData).forEach(({ nodes }) => {
+      nodes.forEach(id => this.allAscendancyNodeIds.add(id))
+    })
 
     // Group ascendancy nodes first
     this.setupAscendancyGroups()
@@ -558,7 +564,7 @@ export class PassiveTreeManager {
 
       const neighbors = this.connectionGraph.get(currentId) || []
       neighbors.forEach(neighborId => {
-        if (!visited.has(neighborId)) {
+        if (!visited.has(neighborId) && !this.allAscendancyNodeIds.has(neighborId)) {
           visited.add(neighborId)
           parent.set(neighborId, currentId)
           queue.push(neighborId)
@@ -589,7 +595,7 @@ export class PassiveTreeManager {
 
         const neighbors = this.connectionGraph.get(currentId) || []
         neighbors.forEach(neighborId => {
-          if (!visited.has(neighborId) && this.allocatedNodes.has(neighborId)) {
+          if (!visited.has(neighborId) && this.allocatedNodes.has(neighborId) && !this.allAscendancyNodeIds.has(neighborId)) {
             visited.add(neighborId)
             queue.push(neighborId)
           }
