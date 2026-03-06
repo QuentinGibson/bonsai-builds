@@ -186,6 +186,35 @@ class BuildStorageService {
   }
 
   /**
+   * Remove all breakpoints from a build (used when class changes)
+   */
+  async clearBreakpoints(buildSetId: string): Promise<boolean> {
+    const buildSets = await this.getAllBuildSets()
+    const buildSet = buildSets.find(set => set.id === buildSetId)
+    if (!buildSet) return false
+    buildSet.breakpoints = []
+    buildSet.updatedAt = Date.now()
+    await this.saveBuildSets(buildSets)
+    return true
+  }
+
+  /**
+   * Reset ascendancy data on every breakpoint (used when ascendancy changes)
+   */
+  async resetBreakpointsAscendancy(buildSetId: string, newAscendancy: string | null): Promise<boolean> {
+    const buildSets = await this.getAllBuildSets()
+    const buildSet = buildSets.find(set => set.id === buildSetId)
+    if (!buildSet) return false
+    buildSet.breakpoints.forEach(bp => {
+      bp.selectedAscendancy = newAscendancy
+      bp.allocatedAscendancyNodes = []
+    })
+    buildSet.updatedAt = Date.now()
+    await this.saveBuildSets(buildSets)
+    return true
+  }
+
+  /**
    * Delete a breakpoint
    */
   async deleteBreakpoint(buildSetId: string, breakpointId: string): Promise<boolean> {

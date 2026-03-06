@@ -34,6 +34,20 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
 
   const selectedBuild = builds.find((b) => b.id === selectedId) ?? null;
 
+  // Pending (unsaved) class / ascendancy values for the selected build
+  const [pendingClass, setPendingClass] = useState(selectedBuild?.className ?? "");
+  const [pendingAscendancy, setPendingAscendancy] = useState(selectedBuild?.ascendancy ?? "");
+
+  // Sync pending values whenever the selected build changes
+  useEffect(() => {
+    setPendingClass(selectedBuild?.className ?? "");
+    setPendingAscendancy(selectedBuild?.ascendancy ?? "");
+  }, [selectedBuild?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const classIsDirty = pendingClass !== (selectedBuild?.className ?? "");
+  const ascendancyIsDirty = pendingAscendancy !== (selectedBuild?.ascendancy ?? "");
+  const classAscendancyDirty = classIsDirty || ascendancyIsDirty;
+
   // ── Data loading ──────────────────────────────────────────────────────────
 
   const refreshBuilds = useCallback(async () => {
@@ -67,11 +81,16 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
 
     const onCreateBreakpoint = async (data: { name: string; level: number }) => {
       if (!selectedId) return;
+
+      // Copy nodes from the nearest step below the new level so the user builds on top of it
+      const sorted = [...(selectedBuild?.breakpoints ?? [])].sort((a, b) => a.level - b.level);
+      const prevStep = sorted.filter((bp) => bp.level < data.level).at(-1) ?? null;
+
       await buildStorage.addBreakpoint(selectedId, {
         name: data.name,
         level: data.level,
-        allocatedNodes: [],
-        allocatedAscendancyNodes: [],
+        allocatedNodes: prevStep?.allocatedNodes ?? [],
+        allocatedAscendancyNodes: prevStep?.allocatedAscendancyNodes ?? [],
         selectedClass: selectedBuild?.className
           ? (CLASSES.find((c) => c.name === selectedBuild.className)?.nodeId ?? null)
           : null,
@@ -104,20 +123,44 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
 
   // ── Class / Ascendancy ────────────────────────────────────────────────────
 
-  const handleClassChange = async (newClassName: string) => {
-    if (!selectedBuild) return;
-    await buildStorage.updateBuildSet(selectedBuild.id, {
-      className: newClassName || undefined,
-      ascendancy: undefined, // reset ascendancy when class changes
-    });
-    await refreshBuilds();
+  const handleClassChange = (newClassName: string) => {
+    setPendingClass(newClassName);
+    // Changing class resets the ascendancy selection
+    setPendingAscendancy("");
   };
 
-  const handleAscendancyChange = async (newAscendancy: string) => {
-    if (!selectedBuild) return;
-    await buildStorage.updateBuildSet(selectedBuild.id, {
-      ascendancy: newAscendancy || undefined,
-    });
+  const handleAscendancyChange = (newAscendancy: string) => {
+    setPendingAscendancy(newAscendancy);
+  };
+
+  const handleSaveClassAscendancy = async () => {
+    if (!selectedBuild || !classAscendancyDirty) return;
+
+    if (classIsDirty && selectedBuild.breakpoints.length > 0) {
+      const stepWord = selectedBuild.breakpoints.length === 1 ? "step" : "steps";
+      const confirmed = window.confirm(
+        `Changing the starting class will delete all ${selectedBuild.breakpoints.length} ${stepWord} for this build because the starting point changes.\n\nContinue?`
+      );
+      if (!confirmed) return;
+      await buildStorage.clearBreakpoints(selectedBuild.id);
+    }
+
+    if (classIsDirty) {
+      await buildStorage.updateBuildSet(selectedBuild.id, {
+        className: pendingClass || undefined,
+        ascendancy: undefined,
+      });
+    } else if (ascendancyIsDirty) {
+      await buildStorage.updateBuildSet(selectedBuild.id, {
+        ascendancy: pendingAscendancy || undefined,
+      });
+      // Reset ascendancy nodes on every step so the tree shows the new ascendancy
+      await buildStorage.resetBreakpointsAscendancy(
+        selectedBuild.id,
+        pendingAscendancy || null
+      );
+    }
+
     await refreshBuilds();
   };
 
@@ -155,7 +198,7 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
     await refreshBuilds();
   };
 
-  const availableAscendancies = getAvailableAscendancies(selectedBuild?.className ?? "");
+  const availableAscendancies = getAvailableAscendancies(pendingClass);
 
   // ── Render ────────────────────────────────────────────────────────────────
 
@@ -251,8 +294,8 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
                   <label className="field-label" htmlFor="builder-class">Starting Class</label>
                   <select
                     id="builder-class"
-                    className="field-select"
-                    value={selectedBuild.className ?? ""}
+                    className={classNames("field-select", { dirty: classIsDirty })}
+                    value={pendingClass}
                     onChange={(e) => handleClassChange(e.target.value)}
                   >
                     <option value="">— Select class —</option>
@@ -266,8 +309,8 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
                   <label className="field-label" htmlFor="builder-ascendancy">Ascendancy</label>
                   <select
                     id="builder-ascendancy"
-                    className="field-select"
-                    value={selectedBuild.ascendancy ?? ""}
+                    className={classNames("field-select", { dirty: ascendancyIsDirty })}
+                    value={pendingAscendancy}
                     onChange={(e) => handleAscendancyChange(e.target.value)}
                     disabled={availableAscendancies.length === 0}
                   >
@@ -278,6 +321,22 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
                   </select>
                 </div>
               </div>
+
+              {classAscendancyDirty && (
+                <div className="class-save-row">
+                  {classIsDirty && selectedBuild.breakpoints.length > 0 && (
+                    <span className="class-save-warning">
+                      ⚠ Changing class will delete all steps
+                    </span>
+                  )}
+                  <button
+                    className="class-save-btn"
+                    onClick={handleSaveClassAscendancy}
+                  >
+                    Save
+                  </button>
+                </div>
+              )}
             </section>
 
             {/* Steps */}

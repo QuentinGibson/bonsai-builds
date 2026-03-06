@@ -6,6 +6,7 @@ export type BuildStateSnapshot = {
   buildSets: BuildSet[]
   currentBuildSetId: string | null
   currentBreakpointId: string | null
+  isReadOnly: boolean
 }
 
 export interface TreeData {
@@ -38,6 +39,8 @@ export class PassiveTreeManager {
   private lastY = 0
   private connectionGraph = new Map<string, string[]>()
   private allAscendancyNodeIds = new Set<string>()
+  private hiddenNodeIds = new Set<string>()
+  private isReadOnly = true // read-only until "Edit Tree" is triggered from Builder
 
   private readonly maxPoints = 123
   private readonly maxAscendancyPoints = 8
@@ -69,7 +72,8 @@ export class PassiveTreeManager {
     this.onStateChange?.({
       buildSets: [...this.buildSets],
       currentBuildSetId: this.currentBuildSetId,
-      currentBreakpointId: this.currentBreakpointId
+      currentBreakpointId: this.currentBreakpointId,
+      isReadOnly: this.isReadOnly
     })
   }
 
@@ -187,6 +191,14 @@ export class PassiveTreeManager {
       nodes.forEach(id => this.allAscendancyNodeIds.add(id))
     })
 
+    // Identify PoE1 mastery nodes that don't belong in the PoE2 tree:
+    // they have "mastery" in their name and no stats (empty stats = placeholder node)
+    Object.entries(this.treeData.nodes).forEach(([nodeId, nodeData]) => {
+      if (nodeData.name.toLowerCase().includes('mastery') && nodeData.stats.length === 0) {
+        this.hiddenNodeIds.add(nodeId)
+      }
+    })
+
     // Group ascendancy nodes first
     this.setupAscendancyGroups()
 
@@ -195,6 +207,12 @@ export class PassiveTreeManager {
 
     // Build connection graph
     this.buildConnectionGraph()
+
+    // Hide invalid nodes AFTER the graph is built
+    this.hideInvalidNodes()
+
+    // Tree starts read-only; "Edit Tree" from Builder will lift this
+    this.svg.classList.add('read-only')
 
     // Setup event listeners
     this.setupEventListeners()
@@ -304,11 +322,41 @@ export class PassiveTreeManager {
         const parts = connId.substring(1).split('-')
         if (parts.length === 2) {
           const [id1, id2] = parts
+          // Skip connections involving hidden (mastery) nodes
+          if (this.hiddenNodeIds.has(id1) || this.hiddenNodeIds.has(id2)) return
           if (!this.connectionGraph.has(id1)) this.connectionGraph.set(id1, [])
           if (!this.connectionGraph.has(id2)) this.connectionGraph.set(id2, [])
           this.connectionGraph.get(id1)!.push(id2)
           this.connectionGraph.get(id2)!.push(id1)
         }
+      }
+    })
+  }
+
+  private hideInvalidNodes() {
+    if (!this.svg) return
+
+    // Hide the circle elements (and their icon image siblings) for all hidden nodes
+    this.hiddenNodeIds.forEach(nodeId => {
+      const circle = this.svg!.querySelector(`#n${nodeId}`)
+      if (circle) {
+        (circle as SVGElement).style.display = 'none'
+        ;(circle as SVGElement).style.pointerEvents = 'none'
+
+        // applyNodeImages() inserts a .node-icon <image> immediately after the circle
+        const icon = circle.nextElementSibling
+        if (icon && icon.classList.contains('node-icon')) {
+          (icon as SVGElement).style.display = 'none'
+        }
+      }
+    })
+
+    // Hide connections where either endpoint is a hidden node
+    const allConns = this.svg.querySelectorAll('#connections line, #connections path')
+    allConns.forEach(conn => {
+      const m = conn.id.match(/^c(\d+)-(\d+)$/)
+      if (m && (this.hiddenNodeIds.has(m[1]) || this.hiddenNodeIds.has(m[2]))) {
+        ;(conn as SVGElement).style.display = 'none'
       }
     })
   }
@@ -424,7 +472,23 @@ export class PassiveTreeManager {
     this.updateViewBox()
   }
 
+  /** Saves current tree state to storage without triggering a full state reload. */
+  private async autoSave(): Promise<void> {
+    if (!this.currentBuildSetId || !this.currentBreakpointId) return
+    try {
+      await buildStorage.updateBreakpoint(this.currentBuildSetId, this.currentBreakpointId, {
+        allocatedNodes: Array.from(this.allocatedNodes),
+        allocatedAscendancyNodes: Array.from(this.allocatedAscendancyNodes),
+        selectedClass: this.startingNodeId,
+        selectedAscendancy: this.currentSelectedAscendancy,
+      })
+    } catch (error) {
+      console.error('Auto-save error:', error)
+    }
+  }
+
   private handleNodeClick(e: Event) {
+    if (this.isReadOnly) return
     const target = e.target as HTMLElement
     if (target.tagName === 'circle') {
       const nodeId = target.id.replace('n', '')
@@ -502,6 +566,7 @@ export class PassiveTreeManager {
 
       this.updatePointsDisplay()
       this.updateAllConnections()
+      this.autoSave()
     }
   }
 
@@ -733,6 +798,7 @@ export class PassiveTreeManager {
   }
 
   private showPreview(nodeId: string) {
+    if (this.isReadOnly) return
     this.clearPreview()
 
     if (this.allocatedNodes.has(nodeId)) {
@@ -1075,6 +1141,9 @@ export class PassiveTreeManager {
           // Check for a specific breakpoint requested by the Builder "Edit Tree" action
           const pendingBpId = buildStorage.getPendingBreakpointId()
           if (pendingBpId) {
+            // User arrived via Builder's "Edit Tree" — unlock editing
+            this.isReadOnly = false
+            this.svg?.classList.remove('read-only')
             buildStorage.setPendingBreakpointId(null)
             await this.handleBreakpointChange(pendingBpId)
           }
@@ -1244,6 +1313,8 @@ export class PassiveTreeManager {
   }
 
   async handleBreakpointChange(breakpointId: string) {
+    if (!this.isReadOnly) await this.autoSave()
+
     if (!breakpointId) {
       this.currentBreakpointId = null
       this.notifyStateChange()

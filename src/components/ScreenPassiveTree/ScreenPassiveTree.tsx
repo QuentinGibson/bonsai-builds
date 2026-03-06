@@ -24,8 +24,8 @@ export function ScreenPassiveTree({ className }: ScreenPassiveTreeProps) {
 	const [buildSets, setBuildSets] = useState<BuildSet[]>([]);
 	const [currentBuildSetId, setCurrentBuildSetId] = useState<string | null>(null);
 	const [currentBreakpointId, setCurrentBreakpointId] = useState<string | null>(null);
+	const [isReadOnly, setIsReadOnly] = useState(true);
 	const [showBuildModal, setShowBuildModal] = useState(false);
-	const [stepSaved, setStepSaved] = useState(false);
 
 	const ZOOM_MIN = 0.5;
 	const ZOOM_MAX = 10.0;
@@ -40,15 +40,6 @@ export function ScreenPassiveTree({ className }: ScreenPassiveTreeProps) {
 
 	const currentBuildSet = buildSets.find((b) => b.id === currentBuildSetId) ?? null;
 	const currentBreakpoint = currentBuildSet?.breakpoints.find((bp) => bp.id === currentBreakpointId) ?? null;
-
-	const handleSaveStep = async () => {
-		if (!treeManagerRef.current) return;
-		const ok = await treeManagerRef.current.saveCurrentBreakpoint();
-		if (ok) {
-			setStepSaved(true);
-			setTimeout(() => setStepSaved(false), 2000);
-		}
-	};
 
 	useEffect(() => {
 		const handleZoomChange = (e: Event) => {
@@ -104,6 +95,7 @@ export function ScreenPassiveTree({ className }: ScreenPassiveTreeProps) {
 					setBuildSets(state.buildSets);
 					setCurrentBuildSetId(state.currentBuildSetId);
 					setCurrentBreakpointId(state.currentBreakpointId);
+					setIsReadOnly(state.isReadOnly);
 				}
 			);
 			treeManagerRef.current.initialize(treeContainerRef.current);
@@ -238,23 +230,33 @@ export function ScreenPassiveTree({ className }: ScreenPassiveTreeProps) {
 							</button>
 						</div>
 
-						{/* Step save bar — visible when a breakpoint is active */}
-						{currentBreakpointId && (
-							<div className="step-save-bar">
-								<div className="step-save-info">
-									<span className="step-save-label">Step</span>
-									<span className="step-save-name">
-										{currentBreakpoint
-											? `L${currentBreakpoint.level} · ${currentBreakpoint.name || "Unnamed"}`
-											: "—"}
-									</span>
+						{/* Step selector — visible when a build is active */}
+						{currentBuildSetId && (
+							<div className="step-select-bar">
+								<div className="step-select-header">
+									<span className="step-select-label">Step</span>
+									{!isReadOnly && <span className="editing-badge">Editing</span>}
 								</div>
-								<button
-									className={classNames("save-step-btn", { saved: stepSaved })}
-									onClick={handleSaveStep}
-								>
-									{stepSaved ? "✓ Saved" : "Save Step"}
-								</button>
+								{currentBreakpointSortedList.length === 0 ? (
+									<div className="step-select-empty">
+										No steps yet — go to Builder to create one
+									</div>
+								) : (
+									<select
+										className="step-select-dropdown"
+										value={currentBreakpointId ?? ""}
+										onChange={(e) =>
+											treeManagerRef.current?.handleBreakpointChange(e.target.value)
+										}
+									>
+										<option value="">— Select Step —</option>
+										{currentBreakpointSortedList.map((step) => (
+											<option key={step.id} value={step.id}>
+												L{step.level} · {step.name || "Unnamed"}
+											</option>
+										))}
+									</select>
+								)}
 							</div>
 						)}
 
