@@ -172,6 +172,28 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
     );
   }, [selectedBuild]);
 
+  const [editingStepId, setEditingStepId] = useState<string | null>(null);
+  const [editStepName, setEditStepName] = useState("");
+  const [editStepLevel, setEditStepLevel] = useState<number>(1);
+
+  const startEditStep = (step: Breakpoint) => {
+    setEditingStepId(step.id);
+    setEditStepName(step.name ?? "");
+    setEditStepLevel(step.level);
+  };
+
+  const cancelEditStep = () => setEditingStepId(null);
+
+  const saveEditStep = async () => {
+    if (!selectedBuild || !editingStepId) return;
+    await buildStorage.updateBreakpoint(selectedBuild.id, editingStepId, {
+      name: editStepName,
+      level: editStepLevel,
+    });
+    setEditingStepId(null);
+    await refreshBuilds();
+  };
+
   const handleDeleteStep = async (stepId: string) => {
     if (!selectedBuild) return;
     if (!window.confirm("Delete this step?")) return;
@@ -362,31 +384,74 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
                 </div>
               ) : (
                 <div className="steps-list">
-                  {sortedSteps.map((step) => (
-                    <div key={step.id} className="step-row">
-                      <span className="step-level">L{step.level}</span>
-                      <span className="step-name">{step.name || "Unnamed"}</span>
-                      <span className="step-nodes">
-                        {step.allocatedNodes.length > 0
-                          ? `${step.allocatedNodes.length} nodes`
-                          : "Empty"}
-                      </span>
-                      <button
-                        className="step-edit-tree"
-                        title="Edit passive tree for this step"
-                        onClick={() => handleEditStepTree(step.id)}
-                      >
-                        Edit Tree
-                      </button>
-                      <button
-                        className="step-delete"
-                        title="Delete step"
-                        onClick={() => handleDeleteStep(step.id)}
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
+                  {sortedSteps.map((step) => {
+                    const isEditing = editingStepId === step.id;
+                    return (
+                      <div key={step.id} className={`step-row${isEditing ? " editing" : ""}`}>
+                        {isEditing ? (
+                          <>
+                            <input
+                              className="step-edit-level"
+                              type="number"
+                              min={1}
+                              max={100}
+                              value={editStepLevel}
+                              onChange={(e) => setEditStepLevel(Number(e.target.value))}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") saveEditStep();
+                                if (e.key === "Escape") cancelEditStep();
+                              }}
+                            />
+                            <input
+                              className="step-edit-name"
+                              type="text"
+                              placeholder="Step name"
+                              value={editStepName}
+                              onChange={(e) => setEditStepName(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") saveEditStep();
+                                if (e.key === "Escape") cancelEditStep();
+                              }}
+                              autoFocus
+                            />
+                            <button className="step-save-edit" onClick={saveEditStep}>Save</button>
+                            <button className="step-cancel-edit" onClick={cancelEditStep}>Cancel</button>
+                          </>
+                        ) : (
+                          <>
+                            <span className="step-level">L{step.level}</span>
+                            <span className="step-name">{step.name || "Unnamed"}</span>
+                            <span className="step-nodes">
+                              {step.allocatedNodes.length > 0
+                                ? `${step.allocatedNodes.length} nodes`
+                                : "Empty"}
+                            </span>
+                            <button
+                              className="step-rename"
+                              title="Edit step name and level"
+                              onClick={() => startEditStep(step)}
+                            >
+                              Edit
+                            </button>
+                            <button
+                              className="step-edit-tree"
+                              title="Edit passive tree for this step"
+                              onClick={() => handleEditStepTree(step.id)}
+                            >
+                              Edit Tree
+                            </button>
+                            <button
+                              className="step-delete"
+                              title="Delete step"
+                              onClick={() => handleDeleteStep(step.id)}
+                            >
+                              ×
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </section>
