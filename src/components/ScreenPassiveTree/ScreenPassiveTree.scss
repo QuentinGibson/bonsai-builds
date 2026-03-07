@@ -627,6 +627,115 @@
 		line-height: 1.4;
 	}
 
+	// ── Skill gems section ─────────────────────────────────────────────────
+
+	.skill-gems-section {
+		margin-top: 12px;
+		padding-top: 10px;
+		border-top: 1px solid rgba(200, 149, 45, 0.1);
+	}
+
+	.skill-gems-label {
+		font-family: var(--font-display);
+		font-size: 7px;
+		letter-spacing: 1.8px;
+		text-transform: uppercase;
+		color: rgba(200, 149, 45, 0.45);
+		margin-bottom: 7px;
+	}
+
+	.skill-gems-empty {
+		font-size: 10px;
+		color: rgba(200, 149, 45, 0.3);
+		font-style: italic;
+		line-height: 1.4;
+	}
+
+	.skill-gems-list {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+
+	.skill-gem-row {
+		display: flex;
+		align-items: center;
+		gap: 7px;
+		padding: 5px 7px;
+		background: rgba(200, 149, 45, 0.02);
+		border-radius: 4px;
+		border-left: 2px solid;
+
+		&.gem-color-red   { border-color: rgba(192, 57, 43, 0.5); }
+		&.gem-color-green { border-color: rgba(39, 174, 96, 0.5); }
+		&.gem-color-blue  { border-color: rgba(41, 128, 185, 0.5); }
+		&.gem-color-white { border-color: rgba(138, 122, 106, 0.4); }
+	}
+
+	.skill-gem-dot {
+		width: 22px;
+		height: 22px;
+		border-radius: 50%;
+		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-family: var(--font-display);
+		font-size: 10px;
+		font-weight: 700;
+		border: 1px solid;
+
+		&.gem-color-red   { background: rgba(192, 57, 43, 0.15);  border-color: rgba(192, 57, 43, 0.5);  color: #e74c3c; }
+		&.gem-color-green { background: rgba(39, 174, 96, 0.15);  border-color: rgba(39, 174, 96, 0.5);  color: #2ecc71; }
+		&.gem-color-blue  { background: rgba(41, 128, 185, 0.15); border-color: rgba(41, 128, 185, 0.5); color: #3498db; }
+		&.gem-color-white { background: rgba(138, 122, 106, 0.1); border-color: rgba(138, 122, 106, 0.4); color: #a89a88; }
+	}
+
+	.skill-gem-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		border-radius: 50%;
+		display: block;
+	}
+
+	.skill-gem-name {
+		flex: 1;
+		font-size: 11px;
+		font-weight: 600;
+		color: #c8b898;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		min-width: 0;
+	}
+
+	.skill-support-dots {
+		display: flex;
+		gap: 3px;
+		flex-shrink: 0;
+	}
+
+	.support-dot {
+		width: 12px;
+		height: 12px;
+		border-radius: 50%;
+		border: 1px solid;
+
+		&.empty {
+			border-color: rgba(200, 149, 45, 0.12);
+			border-style: dashed;
+			background: transparent;
+		}
+
+		&.filled {
+			&.gem-color-red   { background: rgba(192, 57, 43, 0.3);  border-color: rgba(192, 57, 43, 0.6); }
+			&.gem-color-green { background: rgba(39, 174, 96, 0.3);  border-color: rgba(39, 174, 96, 0.6); }
+			&.gem-color-blue  { background: rgba(41, 128, 185, 0.3); border-color: rgba(41, 128, 185, 0.6); }
+			&.gem-color-white { background: rgba(138, 122, 106, 0.2);border-color: rgba(138, 122, 106, 0.5); }
+		}
+	}
+
 	// ── Build management (hidden — DOM nodes kept for passiveTreeLogic) ────
 
 	.build-management {

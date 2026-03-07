@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { buildStorage, BuildSet, Breakpoint } from "../../services/buildStorage";
+import { SkillsPanel } from "../SkillsPanel/SkillsPanel";
 import { useEventBus } from "../../hooks/use-event-bus";
 import { kAppPopups, kAppScreens } from "../../config/enums";
 import { classNames } from "../../utils";
@@ -455,6 +456,9 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
                 </div>
               )}
             </section>
+
+            {/* Skills section */}
+            <SkillsPanel build={selectedBuild} onRefresh={refreshBuilds} />
 
             {/* Footer: open in Tree */}
             <div className="detail-footer">

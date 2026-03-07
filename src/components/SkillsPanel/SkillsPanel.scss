@@ -1,0 +1,469 @@
+// ── Color token map ───────────────────────────────────────────────────────────
+
+$gem-red:   #c0392b;
+$gem-green: #27ae60;
+$gem-blue:  #2980b9;
+$gem-white: #8a7a6a;
+
+@mixin gem-color($c) {
+  &.color-red   { --gem-c: #{$gem-red};   }
+  &.color-green { --gem-c: #{$gem-green}; }
+  &.color-blue  { --gem-c: #{$gem-blue};  }
+  &.color-white { --gem-c: #{$gem-white}; }
+}
+
+// ── Panel ─────────────────────────────────────────────────────────────────────
+
+.SkillsPanel {
+  margin-top: 36px;
+  border-top: 1px solid rgba(200, 149, 45, 0.1);
+  padding-top: 24px;
+}
+
+.skills-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.skills-title {
+  font-family: var(--font-display);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: rgba(200, 149, 45, 0.45);
+}
+
+.add-skill-btn {
+  padding: 4px 10px;
+  background: rgba(200, 149, 45, 0.07);
+  border: 1px solid rgba(200, 149, 45, 0.22);
+  border-radius: 3px;
+  color: rgba(200, 149, 45, 0.7);
+  font-family: var(--font-display);
+  font-size: 7.5px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: rgba(200, 149, 45, 0.13);
+    border-color: rgba(200, 149, 45, 0.45);
+    color: var(--accent-gold);
+  }
+}
+
+// ── Step tabs ─────────────────────────────────────────────────────────────────
+
+.skills-step-tabs {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid rgba(200, 149, 45, 0.1);
+  padding-bottom: 0;
+  overflow-x: auto;
+
+  &::-webkit-scrollbar { height: 2px; }
+  &::-webkit-scrollbar-thumb { background: rgba(200, 149, 45, 0.15); }
+}
+
+.skills-step-tab {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: rgba(176, 160, 128, 0.35);
+  font-family: var(--font-display);
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  margin-bottom: -1px;
+
+  &:hover {
+    color: rgba(200, 149, 45, 0.65);
+  }
+
+  &.active {
+    color: var(--accent-gold);
+    border-bottom-color: var(--accent-gold);
+  }
+}
+
+.tab-level {
+  font-size: 8px;
+  opacity: 0.7;
+}
+
+.tab-name {
+  font-size: 9px;
+}
+
+// ── Skills list ───────────────────────────────────────────────────────────────
+
+.skills-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.skills-empty {
+  padding: 18px;
+  font-size: 11px;
+  color: rgba(176, 160, 128, 0.3);
+  font-style: italic;
+  text-align: center;
+  background: rgba(200, 149, 45, 0.02);
+  border: 1px dashed rgba(200, 149, 45, 0.08);
+  border-radius: 4px;
+}
+
+// ── Skill row ─────────────────────────────────────────────────────────────────
+
+.skill-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: rgba(200, 149, 45, 0.02);
+  border: 1px solid rgba(200, 149, 45, 0.09);
+  border-radius: 5px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  cursor: default;
+
+  &:hover {
+    border-color: rgba(200, 149, 45, 0.18);
+  }
+
+  &.drag-over {
+    border-color: rgba(200, 149, 45, 0.5);
+    background: rgba(200, 149, 45, 0.06);
+  }
+
+  // left accent by gem color
+  &.color-red   { border-left: 3px solid rgba(192, 57, 43, 0.5); }
+  &.color-green { border-left: 3px solid rgba(39, 174, 96, 0.5); }
+  &.color-blue  { border-left: 3px solid rgba(41, 128, 185, 0.5); }
+  &.color-white { border-left: 3px solid rgba(138, 122, 106, 0.4); }
+}
+
+.drag-handle {
+  flex-shrink: 0;
+  color: rgba(200, 149, 45, 0.2);
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: rgba(200, 149, 45, 0.55);
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+// ── Main gem display ──────────────────────────────────────────────────────────
+
+.skill-gem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  min-width: 130px;
+}
+
+.gem-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  border: 2px solid;
+
+  @include gem-color(&);
+
+  &.color-red   { background: rgba(192, 57, 43, 0.15);  border-color: rgba(192, 57, 43, 0.5);  color: #e74c3c; }
+  &.color-green { background: rgba(39, 174, 96, 0.15);  border-color: rgba(39, 174, 96, 0.5);  color: #2ecc71; }
+  &.color-blue  { background: rgba(41, 128, 185, 0.15); border-color: rgba(41, 128, 185, 0.5); color: #3498db; }
+  &.color-white { background: rgba(138, 122, 106, 0.1); border-color: rgba(138, 122, 106, 0.4); color: #a89a88; }
+}
+
+.gem-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+  pointer-events: none;
+}
+
+.gem-initial {
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.skill-gem-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.skill-gem-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: #d4c8b4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 110px;
+}
+
+// ── Support sockets ───────────────────────────────────────────────────────────
+
+.support-sockets {
+  display: flex;
+  gap: 5px;
+  flex: 1;
+}
+
+.socket-wrapper {}
+
+.socket {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid rgba(200, 149, 45, 0.15);
+  background: rgba(200, 149, 45, 0.03);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  transition: all 0.15s ease;
+
+  &.empty {
+    border-style: dashed;
+    color: transparent;
+
+    &:hover {
+      border-color: rgba(200, 149, 45, 0.35);
+      background: rgba(200, 149, 45, 0.06);
+    }
+  }
+
+  &.filled {
+    border-style: solid;
+    cursor: pointer;
+
+    &.color-red   { background: rgba(192, 57, 43, 0.18);  border-color: rgba(192, 57, 43, 0.55);  color: #e74c3c; }
+    &.color-green { background: rgba(39, 174, 96, 0.18);  border-color: rgba(39, 174, 96, 0.55);  color: #2ecc71; }
+    &.color-blue  { background: rgba(41, 128, 185, 0.18); border-color: rgba(41, 128, 185, 0.55); color: #3498db; }
+    &.color-white { background: rgba(138, 122, 106, 0.12);border-color: rgba(138, 122, 106, 0.45); color: #b0a090; }
+  }
+}
+
+.socket-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+  pointer-events: none;
+}
+
+.socket-initial {
+  line-height: 1;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.socket-wrapper-inner {
+  position: relative;
+}
+
+// ── Socket tooltip (click-toggled) ───────────────────────────────────────────
+
+.socket-tooltip {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1710;
+  border: 1px solid rgba(200, 149, 45, 0.25);
+  border-radius: 5px;
+  padding: 8px 10px;
+  z-index: 100;
+  min-width: 120px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+}
+
+.socket-tooltip-name {
+  font-size: 10px;
+  font-weight: 600;
+  color: #d4c8b4;
+  margin-bottom: 2px;
+}
+
+.socket-remove {
+  padding: 3px 0;
+  background: transparent;
+  border: none;
+  color: rgba(192, 57, 43, 0.6);
+  font-family: var(--font-display);
+  font-size: 7.5px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.12s ease;
+
+  &:hover {
+    color: #e74c3c;
+  }
+}
+
+// ── Skill remove button ───────────────────────────────────────────────────────
+
+.skill-remove {
+  width: 22px;
+  height: 22px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: rgba(192, 57, 43, 0.35);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.12s ease;
+
+  &:hover {
+    color: #e74c3c;
+    border-color: rgba(192, 57, 43, 0.35);
+    background: rgba(192, 57, 43, 0.07);
+  }
+}
+
+// ── Gem picker overlay ────────────────────────────────────────────────────────
+
+.gem-picker-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.gem-picker {
+  background: #16130d;
+  border: 1px solid rgba(200, 149, 45, 0.28);
+  border-radius: 6px;
+  padding: 12px;
+  width: 280px;
+  max-height: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+.gem-picker-search {
+  width: 100%;
+  padding: 7px 10px;
+  background: rgba(200, 149, 45, 0.05);
+  border: 1px solid rgba(200, 149, 45, 0.22);
+  border-radius: 4px;
+  color: #c8b898;
+  font-size: 12px;
+  font-family: var(--font-body);
+
+  &::placeholder { color: rgba(176, 160, 128, 0.3); }
+  &:focus { outline: none; border-color: rgba(200, 149, 45, 0.5); }
+}
+
+.gem-picker-list {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+
+  &::-webkit-scrollbar { width: 3px; }
+  &::-webkit-scrollbar-thumb { background: rgba(200, 149, 45, 0.2); border-radius: 2px; }
+}
+
+.gem-picker-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  color: #c8b898;
+  font-size: 11.5px;
+  font-family: var(--font-body);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s ease;
+
+  &:hover {
+    background: rgba(200, 149, 45, 0.07);
+  }
+}
+
+.gem-picker-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+
+  .color-red &   { background: $gem-red;   }
+  .color-green & { background: $gem-green; }
+  .color-blue &  { background: $gem-blue;  }
+  .color-white & { background: $gem-white; }
+}
+
+.gem-picker-empty {
+  padding: 16px;
+  font-size: 11px;
+  color: rgba(176, 160, 128, 0.3);
+  font-style: italic;
+  text-align: center;
+}

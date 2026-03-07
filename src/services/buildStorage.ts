@@ -18,6 +18,20 @@ export interface BuildSet {
   breakpoints: Breakpoint[]
 }
 
+export interface SupportGemSlot {
+  name: string
+  color: 1 | 2 | 3
+  iconUrl?: string
+}
+
+export interface SkillGemEntry {
+  id: string
+  name: string
+  color: 1 | 2 | 3
+  iconUrl?: string
+  supports: (SupportGemSlot | null)[]  // always 6 slots
+}
+
 export interface Breakpoint {
   id: string
   name: string
@@ -26,6 +40,7 @@ export interface Breakpoint {
   allocatedAscendancyNodes: string[]
   selectedClass: string | null
   selectedAscendancy: string | null
+  skills: SkillGemEntry[]
   createdAt: number
 }
 
@@ -44,7 +59,12 @@ class BuildStorageService {
     try {
       const data = localStorage.getItem(STORAGE_KEY)
       if (!data) return []
-      return JSON.parse(data) as BuildSet[]
+      const sets = JSON.parse(data) as BuildSet[]
+      // Migrate breakpoints that predate the skills field
+      sets.forEach(s => s.breakpoints.forEach(bp => {
+        if (!bp.skills) bp.skills = []
+      }))
+      return sets
     } catch (error) {
       console.error('Error loading build sets:', error)
       return []
@@ -142,7 +162,7 @@ class BuildStorageService {
    */
   async addBreakpoint(
     buildSetId: string,
-    breakpoint: Omit<Breakpoint, 'id' | 'createdAt'>
+    breakpoint: Omit<Breakpoint, 'id' | 'createdAt' | 'skills'> & { skills?: SkillGemEntry[] }
   ): Promise<Breakpoint | null> {
     const buildSets = await this.getAllBuildSets()
     const buildSet = buildSets.find(set => set.id === buildSetId)
@@ -151,6 +171,7 @@ class BuildStorageService {
 
     const newBreakpoint: Breakpoint = {
       ...breakpoint,
+      skills: breakpoint.skills ?? [],
       id: this.generateId(),
       createdAt: Date.now()
     }

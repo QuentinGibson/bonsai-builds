@@ -260,6 +260,53 @@ export function ScreenPassiveTree({ className }: ScreenPassiveTreeProps) {
 							</div>
 						)}
 
+						{/* Skill gems for the active step */}
+						{currentBreakpoint && (
+							<div className="skill-gems-section">
+								<div className="skill-gems-label">Skill Gems</div>
+								{currentBreakpoint.skills.length === 0 ? (
+									<div className="skill-gems-empty">No skills set — add them in the Builder.</div>
+								) : (
+									<div className="skill-gems-list">
+										{currentBreakpoint.skills.map((skill) => {
+											const colorClass =
+												skill.color === 1 ? "red" :
+												skill.color === 2 ? "green" :
+												skill.color === 3 ? "blue" : "white";
+											return (
+												<div key={skill.id} className={`skill-gem-row gem-color-${colorClass}`}>
+													<div className={`skill-gem-dot gem-color-${colorClass}`}>
+														{skill.iconUrl
+															? <img src={skill.iconUrl} alt={skill.name} className="skill-gem-img" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
+															: skill.name[0]}
+													</div>
+													<span className="skill-gem-name">{skill.name}</span>
+													<div className="skill-support-dots">
+														{skill.supports.map((sup, i) => {
+															if (!sup) return (
+																<div key={i} className="support-dot empty" />
+															);
+															const sc =
+																sup.color === 1 ? "red" :
+																sup.color === 2 ? "green" :
+																sup.color === 3 ? "blue" : "white";
+															return (
+																<div
+																	key={i}
+																	className={`support-dot filled gem-color-${sc}`}
+																	title={sup.name}
+																/>
+															);
+														})}
+													</div>
+												</div>
+											);
+										})}
+									</div>
+								)}
+							</div>
+						)}
+
 						{/* Hidden DOM dropdowns — passiveTreeLogic still reads/writes these */}
 						<div className="build-management">
 							<div className="build-set-selection">
