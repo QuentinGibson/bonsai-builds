@@ -17,9 +17,7 @@ import {
 	kHotkeyLoading,
 	kHotkeyServiceName,
 	kLoadingHeight,
-	kLoadingLeft,
 	kLoadingTop,
-	kLoadingWidth,
 	kMainHeight,
 	kMainWidth,
 	kNoticesHeight,
@@ -32,6 +30,7 @@ import { kWindowNames } from "./config/enums";
 import type { EventBusEvents, Notice, Toast } from "./config/types";
 import { makeCommonStore } from "./store/common";
 import { makePersStore } from "./store/pers";
+import { userService } from "./services/userService";
 
 class BackgroundController {
 	readonly #eventBus = new EventEmitter<EventBusEvents>();
@@ -73,6 +72,8 @@ class BackgroundController {
 			this.#hotkey.start(),
 			this.#updateViewports(),
 		]);
+
+		this.#state.isPremium = await userService.getIsPremium();
 
 		await this.#initHotkeys();
 
@@ -471,11 +472,11 @@ Press <kbd>${this.#state.hotkey}</kbd> to show the skill tree`,
 		const viewportWidthScaled = viewport.width / viewport.scale,
 			viewportHeightScaled = viewport.height / viewport.scale;
 
-		let left = viewport.x + viewportWidthScaled / 2 - kMainWidth / 2,
-			top = viewport.y + viewportHeightScaled / 2 - kMainHeight / 2;
-
-		// make sure ingame window doesn't overlap with loading window
-		left = Math.max(kLoadingLeft + kLoadingWidth + 15, left);
+		// center, then clamp so the window never goes off-screen
+		let left = viewport.x + viewportWidthScaled / 2 - kMainWidth / 2;
+		let top = viewport.y + viewportHeightScaled / 2 - kMainHeight / 2;
+		left = Math.max(viewport.x, Math.min(left, viewport.x + viewportWidthScaled - kMainWidth));
+		top = Math.max(viewport.y, Math.min(top, viewport.y + viewportHeightScaled - kMainHeight));
 
 		// get unscaled position
 		left = Math.round(left * viewport.scale);

@@ -1,6 +1,5 @@
-//TODO: Make subscription and ads work
-import { kAppScreens } from "../../config/enums";
-import { useEventBus } from "../../hooks/use-event-bus";
+import { useContext } from "react";
+import { CommonStoreContext } from "../../hooks/common-context";
 import { classNames } from "../../utils";
 
 import "./AdPremium.scss";
@@ -12,23 +11,13 @@ export type AdPremiumProps = {
 };
 
 export function AdPremium({ className }: AdPremiumProps) {
-	const eventBus = useEventBus();
+	const { isPremium } = useContext(CommonStoreContext);
 
-	const _goPremuim = () => {
-		eventBus.emit("setScreen", kAppScreens.Premium);
-	};
+	if (isPremium) return null;
 
 	return (
 		<div className={classNames("AdPremium", className)}>
-			{/* <div className="premium"> */}
-			{/* 	<p>Remove ads and get extra features</p> */}
-			{/**/}
-			{/* 	<button className="go-premium" onClick={goPremuim}> */}
-			{/* 		Go premium */}
-			{/* 	</button> */}
-			{/* </div> */}
-
-			<Ad></Ad>
+			<Ad />
 		</div>
 	);
 }

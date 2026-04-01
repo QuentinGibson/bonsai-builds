@@ -10,7 +10,8 @@ export const enum kAppScreens {
   Main,
   Premium,
   Settings,
-  Builder
+  Builder,
+  Marketplace
 }
 
 export const enum kAppStatus {

@@ -1,11 +1,23 @@
 import { basename, extname } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import autoprefixer from "autoprefixer";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 // eslint-disable-next-line import/no-unresolved
 import million from "million/compiler";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
+import webpack from "webpack";
 import type { Configuration } from "webpack";
 import { kAppTitle, kBuildPath, kWindowNames } from "./constants";
+
+// Load .env.local so CONVEX_URL is available at build time
+const envLocalPath = resolve(process.cwd(), ".env.local");
+if (existsSync(envLocalPath)) {
+  for (const line of readFileSync(envLocalPath, "utf-8").split("\n")) {
+    const m = line.match(/^([^=#\s][^=]*)=(.*)$/);
+    if (m) process.env[m[1].trim()] = m[2].trim();
+  }
+}
 import { OverwolfWebpackPlugin } from "./overwolf.webpack";
 
 const tailwindcss = require("tailwindcss/plugin");
@@ -126,6 +138,9 @@ export const makeConfig = (env: EnvArg): Configuration => {
 			],
 		},
 		plugins: [
+			new webpack.DefinePlugin({
+				"process.env.CONVEX_URL": JSON.stringify(process.env.CONVEX_URL ?? ""),
+			}),
 			million.webpack({
 				auto: true,
 				mute: true,

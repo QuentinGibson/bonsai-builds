@@ -101,7 +101,7 @@ export function ScreenPassiveTree({ className }: ScreenPassiveTreeProps) {
 			treeManagerRef.current.initialize(treeContainerRef.current);
 		}
 
-		// Listen for events from popups
+		const ref = {};
 		eventBus.on({
 			createBuildSet: handleCreateBuildSet,
 			createBreakpoint: handleCreateBreakpoint,
@@ -109,11 +109,11 @@ export function ScreenPassiveTree({ className }: ScreenPassiveTreeProps) {
 			editBreakpoint: handleEditBreakpoint,
 			deleteBuildSet: handleDeleteBuildSet,
 			deleteBreakpoint: handleDeleteBreakpoint
-		});
+		}, ref);
 
 		return () => {
-			// Cleanup
 			treeManagerRef.current = null;
+			eventBus.off(['createBuildSet', 'createBreakpoint', 'editBuildSet', 'editBreakpoint', 'deleteBuildSet', 'deleteBreakpoint'], ref);
 		};
 	}, [eventBus]);
 

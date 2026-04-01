@@ -9,12 +9,14 @@ import { classNames } from "../../utils";
 import "./Ingame.scss";
 
 import { AdPremium } from "../AdPremium/AdPremium";
-import { DesktopHeader } from "../DesktopHeader/DesktopHeader";
+import { IngameHeader } from "../IngameHeader/IngameHeader";
 import { Navigation } from "../Navigation/Navigation";
 import { Popup } from "../Popup/Popup";
 import { Premium } from "../Premium/Premium";
 import { RootWrapper } from "../RootWrapper/RootWrapper";
 import { ScreenError } from "../ScreenError/ScreenError";
+import { ScreenBuilder } from "../ScreenBuilder/ScreenBuilder";
+import { ScreenMarketplace } from "../ScreenMarketplace/ScreenMarketplace";
 import { ScreenPassiveTree } from "../ScreenPassiveTree/ScreenPassiveTree";
 import { Settings } from "../Settings/Settings";
 import { Toaster } from "../Toaster/Toaster";
@@ -46,6 +48,10 @@ export function Ingame({ className }: IngameProps) {
 		switch (screen) {
 			case kAppScreens.Main:
 				return ScreenPassiveTree;
+			case kAppScreens.Builder:
+				return ScreenBuilder;
+			case kAppScreens.Marketplace:
+				return ScreenMarketplace;
 			case kAppScreens.Settings:
 				return Settings;
 			case kAppScreens.Premium:
@@ -59,7 +65,7 @@ export function Ingame({ className }: IngameProps) {
 
 	return (
 		<div className={classNames("Ingame", { "nav-collapsed": navCollapsed }, className)}>
-			<DesktopHeader />
+			<IngameHeader />
 
 			<Navigation
 				collapsed={navCollapsed}

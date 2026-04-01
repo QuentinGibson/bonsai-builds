@@ -17,6 +17,7 @@ export interface CommonState {
   hotkey: string
   hotkeyLoading: string
   version: string
+  isPremium: boolean
 }
 
 export const kCommonStoreDefauts: CommonState = {
@@ -31,7 +32,8 @@ export const kCommonStoreDefauts: CommonState = {
   toasts: [],
   hotkey: '',
   hotkeyLoading: '',
-  version: ''
+  version: '',
+  isPremium: false
 }
 
 export const kCommonStoreName = 'common'

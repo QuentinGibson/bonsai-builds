@@ -146,10 +146,15 @@ export function Popup() {
       setPopup(kAppPopups.EditBreakpoint)
     }
 
+    const ref = {};
     eventBus.on({
       openEditBuildSet: handleOpenEditBuildSet,
       openEditBreakpoint: handleOpenEditBreakpoint
-    })
+    }, ref);
+
+    return () => {
+      eventBus.off(['openEditBuildSet', 'openEditBreakpoint'], ref);
+    };
   }, [eventBus, setPopup])
 
   return (

@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { buildStorage, BuildSet, Breakpoint } from "../../services/buildStorage";
 import { useEventBus } from "../../hooks/use-event-bus";
 import { kAppPopups, kAppScreens } from "../../config/enums";
 import { classNames } from "../../utils";
+import { AddBuildSet } from "../AddBuildSet/AddBuildSet";
 
 import "./ScreenBuilder.scss";
 
@@ -33,6 +34,12 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const selectedBuild = builds.find((b) => b.id === selectedId) ?? null;
+
+  // Refs so event handlers always see current values without re-registering listeners
+  const selectedIdRef = useRef(selectedId);
+  selectedIdRef.current = selectedId;
+  const selectedBuildRef = useRef(selectedBuild);
+  selectedBuildRef.current = selectedBuild;
 
   // Pending (unsaved) class / ascendancy values for the selected build
   const [pendingClass, setPendingClass] = useState(selectedBuild?.className ?? "");
@@ -71,30 +78,24 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
   // ── Event bus listeners ───────────────────────────────────────────────────
 
   useEffect(() => {
-    // Refresh after any build/step mutation that goes through the event bus
-    const onCreateBuild = async (name: string) => {
-      const newBuild = await buildStorage.createBuildSet(name);
-      await refreshBuilds();
-      setSelectedId(newBuild.id);
-      buildStorage.setCurrentBuildSetId(newBuild.id);
-    };
-
     const onCreateBreakpoint = async (data: { name: string; level: number }) => {
-      if (!selectedId) return;
+      const currentId = selectedIdRef.current;
+      const currentBuild = selectedBuildRef.current;
+      if (!currentId) return;
 
       // Copy nodes from the nearest step below the new level so the user builds on top of it
-      const sorted = [...(selectedBuild?.breakpoints ?? [])].sort((a, b) => a.level - b.level);
+      const sorted = [...(currentBuild?.breakpoints ?? [])].sort((a, b) => a.level - b.level);
       const prevStep = sorted.filter((bp) => bp.level < data.level).at(-1) ?? null;
 
-      await buildStorage.addBreakpoint(selectedId, {
+      await buildStorage.addBreakpoint(currentId, {
         name: data.name,
         level: data.level,
         allocatedNodes: prevStep?.allocatedNodes ?? [],
         allocatedAscendancyNodes: prevStep?.allocatedAscendancyNodes ?? [],
-        selectedClass: selectedBuild?.className
-          ? (CLASSES.find((c) => c.name === selectedBuild.className)?.nodeId ?? null)
+        selectedClass: currentBuild?.className
+          ? (CLASSES.find((c) => c.name === currentBuild.className)?.nodeId ?? null)
           : null,
-        selectedAscendancy: selectedBuild?.ascendancy ?? null,
+        selectedAscendancy: currentBuild?.ascendancy ?? null,
       });
       await refreshBuilds();
     };
@@ -107,12 +108,16 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
       await refreshBuilds();
     };
 
+    const ref = {};
     eventBus.on({
-      createBuildSet: onCreateBuild,
       createBreakpoint: onCreateBreakpoint,
       editBuildSet: onEditBuild,
-    });
-  }, [eventBus, refreshBuilds, selectedId, selectedBuild]);
+    }, ref);
+
+    return () => {
+      eventBus.off(['createBreakpoint', 'editBuildSet'], ref);
+    };
+  }, [eventBus, refreshBuilds]);
 
   // ── Build selection ───────────────────────────────────────────────────────
 
@@ -171,6 +176,16 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
       selectedBuild?.breakpoints.slice().sort((a, b) => a.level - b.level) ?? []
     );
   }, [selectedBuild]);
+
+  const [showNewBuild, setShowNewBuild] = useState(false);
+
+  const handleCreateBuild = async (name: string) => {
+    setShowNewBuild(false);
+    const newBuild = await buildStorage.createBuildSet(name);
+    await refreshBuilds();
+    setSelectedId(newBuild.id);
+    buildStorage.setCurrentBuildSetId(newBuild.id);
+  };
 
   const [editingStepId, setEditingStepId] = useState<string | null>(null);
   const [editStepName, setEditStepName] = useState("");
@@ -232,7 +247,7 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
           <span className="sidebar-title">My Builds</span>
           <button
             className="new-build-btn"
-            onClick={() => eventBus.emit("setPopup", kAppPopups.AddBuildSet)}
+            onClick={() => setShowNewBuild(true)}
             title="Create a new build"
           >
             + New Build
@@ -468,6 +483,17 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
           </>
         )}
       </div>
+
+      {showNewBuild && (
+        <div className="new-build-overlay" onClick={() => setShowNewBuild(false)}>
+          <div onClick={(e) => e.stopPropagation()}>
+            <AddBuildSet
+              onClose={() => setShowNewBuild(false)}
+              onSubmit={handleCreateBuild}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

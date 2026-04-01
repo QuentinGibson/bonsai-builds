@@ -3,10 +3,10 @@
   height: 100vh;
   background: var(--surface-surface-pure);
 
-  .Navigation {
+  .menu-navigation {
     position: absolute;
     left: 0;
-    top: 30px;
+    top: 34px;
     bottom: 0;
     width: 116px;
     transition: width 0.22s ease;
@@ -14,7 +14,7 @@
 
   .ingame-screen {
     position: absolute;
-    top: 30px;
+    top: 34px;
     left: 116px;
     right: 0;
     bottom: 0;
@@ -68,7 +68,7 @@
   }
 
   &.nav-collapsed {
-    .Navigation {
+    .menu-navigation {
       width: 40px;
     }
 

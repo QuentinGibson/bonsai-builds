@@ -1,266 +1,246 @@
-/**
- * Build Storage Service
- *
- * Currently uses localStorage for storage.
- * In the future, this will be replaced with Convex API.
- *
- * This abstraction layer makes it easy to swap storage mechanisms
- * without changing the rest of the codebase.
- */
+import { ConvexHttpClient } from "convex/browser";
+import type { Id } from "../../convex/_generated/dataModel";
+import { api } from "../../convex/_generated/api";
 
 export interface BuildSet {
-  id: string
-  name: string
-  className?: string   // e.g. "Ranger", "Huntress"
-  ascendancy?: string  // e.g. "Deadeye"
-  createdAt: number
-  updatedAt: number
-  breakpoints: Breakpoint[]
+  id: string;
+  name: string;
+  className: string;
+  ascendancy: string;
+  createdAt: number;
+  updatedAt: number;
+  breakpoints: Breakpoint[];
 }
 
 export interface Breakpoint {
-  id: string
-  name: string
-  level: number
-  allocatedNodes: string[]
-  allocatedAscendancyNodes: string[]
-  selectedClass: string | null
-  selectedAscendancy: string | null
-  createdAt: number
+  id: string;
+  name: string;
+  level: number;
+  allocatedNodes: string[];
+  allocatedAscendancyNodes: string[];
+  selectedClass: string | null;
+  selectedAscendancy: string | null;
+  createdAt: number;
 }
 
-const STORAGE_KEY = 'bonsaibuild_buildsets'
-const CURRENT_BUILD_KEY = 'bonsaibuild_current'
-const PENDING_BREAKPOINT_KEY = 'bonsaibuild_pending_bp'
+const CURRENT_BUILD_KEY = "bonsaibuild_current";
+const PENDING_BREAKPOINT_KEY = "bonsaibuild_pending_bp";
+const ANON_USER_ID_KEY = "bonsaibuild_anon_uid";
 
-/**
- * Storage abstraction - currently localStorage, future: Convex API
- */
+function getAnonUserId(): string {
+  let uid = localStorage.getItem(ANON_USER_ID_KEY);
+  if (!uid) {
+    uid = `anon-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+    localStorage.setItem(ANON_USER_ID_KEY, uid);
+  }
+  return uid;
+}
+
+function resolveOverwolfUserId(): Promise<string> {
+  return new Promise((resolve) => {
+    overwolf.profile.getCurrentUser((result) => {
+      if (result.success && result.userId) {
+        resolve(result.userId);
+      } else {
+        resolve(getAnonUserId());
+      }
+    });
+  });
+}
+
 class BuildStorageService {
-  /**
-   * Get all build sets
-   */
+  readonly #client = new ConvexHttpClient(process.env.CONVEX_URL!);
+
+  readonly #userId: Promise<string> = resolveOverwolfUserId();
+
+  #id(id: string) {
+    return id as Id<"buildSets">;
+  }
+
+  #bpId(id: string) {
+    return id as Id<"breakpoints">;
+  }
+
   async getAllBuildSets(): Promise<BuildSet[]> {
     try {
-      const data = localStorage.getItem(STORAGE_KEY)
-      if (!data) return []
-      return JSON.parse(data) as BuildSet[]
+      return await this.#client.query(api.buildSets.getAll, {
+        userId: await this.#userId,
+      }) as BuildSet[];
     } catch (error) {
-      console.error('Error loading build sets:', error)
-      return []
+      console.error("Error loading build sets:", error);
+      return [];
     }
   }
 
-  /**
-   * Get a single build set by ID
-   */
   async getBuildSet(id: string): Promise<BuildSet | null> {
-    const buildSets = await this.getAllBuildSets()
-    return buildSets.find(set => set.id === id) || null
+    try {
+      return await this.#client.query(api.buildSets.get, {
+        id: this.#id(id),
+      }) as BuildSet | null;
+    } catch (error) {
+      console.error("Error loading build set:", error);
+      return null;
+    }
   }
 
-  /**
-   * Create a new build set
-   */
   async createBuildSet(name: string): Promise<BuildSet> {
-    const buildSets = await this.getAllBuildSets()
-
-    const newBuildSet: BuildSet = {
-      id: this.generateId(),
+    const id = await this.#client.mutation(api.buildSets.create, {
+      userId: await this.#userId,
       name,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      breakpoints: []
-    }
-
-    buildSets.push(newBuildSet)
-    await this.saveBuildSets(buildSets)
-
-    return newBuildSet
+    });
+    return (await this.getBuildSet(id as string))!;
   }
 
-  /**
-   * Update a build set's name
-   */
   async updateBuildSetName(id: string, name: string): Promise<BuildSet | null> {
-    return this.updateBuildSet(id, { name })
+    return this.updateBuildSet(id, { name });
   }
 
-  /** Persist the ID of the build that should auto-load on Tree screen mount */
-  getCurrentBuildSetId(): string | null {
-    return localStorage.getItem(CURRENT_BUILD_KEY)
+  async updateBuildSet(
+    id: string,
+    updates: Partial<Pick<BuildSet, "name" | "className" | "ascendancy">>
+  ): Promise<BuildSet | null> {
+    await this.#client.mutation(api.buildSets.update, {
+      id: this.#id(id),
+      ...(updates.name !== undefined ? { name: updates.name } : {}),
+      // Empty string clears the field on the server
+      ...(updates.className !== undefined
+        ? { className: updates.className ?? "" }
+        : {}),
+      ...(updates.ascendancy !== undefined
+        ? { ascendancy: updates.ascendancy ?? "" }
+        : {}),
+    });
+    return this.getBuildSet(id);
   }
 
-  setCurrentBuildSetId(id: string | null): void {
-    if (id) localStorage.setItem(CURRENT_BUILD_KEY, id)
-    else localStorage.removeItem(CURRENT_BUILD_KEY)
-  }
-
-  /** Breakpoint to jump to when the Tree screen next mounts (set from Builder "Edit Tree") */
-  getPendingBreakpointId(): string | null {
-    return localStorage.getItem(PENDING_BREAKPOINT_KEY)
-  }
-
-  setPendingBreakpointId(id: string | null): void {
-    if (id) localStorage.setItem(PENDING_BREAKPOINT_KEY, id)
-    else localStorage.removeItem(PENDING_BREAKPOINT_KEY)
-  }
-
-  /**
-   * Update a build set's fields (name, className, ascendancy, etc.)
-   */
-  async updateBuildSet(id: string, updates: Partial<Pick<BuildSet, 'name' | 'className' | 'ascendancy'>>): Promise<BuildSet | null> {
-    const buildSets = await this.getAllBuildSets()
-    const buildSet = buildSets.find(set => set.id === id)
-
-    if (!buildSet) return null
-
-    Object.assign(buildSet, updates)
-    buildSet.updatedAt = Date.now()
-
-    await this.saveBuildSets(buildSets)
-    return buildSet
-  }
-
-  /**
-   * Delete a build set
-   */
   async deleteBuildSet(id: string): Promise<boolean> {
-    const buildSets = await this.getAllBuildSets()
-    const filteredSets = buildSets.filter(set => set.id !== id)
-
-    if (filteredSets.length === buildSets.length) {
-      return false // Build set not found
+    try {
+      await this.#client.mutation(api.buildSets.remove, { id: this.#id(id) });
+      return true;
+    } catch {
+      return false;
     }
-
-    await this.saveBuildSets(filteredSets)
-    return true
   }
 
-  /**
-   * Add a breakpoint to a build set
-   */
   async addBreakpoint(
     buildSetId: string,
-    breakpoint: Omit<Breakpoint, 'id' | 'createdAt'>
+    breakpoint: Omit<Breakpoint, "id" | "createdAt">
   ): Promise<Breakpoint | null> {
-    const buildSets = await this.getAllBuildSets()
-    const buildSet = buildSets.find(set => set.id === buildSetId)
-
-    if (!buildSet) return null
-
-    const newBreakpoint: Breakpoint = {
-      ...breakpoint,
-      id: this.generateId(),
-      createdAt: Date.now()
+    try {
+      const id = await this.#client.mutation(api.breakpoints.add, {
+        buildSetId: this.#id(buildSetId),
+        name: breakpoint.name,
+        level: breakpoint.level,
+        allocatedNodes: breakpoint.allocatedNodes,
+        allocatedAscendancyNodes: breakpoint.allocatedAscendancyNodes,
+        ...(breakpoint.selectedClass != null
+          ? { selectedClass: breakpoint.selectedClass }
+          : {}),
+        ...(breakpoint.selectedAscendancy != null
+          ? { selectedAscendancy: breakpoint.selectedAscendancy }
+          : {}),
+      });
+      const buildSet = await this.getBuildSet(buildSetId);
+      return buildSet?.breakpoints.find((bp) => bp.id === id) ?? null;
+    } catch (error) {
+      console.error("Error adding breakpoint:", error);
+      return null;
     }
-
-    buildSet.breakpoints.push(newBreakpoint)
-    buildSet.updatedAt = Date.now()
-
-    await this.saveBuildSets(buildSets)
-    return newBreakpoint
   }
 
-  /**
-   * Update a breakpoint
-   */
   async updateBreakpoint(
     buildSetId: string,
     breakpointId: string,
-    updates: Partial<Omit<Breakpoint, 'id' | 'createdAt'>>
+    updates: Partial<Omit<Breakpoint, "id" | "createdAt">>
   ): Promise<Breakpoint | null> {
-    const buildSets = await this.getAllBuildSets()
-    const buildSet = buildSets.find(set => set.id === buildSetId)
-
-    if (!buildSet) return null
-
-    const breakpoint = buildSet.breakpoints.find(bp => bp.id === breakpointId)
-    if (!breakpoint) return null
-
-    Object.assign(breakpoint, updates)
-    buildSet.updatedAt = Date.now()
-
-    await this.saveBuildSets(buildSets)
-    return breakpoint
-  }
-
-  /**
-   * Remove all breakpoints from a build (used when class changes)
-   */
-  async clearBreakpoints(buildSetId: string): Promise<boolean> {
-    const buildSets = await this.getAllBuildSets()
-    const buildSet = buildSets.find(set => set.id === buildSetId)
-    if (!buildSet) return false
-    buildSet.breakpoints = []
-    buildSet.updatedAt = Date.now()
-    await this.saveBuildSets(buildSets)
-    return true
-  }
-
-  /**
-   * Reset ascendancy data on every breakpoint (used when ascendancy changes)
-   */
-  async resetBreakpointsAscendancy(buildSetId: string, newAscendancy: string | null): Promise<boolean> {
-    const buildSets = await this.getAllBuildSets()
-    const buildSet = buildSets.find(set => set.id === buildSetId)
-    if (!buildSet) return false
-    buildSet.breakpoints.forEach(bp => {
-      bp.selectedAscendancy = newAscendancy
-      bp.allocatedAscendancyNodes = []
-    })
-    buildSet.updatedAt = Date.now()
-    await this.saveBuildSets(buildSets)
-    return true
-  }
-
-  /**
-   * Delete a breakpoint
-   */
-  async deleteBreakpoint(buildSetId: string, breakpointId: string): Promise<boolean> {
-    const buildSets = await this.getAllBuildSets()
-    const buildSet = buildSets.find(set => set.id === buildSetId)
-
-    if (!buildSet) return false
-
-    const initialLength = buildSet.breakpoints.length
-    buildSet.breakpoints = buildSet.breakpoints.filter(bp => bp.id !== breakpointId)
-
-    if (buildSet.breakpoints.length === initialLength) {
-      return false // Breakpoint not found
-    }
-
-    buildSet.updatedAt = Date.now()
-    await this.saveBuildSets(buildSets)
-    return true
-  }
-
-  /**
-   * Save build sets to storage
-   */
-  private async saveBuildSets(buildSets: BuildSet[]): Promise<void> {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(buildSets))
+      await this.#client.mutation(api.breakpoints.update, {
+        id: this.#bpId(breakpointId),
+        buildSetId: this.#id(buildSetId),
+        ...(updates.name !== undefined ? { name: updates.name } : {}),
+        ...(updates.level !== undefined ? { level: updates.level } : {}),
+        ...(updates.allocatedNodes !== undefined
+          ? { allocatedNodes: updates.allocatedNodes }
+          : {}),
+        ...(updates.allocatedAscendancyNodes !== undefined
+          ? { allocatedAscendancyNodes: updates.allocatedAscendancyNodes }
+          : {}),
+        // Empty string clears the field on the server
+        ...(updates.selectedClass !== undefined
+          ? { selectedClass: updates.selectedClass ?? "" }
+          : {}),
+        ...(updates.selectedAscendancy !== undefined
+          ? { selectedAscendancy: updates.selectedAscendancy ?? "" }
+          : {}),
+      });
+      const buildSet = await this.getBuildSet(buildSetId);
+      return buildSet?.breakpoints.find((bp) => bp.id === breakpointId) ?? null;
     } catch (error) {
-      console.error('Error saving build sets:', error)
-      throw error
+      console.error("Error updating breakpoint:", error);
+      return null;
     }
   }
 
-  /**
-   * Generate a unique ID
-   */
-  private generateId(): string {
-    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+  async deleteBreakpoint(
+    buildSetId: string,
+    breakpointId: string
+  ): Promise<boolean> {
+    try {
+      await this.#client.mutation(api.breakpoints.remove, {
+        id: this.#bpId(breakpointId),
+        buildSetId: this.#id(buildSetId),
+      });
+      return true;
+    } catch {
+      return false;
+    }
   }
 
-  /**
-   * Clear all build sets (useful for testing)
-   */
-  async clearAll(): Promise<void> {
-    localStorage.removeItem(STORAGE_KEY)
+  async clearBreakpoints(buildSetId: string): Promise<boolean> {
+    try {
+      await this.#client.mutation(api.breakpoints.clearAll, {
+        buildSetId: this.#id(buildSetId),
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async resetBreakpointsAscendancy(
+    buildSetId: string,
+    newAscendancy: string | null
+  ): Promise<boolean> {
+    try {
+      await this.#client.mutation(api.breakpoints.resetAscendancy, {
+        buildSetId: this.#id(buildSetId),
+        ascendancy: newAscendancy,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  // ── UI state (session/device only, intentionally kept in localStorage) ──
+
+  getCurrentBuildSetId(): string | null {
+    return localStorage.getItem(CURRENT_BUILD_KEY);
+  }
+
+  setCurrentBuildSetId(id: string | null): void {
+    if (id) localStorage.setItem(CURRENT_BUILD_KEY, id);
+    else localStorage.removeItem(CURRENT_BUILD_KEY);
+  }
+
+  getPendingBreakpointId(): string | null {
+    return localStorage.getItem(PENDING_BREAKPOINT_KEY);
+  }
+
+  setPendingBreakpointId(id: string | null): void {
+    if (id) localStorage.setItem(PENDING_BREAKPOINT_KEY, id);
+    else localStorage.removeItem(PENDING_BREAKPOINT_KEY);
   }
 }
 
-// Export singleton instance
-export const buildStorage = new BuildStorageService()
+export const buildStorage = new BuildStorageService();
