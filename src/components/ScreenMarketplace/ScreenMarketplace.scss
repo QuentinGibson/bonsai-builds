@@ -15,6 +15,20 @@
     margin-bottom: 16px;
     flex-shrink: 0;
 
+    .filter-select {
+      height: 32px;
+      padding: 0 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(200, 149, 45, 0.18);
+      border-radius: 3px;
+      color: var(--text-text-primary);
+      font-size: 11px;
+      cursor: pointer;
+      &:focus { outline: none; border-color: rgba(200, 149, 45, 0.45); }
+      &:disabled { opacity: 0.35; cursor: not-allowed; }
+      option { background: #1a1710; }
+    }
+
     .search-input {
       flex: 1;
       height: 32px;
@@ -181,6 +195,27 @@
       p { margin-top: 16px; color: var(--text-text-tertiary); font-size: 13px; }
     }
 
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .report-btn {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.3);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0 4px;
+        &:hover { color: #cc6666; }
+      }
+
+      .reported-label {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.25);
+      }
+    }
+
     .detail-topbar {
       display: flex;
       align-items: center;
@@ -195,6 +230,17 @@
         padding: 4px 0;
         transition: color 150ms;
         &:hover { color: var(--accent-gold); }
+      }
+
+      .edit-btn {
+        font-size: 11px;
+        color: rgba(200, 149, 45, 0.7);
+        cursor: pointer;
+        padding: 4px 10px;
+        border: 1px solid rgba(200, 149, 45, 0.3);
+        border-radius: 3px;
+        background: transparent;
+        &:hover { color: var(--accent-gold); border-color: rgba(200, 149, 45, 0.6); }
       }
 
       .delete-btn {
@@ -336,35 +382,197 @@
         }
       }
 
+      .comment-hidden {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        opacity: 0.5;
+
+        .hidden-label { font-size: 11px; color: var(--text-text-tertiary); font-style: italic; }
+        .unhide-btn {
+          font-size: 10px;
+          color: rgba(255, 255, 255, 0.35);
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 0;
+          &:hover { color: rgba(255, 255, 255, 0.7); }
+        }
+      }
+
       .no-comments { font-size: 12px; color: var(--text-text-tertiary); }
 
-      .comments-list { display: flex; flex-direction: column; gap: 8px; }
+      .comments-list { display: flex; flex-direction: column; gap: 6px; }
 
       .comment {
-        padding: 10px 12px;
+        display: flex;
+        gap: 8px;
+        padding: 8px 10px;
         background: rgba(255, 255, 255, 0.02);
         border: 1px solid rgba(200, 149, 45, 0.08);
         border-radius: 3px;
 
-        .comment-header {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          margin-bottom: 5px;
+        &.nested {
+          background: rgba(255, 255, 255, 0.01);
+          border-color: rgba(200, 149, 45, 0.05);
+        }
 
-          .comment-author { font-size: 11px; font-weight: 600; color: var(--accent-gold); }
-          .comment-date { font-size: 10px; color: var(--text-text-tertiary); }
-          .comment-delete {
-            margin-left: auto;
-            font-size: 14px;
-            color: #553333;
+        .comment-vote-col {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 2px;
+          flex-shrink: 0;
+          padding-top: 1px;
+
+          .vote-btn {
+            background: none;
+            border: none;
             cursor: pointer;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.25);
+            padding: 1px 3px;
             line-height: 1;
-            &:hover { color: #cc6666; }
+            border-radius: 2px;
+            transition: color 100ms;
+
+            &:hover { color: rgba(255, 255, 255, 0.7); }
+            &.up.active { color: #e8a030; }
+            &.down.active { color: #7080cc; }
+          }
+
+          .vote-score {
+            font-size: 10px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.5);
+            min-width: 16px;
+            text-align: center;
           }
         }
 
-        .comment-body { font-size: 12px; color: var(--text-text-secondary); line-height: 1.4; }
+        .comment-body-col {
+          flex: 1;
+          min-width: 0;
+
+          .comment-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+            flex-wrap: wrap;
+
+            .comment-author { font-size: 11px; font-weight: 600; color: var(--accent-gold); }
+            .comment-date { font-size: 10px; color: var(--text-text-tertiary); }
+
+            .reply-btn, .hide-btn, .report-btn {
+              font-size: 10px;
+              color: rgba(255, 255, 255, 0.3);
+              background: none;
+              border: none;
+              cursor: pointer;
+              padding: 0 2px;
+              &:hover { color: rgba(255, 255, 255, 0.7); }
+            }
+
+            .report-btn:hover { color: #cc6666 !important; }
+            .reported-label { font-size: 10px; color: rgba(255, 255, 255, 0.2); }
+
+            .comment-delete {
+              margin-left: auto;
+              font-size: 14px;
+              color: #553333;
+              cursor: pointer;
+              line-height: 1;
+              background: none;
+              border: none;
+              &:hover { color: #cc6666; }
+            }
+          }
+
+          .comment-body { font-size: 12px; color: var(--text-text-secondary); line-height: 1.4; margin-bottom: 6px; }
+
+          .reply-input-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
+
+            .reply-cancel {
+              height: 28px;
+              padding: 0 10px;
+              background: transparent;
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              border-radius: 3px;
+              color: rgba(255, 255, 255, 0.4);
+              font-size: 10px;
+              cursor: pointer;
+              &:hover { border-color: rgba(255, 255, 255, 0.25); color: rgba(255, 255, 255, 0.7); }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // ── Report modal ──────────────────────────────────────────────────────────
+
+  .ReportModal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+
+    .ReportModal {
+      background: var(--bg-surface, #1a1710);
+      border: 1px solid rgba(200, 149, 45, 0.25);
+      border-radius: 6px;
+      padding: 20px 24px;
+      width: 320px;
+
+      h3 { font-size: 13px; color: var(--accent-gold); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 1px; }
+
+      select {
+        width: 100%;
+        padding: 7px 10px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(200, 149, 45, 0.2);
+        border-radius: 3px;
+        color: var(--text-text-primary);
+        font-size: 12px;
+        margin-bottom: 16px;
+        &:focus { outline: none; border-color: rgba(200, 149, 45, 0.5); }
+      }
+
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+
+        .cancel-btn {
+          padding: 6px 14px;
+          background: transparent;
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 3px;
+          color: rgba(255, 255, 255, 0.5);
+          font-size: 11px;
+          cursor: pointer;
+          &:hover { border-color: rgba(255, 255, 255, 0.25); color: rgba(255, 255, 255, 0.8); }
+        }
+
+        .report-submit-btn {
+          padding: 6px 14px;
+          background: rgba(180, 60, 60, 0.2);
+          border: 1px solid rgba(180, 60, 60, 0.4);
+          border-radius: 3px;
+          color: #cc8888;
+          font-size: 11px;
+          cursor: pointer;
+          &:hover:not(:disabled) { background: rgba(180, 60, 60, 0.35); }
+          &:disabled { opacity: 0.4; cursor: not-allowed; }
+        }
       }
     }
   }
@@ -395,7 +603,7 @@
 
     label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-text-tertiary); }
 
-    select, textarea {
+    select, textarea, .name-input {
       width: 100%;
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(200, 149, 45, 0.18);
@@ -407,6 +615,17 @@
     }
 
     textarea { resize: vertical; font-family: inherit; line-height: 1.5; }
+
+    .publish-validation {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+
+      span {
+        font-size: 11px;
+        color: #cc8855;
+      }
+    }
 
     .modal-actions {
       display: flex;

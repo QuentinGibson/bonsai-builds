@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { classNames } from "../../utils";
 import {
   marketplaceService,
   type MarketplaceBuild,
+  type MarketplaceComment,
 } from "../../services/marketplaceService";
 import { buildStorage } from "../../services/buildStorage";
 
@@ -13,6 +14,17 @@ export type ScreenMarketplaceProps = {
 };
 
 type View = { kind: "list" } | { kind: "detail"; id: string };
+
+const CLASSES: { name: string; ascendancies: string[] }[] = [
+  { name: "Warrior",   ascendancies: ["Titan", "Warbringer", "Smith of Kitava"] },
+  { name: "Ranger",    ascendancies: ["Deadeye", "Pathfinder"] },
+  { name: "Huntress",  ascendancies: ["Amazon", "Ritualist"] },
+  { name: "Mercenary", ascendancies: ["Tactician", "Witchhunter", "Gemling Legionnaire"] },
+  { name: "Sorceress", ascendancies: ["Stormweaver", "Chronomancer", "Disciple of Varashta"] },
+  { name: "Witch",     ascendancies: ["Infernalist", "Blood Mage", "Lich"] },
+  { name: "Monk",      ascendancies: ["Invoker", "Acolyte of Chayula"] },
+  { name: "Druid",     ascendancies: ["Oracle", "Shaman"] },
+];
 
 function StarRating({
   value,
@@ -79,6 +91,54 @@ function ListingCard({
   );
 }
 
+const REPORT_REASONS = ["Spam", "Inappropriate content", "Misinformation", "Harassment", "Other"];
+
+function ReportModal({
+  onClose,
+  onSubmit,
+}: {
+  onClose: () => void;
+  onSubmit: (reason: string) => void;
+}) {
+  const [reason, setReason] = useState("");
+  return (
+    <div className="ReportModal-overlay" onClick={onClose}>
+      <div className="ReportModal" onClick={(e) => e.stopPropagation()}>
+        <h3>Report content</h3>
+        <select value={reason} onChange={(e) => setReason(e.target.value)}>
+          <option value="">Select a reason…</option>
+          {REPORT_REASONS.map((r) => <option key={r} value={r}>{r}</option>)}
+        </select>
+        <div className="modal-actions">
+          <button className="cancel-btn" onClick={onClose}>Cancel</button>
+          <button
+            className="report-submit-btn"
+            disabled={!reason}
+            onClick={() => { onSubmit(reason); onClose(); }}
+          >Submit report</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+type CommentNode = MarketplaceComment & { replies: CommentNode[] };
+
+function buildTree(flat: MarketplaceComment[]): CommentNode[] {
+  const map = new Map<string, CommentNode>();
+  flat.forEach((c) => map.set(c.id, { ...c, replies: [] }));
+  const roots: CommentNode[] = [];
+  flat.forEach((c) => {
+    const node = map.get(c.id)!;
+    if (c.parentId && map.has(c.parentId)) {
+      map.get(c.parentId)!.replies.push(node);
+    } else {
+      roots.push(node);
+    }
+  });
+  return roots;
+}
+
 function DetailView({
   listingId,
   myUserId,
@@ -88,14 +148,21 @@ function DetailView({
   myUserId: string;
   onBack: () => void;
 }) {
-  const [listing, setListing] = useState<MarketplaceBuildDetail | null>(null);
+  const [listing, setListing] = useState<MarketplaceBuild | null>(null);
   const [liked, setLiked] = useState(false);
   const [myRating, setMyRating] = useState<number | null>(null);
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(true);
   const [submittingComment, setSubmittingComment] = useState(false);
+  const [myVotes, setMyVotes] = useState<Record<string, number>>({});
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const [hiddenComments, setHiddenComments] = useState<Set<string>>(new Set());
+  const [reportTarget, setReportTarget] = useState<{ id: string; type: "comment" | "listing" } | null>(null);
+  const [reportedIds, setReportedIds] = useState<Set<string>>(new Set());
+  const [showEdit, setShowEdit] = useState(false);
 
-  const isMyListing = listing?.authorId === myUserId;
+  const isMyListing = !!myUserId && myUserId !== "anon" && listing?.authorId === myUserId;
 
   useEffect(() => {
     let cancelled = false;
@@ -104,11 +171,15 @@ function DetailView({
       marketplaceService.getListing(listingId),
       marketplaceService.getUserLike(listingId),
       marketplaceService.getUserRating(listingId),
-    ]).then(([detail, userLiked, userRating]) => {
+      marketplaceService.getUserCommentVotes(listingId),
+      marketplaceService.getUserHiddenComments(listingId),
+    ]).then(([detail, userLiked, userRating, userVotes, userHidden]) => {
       if (cancelled) return;
       setListing(detail);
       setLiked(userLiked);
       setMyRating(userRating);
+      setMyVotes(userVotes);
+      setHiddenComments(new Set(userHidden));
       setLoading(false);
     });
     return () => { cancelled = true; };
@@ -145,14 +216,13 @@ function DetailView({
 
   const handleDownload = async () => {
     if (!listing) return;
-    // Import breakpoints into the user's active build set
-    const currentId = buildStorage.getCurrentBuildSetId();
-    if (!currentId) {
-      alert("Select or create a build first before importing.");
-      return;
-    }
-    for (const bp of listing.breakpoints) {
-      await buildStorage.addBreakpoint(currentId, {
+    const newBuild = await buildStorage.createBuildSet(listing.name);
+    await buildStorage.updateBuildSet(newBuild.id, {
+      className: listing.className || undefined,
+      ascendancy: listing.ascendancy || undefined,
+    });
+    for (const bp of listing.breakpoints ?? []) {
+      await buildStorage.addBreakpoint(newBuild.id, {
         name: bp.name,
         level: bp.level,
         allocatedNodes: bp.allocatedNodes,
@@ -161,10 +231,12 @@ function DetailView({
         selectedAscendancy: bp.selectedAscendancy ?? null,
       });
     }
+    buildStorage.setCurrentBuildSetId(newBuild.id);
     await marketplaceService.incrementDownload(listingId);
     setListing((prev) =>
       prev ? { ...prev, downloadCount: prev.downloadCount + 1 } : prev
     );
+    alert(`"${listing.name}" imported as a new build.`);
   };
 
   const handleDeleteListing = async () => {
@@ -173,14 +245,58 @@ function DetailView({
     onBack();
   };
 
-  const handleSubmitComment = async () => {
-    if (!comment.trim() || myUserId === "anon") return;
+  const handleSubmitComment = async (parentId?: string) => {
+    const text = parentId ? replyText : comment;
+    if (!text.trim() || myUserId === "anon") return;
     setSubmittingComment(true);
-    await marketplaceService.addComment(listingId, comment.trim());
+    await marketplaceService.addComment(listingId, text.trim(), parentId);
     const updated = await marketplaceService.getListing(listingId);
     setListing(updated);
-    setComment("");
+    if (parentId) {
+      setReplyText("");
+      setReplyingTo(null);
+    } else {
+      setComment("");
+    }
     setSubmittingComment(false);
+  };
+
+  const handleHideComment = async (commentId: string) => {
+    const isHidden = hiddenComments.has(commentId);
+    setHiddenComments((prev) => {
+      const next = new Set(prev);
+      isHidden ? next.delete(commentId) : next.add(commentId);
+      return next;
+    });
+    await marketplaceService.toggleHideComment(commentId);
+  };
+
+  const handleReport = async (reason: string) => {
+    if (!reportTarget) return;
+    const alreadyReported = await marketplaceService.reportContent(reportTarget.id, reportTarget.type, reason);
+    if (alreadyReported === false) {
+      alert("You have already reported this content.");
+    } else {
+      setReportedIds((prev) => new Set([...prev, reportTarget.id]));
+    }
+  };
+
+  const handleVoteComment = async (commentId: string, value: 1 | -1 | 0) => {
+    if (myUserId === "anon") return;
+    const prev = myVotes[commentId] ?? 0;
+    const delta = value - prev;
+    setMyVotes((v) => ({ ...v, [commentId]: value }));
+    setListing((prev) =>
+      prev
+        ? {
+            ...prev,
+            comments: prev.comments?.map((c) =>
+              c.id === commentId ? { ...c, score: c.score + delta } : c
+            ),
+          }
+        : prev
+    );
+    await marketplaceService.voteComment(commentId, value);
   };
 
   const handleDeleteComment = async (commentId: string) => {
@@ -189,6 +305,88 @@ function DetailView({
       prev
         ? { ...prev, comments: prev.comments.filter((c) => c.id !== commentId) }
         : prev
+    );
+  };
+
+  const renderComment = (node: CommentNode, depth: number): React.ReactNode => {
+    const isHidden = hiddenComments.has(node.id);
+
+    if (isHidden) {
+      return (
+        <div key={node.id} className="comment comment-hidden" style={{ marginLeft: depth * 16 }}>
+          <span className="hidden-label">[comment hidden]</span>
+          <button className="unhide-btn" onClick={() => handleHideComment(node.id)}>Unhide</button>
+          {node.replies.length > 0 && node.replies.map((child) => renderComment(child, depth + 1))}
+        </div>
+      );
+    }
+
+    return (
+      <div key={node.id} className={classNames("comment", { nested: depth > 0 })} style={{ marginLeft: depth * 16 }}>
+        <div className="comment-vote-col">
+          <button
+            className={classNames("vote-btn up", { active: (myVotes[node.id] ?? 0) === 1 })}
+            onClick={() => handleVoteComment(node.id, (myVotes[node.id] ?? 0) === 1 ? 0 : 1)}
+            title="Upvote"
+          >▲</button>
+          <span className="vote-score">{node.score}</span>
+          <button
+            className={classNames("vote-btn down", { active: (myVotes[node.id] ?? 0) === -1 })}
+            onClick={() => handleVoteComment(node.id, (myVotes[node.id] ?? 0) === -1 ? 0 : -1)}
+            title="Downvote"
+          >▼</button>
+        </div>
+
+        <div className="comment-body-col">
+          <div className="comment-header">
+            <span className="comment-author">{node.authorName}</span>
+            <span className="comment-date">{new Date(node.createdAt).toLocaleDateString()}</span>
+            {myUserId !== "anon" && (
+              <button className="reply-btn" onClick={() => {
+                setReplyingTo(replyingTo === node.id ? null : node.id);
+                setReplyText("");
+              }}>Reply</button>
+            )}
+            <button className="hide-btn" onClick={() => handleHideComment(node.id)}>Hide</button>
+            {!reportedIds.has(node.id) ? (
+              <button className="report-btn" onClick={() => setReportTarget({ id: node.id, type: "comment" })}>
+                Report
+              </button>
+            ) : (
+              <span className="reported-label">Reported</span>
+            )}
+            {node.authorId === myUserId && (
+              <button className="comment-delete" onClick={() => handleDeleteComment(node.id)}>×</button>
+            )}
+          </div>
+
+          <p className="comment-body">{node.body}</p>
+
+          {replyingTo === node.id && (
+            <div className="reply-input-row">
+              <input
+                className="comment-input"
+                placeholder="Write a reply…"
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSubmitComment(node.id);
+                  if (e.key === "Escape") setReplyingTo(null);
+                }}
+                autoFocus
+              />
+              <button
+                className="comment-submit"
+                disabled={!replyText.trim() || submittingComment}
+                onClick={() => handleSubmitComment(node.id)}
+              >Reply</button>
+              <button className="reply-cancel" onClick={() => setReplyingTo(null)}>Cancel</button>
+            </div>
+          )}
+
+          {node.replies.map((child) => renderComment(child, depth + 1))}
+        </div>
+      </div>
     );
   };
 
@@ -214,12 +412,47 @@ function DetailView({
     <div className="DetailView">
       <div className="detail-topbar">
         <button className="back-btn" onClick={onBack}>← Back</button>
-        {isMyListing && (
-          <button className="delete-btn" onClick={handleDeleteListing}>
-            Delete listing
-          </button>
-        )}
+        <div className="topbar-actions">
+          {!isMyListing && (
+            !reportedIds.has(listingId) ? (
+              <button className="report-btn" onClick={() => setReportTarget({ id: listingId, type: "listing" })}>
+                Report build
+              </button>
+            ) : (
+              <span className="reported-label">Reported</span>
+            )
+          )}
+          {isMyListing && (
+            <>
+              <button className="edit-btn" onClick={() => setShowEdit(true)}>
+                Edit listing
+              </button>
+              <button className="delete-btn" onClick={handleDeleteListing}>
+                Delete listing
+              </button>
+            </>
+          )}
+        </div>
       </div>
+
+      {reportTarget && (
+        <ReportModal
+          onClose={() => setReportTarget(null)}
+          onSubmit={handleReport}
+        />
+      )}
+
+      {showEdit && listing && (
+        <EditListingModal
+          listing={listing}
+          onClose={() => setShowEdit(false)}
+          onSaved={async () => {
+            setShowEdit(false);
+            const updated = await marketplaceService.getListing(listingId);
+            setListing(updated);
+          }}
+        />
+      )}
 
       <div className="detail-header">
         <div className="detail-title-row">
@@ -263,7 +496,7 @@ function DetailView({
         </button>
 
         <button className="download-btn" onClick={handleDownload}>
-          ↓ Import to active build · {listing.downloadCount}
+          ↓ Import as new build · {listing.downloadCount}
         </button>
       </div>
 
@@ -287,7 +520,7 @@ function DetailView({
       )}
 
       <div className="detail-comments">
-        <h3>Comments ({listing.comments.length})</h3>
+        <h3>Comments ({(listing.comments ?? []).length})</h3>
 
         <div className="comment-input-row">
           <input
@@ -301,35 +534,127 @@ function DetailView({
           <button
             className="comment-submit"
             disabled={!comment.trim() || submittingComment || myUserId === "anon"}
-            onClick={handleSubmitComment}
+            onClick={() => handleSubmitComment()}
           >
             Post
           </button>
         </div>
 
         <div className="comments-list">
-          {listing.comments.length === 0 && (
+          {(listing.comments ?? []).length === 0 && (
             <p className="no-comments">No comments yet.</p>
           )}
-          {listing.comments.map((c) => (
-            <div key={c.id} className="comment">
-              <div className="comment-header">
-                <span className="comment-author">{c.authorName}</span>
-                <span className="comment-date">
-                  {new Date(c.createdAt).toLocaleDateString()}
-                </span>
-                {c.authorId === myUserId && (
-                  <button
-                    className="comment-delete"
-                    onClick={() => handleDeleteComment(c.id)}
-                  >
-                    ×
-                  </button>
-                )}
-              </div>
-              <p className="comment-body">{c.body}</p>
-            </div>
+          {buildTree(listing.comments ?? []).map((node) =>
+            renderComment(node, 0)
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EditListingModal({
+  listing,
+  onClose,
+  onSaved,
+}: {
+  listing: MarketplaceBuild;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [buildSets, setBuildSets] = useState<
+    { id: string; name: string; className: string; ascendancy: string; breakpoints: any[] }[]
+  >([]);
+  const [name, setName] = useState(listing.name);
+  const [description, setDescription] = useState(listing.description);
+  const [syncBuildId, setSyncBuildId] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    buildStorage.getAllBuildSets().then(setBuildSets);
+  }, []);
+
+  const syncBuild = buildSets.find((b) => b.id === syncBuildId) ?? null;
+  const missingClass = syncBuild ? !syncBuild.className : false;
+  const missingSteps = syncBuild ? syncBuild.breakpoints.length === 0 : false;
+  const canSave = name.trim().length > 0 && !submitting &&
+    (!syncBuildId || (!missingClass && !missingSteps));
+
+  const handleSave = async () => {
+    if (!canSave) return;
+    setSubmitting(true);
+    await marketplaceService.updateListing(listing.id, {
+      name: name.trim(),
+      description,
+      className: syncBuild ? syncBuild.className : listing.className,
+      ascendancy: syncBuild ? syncBuild.ascendancy || undefined : listing.ascendancy || undefined,
+      breakpoints: syncBuild
+        ? syncBuild.breakpoints.map((bp: any) => ({
+            name: bp.name,
+            level: bp.level,
+            allocatedNodes: bp.allocatedNodes,
+            allocatedAscendancyNodes: bp.allocatedAscendancyNodes,
+            selectedClass: bp.selectedClass ?? undefined,
+            selectedAscendancy: bp.selectedAscendancy ?? undefined,
+          }))
+        : (listing.breakpoints ?? []).map((bp) => ({
+            name: bp.name,
+            level: bp.level,
+            allocatedNodes: bp.allocatedNodes,
+            allocatedAscendancyNodes: bp.allocatedAscendancyNodes,
+            selectedClass: bp.selectedClass ?? undefined,
+            selectedAscendancy: bp.selectedAscendancy ?? undefined,
+          })),
+    });
+    setSubmitting(false);
+    onSaved();
+  };
+
+  return (
+    <div className="PublishModal-overlay" onClick={onClose}>
+      <div className="PublishModal" onClick={(e) => e.stopPropagation()}>
+        <h3>Edit listing</h3>
+
+        <label>Name</label>
+        <input
+          className="name-input"
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          maxLength={80}
+        />
+
+        <label>Description</label>
+        <textarea
+          placeholder="Describe your build, playstyle, or any tips…"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={4}
+        />
+
+        <label>Re-sync steps from local build (optional)</label>
+        <select value={syncBuildId} onChange={(e) => setSyncBuildId(e.target.value)}>
+          <option value="">— Keep existing steps —</option>
+          {buildSets.map((b) => (
+            <option key={b.id} value={b.id}>
+              {b.name}
+              {b.className ? ` (${b.className}${b.ascendancy ? ` · ${b.ascendancy}` : ""})` : ""}
+            </option>
           ))}
+        </select>
+
+        {syncBuild && (missingClass || missingSteps) && (
+          <div className="publish-validation">
+            {missingClass && <span>⚠ Selected build has no class set.</span>}
+            {missingSteps && <span>⚠ Selected build has no steps.</span>}
+          </div>
+        )}
+
+        <div className="modal-actions">
+          <button className="cancel-btn" onClick={onClose}>Cancel</button>
+          <button className="publish-btn" disabled={!canSave} onClick={handleSave}>
+            {submitting ? "Saving…" : "Save changes"}
+          </button>
         </div>
       </div>
     </div>
@@ -357,9 +682,14 @@ function PublishModal({
     });
   }, []);
 
+  const selectedBuild = buildSets.find((b) => b.id === selectedId) ?? null;
+  const missingClass = selectedBuild ? !selectedBuild.className : false;
+  const missingSteps = selectedBuild ? selectedBuild.breakpoints.length === 0 : false;
+  const canPublish = !!selectedId && !missingClass && !missingSteps && !submitting;
+
   const handlePublish = async () => {
-    const build = buildSets.find((b) => b.id === selectedId);
-    if (!build || !build.className) return;
+    const build = selectedBuild;
+    if (!build || !canPublish) return;
     setSubmitting(true);
     await marketplaceService.publish({
       name: build.name,
@@ -402,11 +732,18 @@ function PublishModal({
           rows={4}
         />
 
+        {selectedBuild && (missingClass || missingSteps) && (
+          <div className="publish-validation">
+            {missingClass && <span>⚠ Build has no class set.</span>}
+            {missingSteps && <span>⚠ Build has no steps.</span>}
+          </div>
+        )}
+
         <div className="modal-actions">
           <button className="cancel-btn" onClick={onClose}>Cancel</button>
           <button
             className="publish-btn"
-            disabled={!selectedId || submitting}
+            disabled={!canPublish}
             onClick={handlePublish}
           >
             {submitting ? "Publishing…" : "Publish"}
@@ -424,6 +761,8 @@ export function ScreenMarketplace({ className }: ScreenMarketplaceProps) {
   const [myUserId, setMyUserId] = useState("anon");
   const [showPublish, setShowPublish] = useState(false);
   const [search, setSearch] = useState("");
+  const [filterClass, setFilterClass] = useState("");
+  const [filterAscendancy, setFilterAscendancy] = useState("");
 
   const loadListings = () => {
     setLoading(true);
@@ -438,13 +777,21 @@ export function ScreenMarketplace({ className }: ScreenMarketplaceProps) {
     marketplaceService.getMyUserId().then(setMyUserId);
   }, []);
 
-  const filtered = listings.filter(
-    (l) =>
-      !search ||
-      l.name.toLowerCase().includes(search.toLowerCase()) ||
-      l.authorName.toLowerCase().includes(search.toLowerCase()) ||
-      l.className.toLowerCase().includes(search.toLowerCase())
-  );
+  const availableAscendancies = CLASSES.find((c) => c.name === filterClass)?.ascendancies ?? [];
+
+  const filtered = listings.filter((l) => {
+    if (search) {
+      const q = search.toLowerCase();
+      const matches =
+        l.name.toLowerCase().includes(q) ||
+        l.authorName.toLowerCase().includes(q) ||
+        l.className.toLowerCase().includes(q);
+      if (!matches) return false;
+    }
+    if (filterClass && l.className !== filterClass) return false;
+    if (filterAscendancy && l.ascendancy !== filterAscendancy) return false;
+    return true;
+  });
 
   if (view.kind === "detail") {
     return (
@@ -466,10 +813,27 @@ export function ScreenMarketplace({ className }: ScreenMarketplaceProps) {
       <div className="marketplace-toolbar">
         <input
           className="search-input"
-          placeholder="Search builds, authors, class…"
+          placeholder="Search builds, authors…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+        <select
+          className="filter-select"
+          value={filterClass}
+          onChange={(e) => { setFilterClass(e.target.value); setFilterAscendancy(""); }}
+        >
+          <option value="">All classes</option>
+          {CLASSES.map((c) => <option key={c.name} value={c.name}>{c.name}</option>)}
+        </select>
+        <select
+          className="filter-select"
+          value={filterAscendancy}
+          onChange={(e) => setFilterAscendancy(e.target.value)}
+          disabled={!filterClass}
+        >
+          <option value="">All ascendancies</option>
+          {availableAscendancies.map((a) => <option key={a} value={a}>{a}</option>)}
+        </select>
         <button className="refresh-btn" onClick={loadListings}>↻ Refresh</button>
         {myUserId !== "anon" && (
           <button className="publish-btn" onClick={() => setShowPublish(true)}>
@@ -482,7 +846,7 @@ export function ScreenMarketplace({ className }: ScreenMarketplaceProps) {
         <div className="marketplace-loading">Loading listings…</div>
       ) : filtered.length === 0 ? (
         <div className="marketplace-empty">
-          {search ? "No builds match your search." : "No builds published yet. Be the first!"}
+          {(search || filterClass || filterAscendancy) ? "No builds match your filters." : "No builds published yet. Be the first!"}
         </div>
       ) : (
         <div className="listings-grid">

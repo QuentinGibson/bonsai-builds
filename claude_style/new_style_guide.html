@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ethereal Navigator — Style Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Inter:wght@300;400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ============================================================
+     ETHEREAL NAVIGATOR DESIGN SYSTEM
+     Migration guide: BonsaiBuilds (warm/amber) → Ethereal (cool/teal)
+  ============================================================ */
+
+    :root {
+      /* --- BACKGROUND LAYERS --- */
+      --bg-canvas: #080C12;
+      /* replaces: #0D0B09 (warm black) */
+      --bg-surface: #0E1520;
+      /* replaces: #15110D (warm dark) */
+      --bg-panel: #111927;
+      /* replaces: #1A1410 (warm panel) */
+      --bg-card: #151F2E;
+      /* replaces: #1E1A14 (warm card) */
+      --bg-card-hover: #1A2638;
+      --bg-elevated: #1D2A3A;
+
+      /* --- ACCENT / INTERACTIVE --- */
+      --accent-primary: #00D4B4;
+      /* replaces: #C8952A (amber/gold) — teal */
+      --accent-glow: rgba(0, 212, 180, 0.15);
+      --accent-border: rgba(0, 212, 180, 0.35);
+      --accent-hover: #00EDCA;
+
+      /* --- TEXT --- */
+      --text-primary: #E8EEF5;
+      /* replaces: #E8D9B5 (warm white) */
+      --text-secondary: #7A8FA8;
+      /* replaces: #8A7355 (warm gray) */
+      --text-muted: #3D5168;
+      /* replaces: #4A3C28 (warm muted) */
+      --text-accent: #00D4B4;
+      /* replaces: #C8952A */
+      --text-label: #4A6580;
+      /* replaces: #6B5840 — uppercase labels */
+
+      /* --- SEMANTIC --- */
+      --color-positive: #00D4B4;
+      /* teal (was: amber) */
+      --color-negative: #E85D5D;
+      /* coral-red (was: same) */
+      --color-neutral: #7A8FA8;
+      /* cool gray (was: warm gray) */
+      --color-ascendancy: #A87BE8;
+      /* purple — retained, cooled */
+
+      /* --- BORDERS --- */
+      --border-subtle: rgba(0, 212, 180, 0.08);
+      --border-default: rgba(0, 212, 180, 0.15);
+      --border-strong: rgba(0, 212, 180, 0.35);
+      --border-panel: rgba(255, 255, 255, 0.05);
+
+      /* --- TREE NODES --- */
+      --node-default: #1E3D56;
+      /* replaces: #3D2A14 (amber node) */
+      --node-active: #00D4B4;
+      /* replaces: #C8952A */
+      --node-connector: #00B89C;
+      /* replaces: #A07828 */
+
+      /* --- TYPOGRAPHY --- */
+      --font-display: 'Rajdhani', 'Trebuchet MS', sans-serif;
+      /* replaces: serif / condensed gothic */
+      --font-mono: 'Share Tech Mono', 'Courier New', monospace;
+      /* replaces: monospace labels */
+      --font-body: 'Inter', system-ui, sans-serif;
+      /* UI text */
+      --font-label-tracking: 0.12em;
+      /* replaces: 0.06em (tighter warm tracking) */
+
+      /* --- MISC --- */
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 10px;
+      --sidebar-width: 180px;
+      --panel-width: 300px;
+    }
+
+    /* ============ RESET / BASE ============ */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: #040810;
+      color: #c8d8e8;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ============ DOC LAYOUT ============ */
+    .doc-header {
+      background: linear-gradient(135deg, #080C12 0%, #0E1929 100%);
+      border-bottom: 1px solid rgba(0, 212, 180, 0.2);
+      padding: 48px 60px 36px;
+    }
+
+    .doc-header h1 {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: #E8EEF5;
+      text-transform: uppercase;
+    }
+
+    .doc-header .subtitle {
+      color: #4A6580;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+    .doc-header .tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-top: 14px;
+      border: 1px solid rgba(0, 212, 180, 0.4);
+      color: #00D4B4;
+      background: rgba(0, 212, 180, 0.08);
+    }
+
+    .doc-nav {
+      background: #090D16;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 0 60px;
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+    }
+
+    .doc-nav a {
+      padding: 14px 18px;
+      color: #4A6580;
+      text-decoration: none;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .doc-nav a:hover {
+      color: #00D4B4;
+      border-bottom-color: rgba(0, 212, 180, 0.4);
+    }
+
+    .doc-body {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 60px 60px 80px;
+    }
+
+    .section {
+      margin-bottom: 64px;
+    }
+
+    .section-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #00D4B4;
+      margin-bottom: 6px;
+    }
+
+    .section-heading {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: #E8EEF5;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(0, 212, 180, 0.12);
+    }
+
+    .note {
+      padding: 12px 16px;
+      border-left: 3px solid rgba(0, 212, 180, 0.5);
+      background: rgba(0, 212, 180, 0.05);
+      border-radius: 0 6px 6px 0;
+      font-size: 13px;
+      color: #7A8FA8;
+      margin-bottom: 28px;
+    }
+
+    /* ============ MIGRATION ARROW ============ */
+    .migration {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .migration-arrow {
+      font-size: 18px;
+      color: #3D5168;
+      text-align: center;
+    }
+
+    .from-box,
+    .to-box {
+      padding: 14px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .from-box {
+      background: #1A1008;
+      border: 1px solid #3D2810;
+      color: #B89060;
+    }
+
+    .from-box .label {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #6B5840;
+      margin-bottom: 6px;
+    }
+
+    .to-box {
+      background: #0B1929;
+      border: 1px solid rgba(0, 212, 180, 0.25);
+      color: #00D4B4;
+    }
+
+    .to-box .label {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #3D5168;
+      margin-bottom: 6px;
+    }
+
+    .to-box strong {
+      color: #E8EEF5;
+    }
+
+    /* ============ COLOR PALETTE ============ */
+    .palette-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .color-swatch {
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .swatch-block {
+      height: 56px;
+    }
+
+    .swatch-info {
+      padding: 10px 12px;
+      background: #0E1520;
+    }
+
+    .swatch-name {
+      font-size: 12px;
+      font-weight: 500;
+      color: #C8D8E8;
+      margin-bottom: 2px;
+    }
+
+    .swatch-var {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: #4A6580;
+      margin-bottom: 2px;
+    }
+
+    .swatch-hex {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: #7A8FA8;
+    }
+
+    .swatch-replaces {
+      font-size: 10px;
+      color: #3D5168;
+      margin-top: 4px;
+    }
+
+    /* ============ TYPOGRAPHY ============ */
+    .type-specimen {
+      background: #0E1520;
+      border: 1px solid rgba(0, 212, 180, 0.1);
+      border-radius: 10px;
+      padding: 28px 32px;
+      margin-bottom: 14px;
+    }
+
+    .type-specimen .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+
+    .type-specimen .role {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #4A6580;
+    }
+
+    .type-specimen .spec {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: #3D5168;
+      text-align: right;
+    }
+
+    .type-specimen .usage {
+      font-size: 11px;
+      color: #4A6580;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .t-display-xl {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 40px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #E8EEF5;
+      line-height: 1.1;
+    }
+
+    .t-display-lg {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #E8EEF5;
+    }
+
+    .t-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #4A6580;
+    }
+
+    .t-stat-primary {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 48px;
+      font-weight: 700;
+      color: #00D4B4;
+      line-height: 1;
+    }
+
+    .t-stat-secondary {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 48px;
+      font-weight: 700;
+      color: #A87BE8;
+      line-height: 1;
+    }
+
+    .t-body {
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      color: #7A8FA8;
+    }
+
+    .t-nav {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #4A6580;
+    }
+
+    /* ============ COMPONENTS ============ */
+    .component-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 700px) {
+      .component-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .component-card {
+      background: #0E1520;
+      border: 1px solid rgba(0, 212, 180, 0.1);
+      border-radius: 10px;
+      padding: 24px;
+    }
+
+    .component-card .card-label {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #4A6580;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .component-card .card-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* STAT CARD */
+    .stat-card {
+      background: #111927;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-bottom: 10px;
+    }
+
+    .stat-card .stat-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #4A6580;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .stat-card .stat-value {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 48px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .stat-card .stat-total {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 22px;
+      font-weight: 400;
+      color: #3D5168;
+    }
+
+    /* NAV SIDEBAR */
+    .nav-demo {
+      background: #0B1219;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 12px 0;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 20px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #3D5168;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-left: 2px solid transparent;
+      position: relative;
+    }
+
+    .nav-item.active {
+      color: #E8EEF5;
+      border-left-color: #00D4B4;
+      background: rgba(0, 212, 180, 0.06);
+    }
+
+    .nav-item .nav-icon {
+      width: 16px;
+      height: 16px;
+      opacity: 0.6;
+    }
+
+    .nav-item.active .nav-icon {
+      opacity: 1;
+      color: #00D4B4;
+    }
+
+    /* OPTIMIZE BUTTON */
+    .btn-optimize {
+      display: inline-block;
+      padding: 10px 22px;
+      border: 1px solid #00D4B4;
+      border-radius: 4px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #00D4B4;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 16px;
+    }
+
+    .btn-optimize:hover {
+      background: rgba(0, 212, 180, 0.1);
+    }
+
+    /* STAT WEIGHT ROW */
+    .stat-weight-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 13px;
+    }
+
+    .stat-weight-row:last-child {
+      border-bottom: none;
+    }
+
+    .stat-weight-name {
+      color: #7A8FA8;
+    }
+
+    .stat-positive {
+      color: #00D4B4;
+      font-weight: 500;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .stat-neutral {
+      color: #3D5168;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .stat-negative {
+      color: #E85D5D;
+      font-weight: 500;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    /* DROPDOWN */
+    .step-dropdown {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: #0B1219;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      color: #C8D8E8;
+      cursor: pointer;
+    }
+
+    .step-dropdown .chevron {
+      color: #4A6580;
+    }
+
+    /* ============ CSS VARS BLOCK ============ */
+    .code-block {
+      background: #08101A;
+      border: 1px solid rgba(0, 212, 180, 0.12);
+      border-radius: 8px;
+      padding: 24px 28px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+      line-height: 1.9;
+      overflow-x: auto;
+      tab-size: 2;
+      margin-bottom: 20px;
+    }
+
+    .code-block .c-comment {
+      color: #3D5168;
+    }
+
+    .code-block .c-prop {
+      color: #7A8FA8;
+    }
+
+    .code-block .c-value-old {
+      color: #C8952A;
+    }
+
+    .code-block .c-value {
+      color: #00D4B4;
+    }
+
+    .code-block .c-string {
+      color: #A87BE8;
+    }
+
+    .code-block .c-selector {
+      color: #E8EEF5;
+    }
+
+    /* ============ DIFF TABLE ============ */
+    .diff-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-bottom: 28px;
+    }
+
+    .diff-table th {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #4A6580;
+      text-align: left;
+      padding: 8px 16px;
+      border-bottom: 1px solid rgba(0, 212, 180, 0.15);
+      background: rgba(0, 212, 180, 0.04);
+    }
+
+    .diff-table td {
+      padding: 10px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      vertical-align: middle;
+    }
+
+    .diff-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .diff-table td:first-child {
+      color: #C8D8E8;
+      font-weight: 500;
+    }
+
+    .old-val {
+      font-family: 'Share Tech Mono', monospace;
+      color: #C8952A;
+      font-size: 12px;
+    }
+
+    .new-val {
+      font-family: 'Share Tech Mono', monospace;
+      color: #00D4B4;
+      font-size: 12px;
+    }
+
+    /* ============ LIVE PREVIEW ============ */
+    .preview-wrapper {
+      background: #080C12;
+      border: 1px solid rgba(0, 212, 180, 0.15);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .preview-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: #0B1219;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .preview-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .preview-label {
+      margin-left: 6px;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #3D5168;
+    }
+
+    .preview-inner {
+      display: flex;
+      height: 380px;
+      overflow: hidden;
+    }
+
+    .preview-sidebar {
+      width: 140px;
+      background: #0B1219;
+      border-right: 1px solid rgba(255, 255, 255, 0.04);
+      padding: 16px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .preview-sidebar .app-name {
+      padding: 8px 16px 16px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #E8EEF5;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      margin-bottom: 8px;
+    }
+
+    .preview-sidebar .app-sub {
+      font-size: 9px;
+      color: #3D5168;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .preview-canvas {
+      flex: 1;
+      background: #0A1018;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .preview-dots {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(0, 180, 152, 0.25) 1.5px, transparent 1.5px);
+      background-size: 36px 36px;
+      background-position: 18px 18px;
+      pointer-events: none;
+    }
+
+    .connector-line {
+      position: absolute;
+      background: rgba(0, 212, 180, 0.4);
+      height: 1.5px;
+      transform-origin: left center;
+    }
+
+    .preview-panel {
+      width: 240px;
+      background: #0E1520;
+      border-left: 1px solid rgba(255, 255, 255, 0.04);
+      padding: 20px 16px;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+
+    .preview-panel .build-label {
+      font-size: 9px;
+      color: #3D5168;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .preview-panel .build-name {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #E8EEF5;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .preview-mini-card {
+      background: #111927;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+
+    .preview-mini-card .plabel {
+      font-size: 9px;
+      color: #3D5168;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .preview-mini-card .pnum {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 36px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .preview-mini-card .ptotal {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 16px;
+      color: #3D5168;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ========== HEADER ========== -->
+  <div class="doc-header">
+    <div class="doc-header__title">
+      <div style="color:#4A6580;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:8px">Visual
+        Design System</div>
+      <h1>Ethereal Navigator</h1>
+      <div class="subtitle">Migration guide — BonsaiBuilds warm amber → cool teal</div>
+      <div class="tag">Style Reference v1.0</div>
+    </div>
+  </div>
+
+  <nav class="doc-nav">
+    <a href="#palette">Colors</a>
+    <a href="#typography">Typography</a>
+    <a href="#variables">CSS Variables</a>
+    <a href="#components">Components</a>
+    <a href="#preview">Live Preview</a>
+  </nav>
+
+  <div class="doc-body">
+
+    <!-- ========== OVERVIEW ========== -->
+    <div class="section">
+      <div class="note">
+        This guide defines the complete visual transformation from the warm amber/parchment aesthetic of BonsaiBuilds to
+        the cool teal/slate aesthetic of Ethereal Navigator. Content, layout structure, and component hierarchy remain
+        unchanged — only color, font, and surface treatment are replaced.
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div style="background:#1A1008;border:1px solid #3D2810;border-radius:10px;padding:24px">
+          <div style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:#6B5840;margin-bottom:12px">
+            Before — BonsaiBuilds</div>
+          <div
+            style="font-family:Georgia,serif;font-size:22px;color:#C8952A;letter-spacing:0.04em;text-transform:uppercase;font-weight:bold">
+            Passive Tree Planner</div>
+          <div
+            style="display:flex;justify-content:space-between;margin-top:16px;padding-top:16px;border-top:1px solid #3D2810">
+            <div>
+              <div style="font-size:9px;color:#6B5840;letter-spacing:0.12em;text-transform:uppercase">Skill Points</div>
+              <div style="font-family:Georgia,serif;font-size:32px;font-weight:bold;color:#C8952A">0 <span
+                  style="font-size:16px;color:#5A4020">/ 123</span></div>
+            </div>
+            <div>
+              <div style="font-size:9px;color:#6B5840;letter-spacing:0.12em;text-transform:uppercase">Ascendancy</div>
+              <div style="font-family:Georgia,serif;font-size:32px;font-weight:bold;color:#C8952A">0 <span
+                  style="font-size:16px;color:#5A4020">/ 8</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:#0E1520;border:1px solid rgba(0,212,180,0.2);border-radius:10px;padding:24px">
+          <div style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:#3D5168;margin-bottom:12px">
+            After — Ethereal Navigator</div>
+          <div
+            style="font-family:'Rajdhani',sans-serif;font-size:22px;color:#E8EEF5;letter-spacing:0.08em;text-transform:uppercase;font-weight:700">
+            Passive Tree</div>
+          <div
+            style="display:flex;justify-content:space-between;margin-top:16px;padding-top:16px;border-top:1px solid rgba(0,212,180,0.1)">
+            <div>
+              <div
+                style="font-family:'Share Tech Mono',monospace;font-size:9px;color:#3D5168;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:4px">
+                Passive Points</div>
+              <div style="font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;color:#00D4B4;line-height:1">
+                0 <span style="font-size:16px;color:#3D5168">/ 123</span></div>
+            </div>
+            <div>
+              <div
+                style="font-family:'Share Tech Mono',monospace;font-size:9px;color:#3D5168;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:4px">
+                Ascendancy</div>
+              <div style="font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;color:#A87BE8;line-height:1">
+                0 <span style="font-size:16px;color:#3D5168">/ 8</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== COLOR PALETTE ========== -->
+    <div class="section" id="palette">
+      <div class="section-title">01 / Colors</div>
+      <div class="section-heading">Color Palette</div>
+
+      <div style="margin-bottom:32px">
+        <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#4A6580;margin-bottom:14px">
+          Background Layers</div>
+        <div class="palette-grid">
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#080C12"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Canvas</div>
+              <div class="swatch-var">--bg-canvas</div>
+              <div class="swatch-hex">#080C12</div>
+              <div class="swatch-replaces">was: #0D0B09 (warm black)</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#0E1520"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Surface</div>
+              <div class="swatch-var">--bg-surface</div>
+              <div class="swatch-hex">#0E1520</div>
+              <div class="swatch-replaces">was: #15110D</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#111927"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Panel</div>
+              <div class="swatch-var">--bg-panel</div>
+              <div class="swatch-hex">#111927</div>
+              <div class="swatch-replaces">was: #1A1410 (warm panel)</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#151F2E"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Card</div>
+              <div class="swatch-var">--bg-card</div>
+              <div class="swatch-hex">#151F2E</div>
+              <div class="swatch-replaces">was: #1E1A14</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#4A6580;margin-bottom:14px">
+          Accent & Semantic</div>
+        <div class="palette-grid">
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#00D4B4"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Primary Accent</div>
+              <div class="swatch-var">--accent-primary</div>
+              <div class="swatch-hex">#00D4B4</div>
+              <div class="swatch-replaces">was: #C8952A (amber gold)</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#A87BE8"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Ascendancy</div>
+              <div class="swatch-var">--color-ascendancy</div>
+              <div class="swatch-hex">#A87BE8</div>
+              <div class="swatch-replaces">was: purple — cooled hue</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#E85D5D"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Negative / Danger</div>
+              <div class="swatch-var">--color-negative</div>
+              <div class="swatch-hex">#E85D5D</div>
+              <div class="swatch-replaces">retained, brightened</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#1E3D56"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Tree Node (inactive)</div>
+              <div class="swatch-var">--node-default</div>
+              <div class="swatch-hex">#1E3D56</div>
+              <div class="swatch-replaces">was: #3D2A14 (amber node)</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#4A6580;margin-bottom:14px">Text
+          Scale</div>
+        <div class="palette-grid">
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#E8EEF5"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Text Primary</div>
+              <div class="swatch-var">--text-primary</div>
+              <div class="swatch-hex">#E8EEF5</div>
+              <div class="swatch-replaces">was: #E8D9B5 (warm white)</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#7A8FA8"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Text Secondary</div>
+              <div class="swatch-var">--text-secondary</div>
+              <div class="swatch-hex">#7A8FA8</div>
+              <div class="swatch-replaces">was: #8A7355 (warm gray)</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#4A6580"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Label / Muted</div>
+              <div class="swatch-var">--text-label</div>
+              <div class="swatch-hex">#4A6580</div>
+              <div class="swatch-replaces">was: #6B5840</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#3D5168"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Text Muted</div>
+              <div class="swatch-var">--text-muted</div>
+              <div class="swatch-hex">#3D5168</div>
+              <div class="swatch-replaces">was: #4A3C28</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== TYPOGRAPHY ========== -->
+    <div class="section" id="typography">
+      <div class="section-title">02 / Typography</div>
+      <div class="section-heading">Type System</div>
+
+      <div class="note">
+        Replace Georgia / condensed serif with <strong>Rajdhani</strong> for display/UI text, and <strong>Share Tech
+          Mono</strong> for labels and stat readouts. Both have the angular, technical character needed for the
+        blue-slate aesthetic.
+      </div>
+
+      <table class="diff-table" style="margin-bottom:28px">
+        <thead>
+          <tr>
+            <th>Role</th>
+            <th>Before (BonsaiBuilds)</th>
+            <th>After (Ethereal Navigator)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Display / Headings</td>
+            <td><span class="old-val">Georgia, serif · bold</span></td>
+            <td><span class="new-val">'Rajdhani', sans-serif · 700</span></td>
+          </tr>
+          <tr>
+            <td>UI Labels</td>
+            <td><span class="old-val">monospace · tracking 0.06em</span></td>
+            <td><span class="new-val">'Share Tech Mono' · tracking 0.15em</span></td>
+          </tr>
+          <tr>
+            <td>Body / Secondary</td>
+            <td><span class="old-val">system-ui · regular</span></td>
+            <td><span class="new-val">'Inter' · 300-400</span></td>
+          </tr>
+          <tr>
+            <td>Stat Numbers</td>
+            <td><span class="old-val">Georgia · color: #C8952A</span></td>
+            <td><span class="new-val">Rajdhani 700 · color: --accent-primary or --color-ascendancy</span></td>
+          </tr>
+          <tr>
+            <td>Uppercase tracking</td>
+            <td><span class="old-val">0.06em</span></td>
+            <td><span class="new-val">0.12–0.18em (wider, technical)</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="type-specimen">
+        <div class="meta">
+          <div class="role">Display XL — Build Name</div>
+          <div class="spec">Rajdhani 700 · 40px · tracking 0.06em · uppercase · #E8EEF5</div>
+        </div>
+        <div class="t-display-xl">Bad Build</div>
+        <div class="usage">Used for: current build name, app title, major section headers</div>
+      </div>
+
+      <div class="type-specimen">
+        <div class="meta">
+          <div class="role">Label — Section Header</div>
+          <div class="spec">Share Tech Mono · 11px · tracking 0.15em · uppercase · #4A6580</div>
+        </div>
+        <div class="t-label">Passive Points</div>
+        <div class="usage">Used for: all card labels, sidebar section names, panel titles</div>
+      </div>
+
+      <div class="type-specimen">
+        <div class="meta">
+          <div class="role">Stat — Primary (Passive Points)</div>
+          <div class="spec">Rajdhani 700 · 48px · line-height 1 · #00D4B4</div>
+        </div>
+        <div class="t-stat-primary">0 <span style="font-size:24px;color:#3D5168">/ 123</span></div>
+        <div class="usage">Used for: passive point count, key metric values</div>
+      </div>
+
+      <div class="type-specimen">
+        <div class="meta">
+          <div class="role">Stat — Secondary (Ascendancy)</div>
+          <div class="spec">Rajdhani 700 · 48px · line-height 1 · #A87BE8</div>
+        </div>
+        <div class="t-stat-secondary">0 <span style="font-size:24px;color:#3D5168">/ 8</span></div>
+        <div class="usage">Used for: ascendancy point count</div>
+      </div>
+
+      <div class="type-specimen">
+        <div class="meta">
+          <div class="role">Nav Item</div>
+          <div class="spec">Rajdhani 500 · 14px · tracking 0.08em · uppercase</div>
+        </div>
+        <div class="t-nav">Tree · Builder · Market</div>
+        <div class="usage">Used for: sidebar navigation, top tab bar</div>
+      </div>
+    </div>
+
+    <!-- ========== CSS VARIABLES ========== -->
+    <div class="section" id="variables">
+      <div class="section-title">03 / CSS Variables</div>
+      <div class="section-heading">Design Token Reference</div>
+
+      <div class="note">
+        Drop this <code style="font-family:'Share Tech Mono',monospace;color:#00D4B4">:root</code> block into your
+        global stylesheet. These replace all inline warm-amber color values from BonsaiBuilds.
+      </div>
+
+      <div class="code-block">
+        <span class="c-selector">:root</span> {
+        <span class="c-comment">/* ── Backgrounds ─────────────────────────── */</span>
+        <span class="c-prop">--bg-canvas</span>: <span class="c-value">#080C12</span>; <span class="c-comment">/* was
+          #0D0B09 */</span>
+        <span class="c-prop">--bg-surface</span>: <span class="c-value">#0E1520</span>; <span class="c-comment">/* was
+          #15110D */</span>
+        <span class="c-prop">--bg-panel</span>: <span class="c-value">#111927</span>; <span class="c-comment">/* sidebar
+          bg — was #1A1410 */</span>
+        <span class="c-prop">--bg-card</span>: <span class="c-value">#151F2E</span>; <span class="c-comment">/* stat
+          cards — was #1E1A14 */</span>
+        <span class="c-prop">--bg-elevated</span>: <span class="c-value">#1D2A3A</span>; <span class="c-comment">/*
+          hover/elevated surface */</span>
+
+        <span class="c-comment">/* ── Accent ───────────────────────────────── */</span>
+        <span class="c-prop">--accent-primary</span>: <span class="c-value">#00D4B4</span>; <span class="c-comment">/*
+          was #C8952A (amber) */</span>
+        <span class="c-prop">--accent-hover</span>: <span class="c-value">#00EDCA</span>;
+        <span class="c-prop">--accent-glow</span>: <span class="c-value">rgba(0, 212, 180, 0.15)</span>;
+        <span class="c-prop">--accent-border</span>: <span class="c-value">rgba(0, 212, 180, 0.35)</span>;
+
+        <span class="c-comment">/* ── Text ─────────────────────────────────── */</span>
+        <span class="c-prop">--text-primary</span>: <span class="c-value">#E8EEF5</span>; <span class="c-comment">/* was
+          #E8D9B5 (warm white) */</span>
+        <span class="c-prop">--text-secondary</span>: <span class="c-value">#7A8FA8</span>; <span class="c-comment">/*
+          was #8A7355 */</span>
+        <span class="c-prop">--text-label</span>: <span class="c-value">#4A6580</span>; <span class="c-comment">/*
+          uppercase label color */</span>
+        <span class="c-prop">--text-muted</span>: <span class="c-value">#3D5168</span>; <span class="c-comment">/*
+          deemphasized text */</span>
+        <span class="c-prop">--text-accent</span>: <span class="c-value">#00D4B4</span>; <span class="c-comment">/*
+          interactive / highlight */</span>
+
+        <span class="c-comment">/* ── Semantic values ──────────────────────── */</span>
+        <span class="c-prop">--color-positive</span>: <span class="c-value">#00D4B4</span>; <span class="c-comment">/*
+          stat weight positive */</span>
+        <span class="c-prop">--color-neutral</span>: <span class="c-value">#3D5168</span>; <span class="c-comment">/*
+          stat weight ±0 */</span>
+        <span class="c-prop">--color-negative</span>: <span class="c-value">#E85D5D</span>; <span class="c-comment">/*
+          stat weight negative */</span>
+        <span class="c-prop">--color-ascendancy</span>: <span class="c-value">#A87BE8</span>; <span class="c-comment">/*
+          ascendancy stat number */</span>
+
+        <span class="c-comment">/* ── Borders ──────────────────────────────── */</span>
+        <span class="c-prop">--border-subtle</span>: <span class="c-value">rgba(0, 212, 180, 0.08)</span>;
+        <span class="c-prop">--border-default</span>: <span class="c-value">rgba(0, 212, 180, 0.15)</span>;
+        <span class="c-prop">--border-strong</span>: <span class="c-value">rgba(0, 212, 180, 0.35)</span>;
+        <span class="c-prop">--border-panel</span>: <span class="c-value">rgba(255, 255, 255, 0.05)</span>;
+
+        <span class="c-comment">/* ── Tree nodes ───────────────────────────── */</span>
+        <span class="c-prop">--node-default</span>: <span class="c-value">#1E3D56</span>; <span class="c-comment">/* was
+          #3D2A14 */</span>
+        <span class="c-prop">--node-active</span>: <span class="c-value">#00D4B4</span>; <span class="c-comment">/* was
+          #C8952A */</span>
+        <span class="c-prop">--node-connector</span>: <span class="c-value">#00B89C</span>; <span class="c-comment">/*
+          connector line between nodes */</span>
+
+        <span class="c-comment">/* ── Typography ───────────────────────────── */</span>
+        <span class="c-prop">--font-display</span>: <span class="c-string">'Rajdhani'</span>, <span
+          class="c-string">'Trebuchet MS'</span>, sans-serif;
+        <span class="c-prop">--font-mono</span>: <span class="c-string">'Share Tech Mono'</span>, <span
+          class="c-string">'Courier New'</span>, monospace;
+        <span class="c-prop">--font-body</span>: <span class="c-string">'Inter'</span>, system-ui, sans-serif;
+
+        <span class="c-comment">/* ── Spacing / Shape ──────────────────────── */</span>
+        <span class="c-prop">--radius-sm</span>: <span class="c-value">4px</span>;
+        <span class="c-prop">--radius-md</span>: <span class="c-value">6px</span>;
+        <span class="c-prop">--radius-lg</span>: <span class="c-value">10px</span>;
+        <span class="c-prop">--sidebar-width</span>: <span class="c-value">180px</span>;
+        <span class="c-prop">--panel-width</span>: <span class="c-value">300px</span>;
+        }
+      </div>
+
+      <div style="margin-top:8px;margin-bottom:28px">
+        <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#4A6580;margin-bottom:10px">
+          Google Fonts import</div>
+        <div class="code-block" style="padding:16px 20px">
+          <span class="c-comment">/* Add to &lt;head&gt; or @import in global CSS */</span>
+          <span class="c-selector">@import url</span>(<span
+            class="c-string">'https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Inter:wght@300;400;500&display=swap'</span>);
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== COMPONENTS ========== -->
+    <div class="section" id="components">
+      <div class="section-title">04 / Components</div>
+      <div class="section-heading">Component Patterns</div>
+
+      <div class="component-grid">
+
+        <!-- STAT CARDS -->
+        <div class="component-card">
+          <div class="card-label">Stat Cards</div>
+
+          <div class="stat-card">
+            <div class="stat-label">
+              Passive Points
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <rect x="1" y="1" width="12" height="12" rx="2" stroke="#4A6580" stroke-width="1" />
+                <rect x="3" y="3" width="4" height="4" fill="#4A6580" />
+              </svg>
+            </div>
+            <div class="stat-value" style="color:#00D4B4">
+              0 <span class="stat-total">/ 123</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">
+              Ascendancy
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <circle cx="7" cy="7" r="5" stroke="#4A6580" stroke-width="1" />
+                <circle cx="7" cy="7" r="2" fill="#4A6580" />
+              </svg>
+            </div>
+            <div class="stat-value" style="color:#A87BE8">
+              0 <span class="stat-total">/ 8</span>
+            </div>
+          </div>
+
+          <div style="font-size:11px;color:#4A6580;margin-top:10px;line-height:1.6">
+            <code style="font-family:'Share Tech Mono',monospace;color:#00D4B4">background: var(--bg-card)</code><br>
+            Passive: <code style="font-family:'Share Tech Mono',monospace;color:#00D4B4">color:
+              var(--accent-primary)</code><br>
+            Ascendancy: <code style="font-family:'Share Tech Mono',monospace;color:#A87BE8">color:
+              var(--color-ascendancy)</code>
+          </div>
+        </div>
+
+        <!-- SIDEBAR NAV -->
+        <div class="component-card">
+          <div class="card-label">Sidebar Navigation</div>
+
+          <div class="nav-demo">
+            <div style="padding:8px 16px 12px">
+              <div
+                style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#E8EEF5">
+                Navigator</div>
+              <div style="font-size:9px;color:#3D5168;letter-spacing:0.1em;text-transform:uppercase">Exile Data Core
+              </div>
+            </div>
+
+            <div class="nav-item active">
+              <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor">
+                <rect x="2" y="2" width="5" height="5" rx="1" />
+                <rect x="9" y="2" width="5" height="5" rx="1" />
+                <rect x="2" y="9" width="5" height="5" rx="1" />
+                <rect x="9" y="9" width="5" height="5" rx="1" />
+              </svg>
+              Tree
+            </div>
+            <div class="nav-item">
+              <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M3 4h10M5 8h6M7 12h2" />
+              </svg>
+              Builder
+            </div>
+            <div class="nav-item">
+              <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="2" y="4" width="12" height="9" rx="1" />
+                <path d="M5 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" />
+              </svg>
+              Market
+            </div>
+            <div class="nav-item">
+              <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="8" cy="8" r="2.5" />
+                <path d="M8 1v2M8 13v2M1 8h2M13 8h2" />
+              </svg>
+              Settings
+            </div>
+
+            <div style="padding: 12px 16px 4px">
+              <button class="btn-optimize">Optimize Build</button>
+            </div>
+          </div>
+
+          <div style="font-size:11px;color:#4A6580;margin-top:12px;line-height:1.6">
+            Active item: <code style="font-family:'Share Tech Mono',monospace;color:#00D4B4">border-left: 2px solid
+              var(--accent-primary)</code><br>
+            Active bg: <code style="font-family:'Share Tech Mono',monospace;color:#00D4B4">var(--accent-glow)</code>
+          </div>
+        </div>
+
+        <!-- STAT WEIGHTS -->
+        <div class="component-card">
+          <div class="card-label">Stat Weights Panel</div>
+
+          <div style="background:#111927;border:1px solid rgba(255,255,255,0.05);border-radius:8px;padding:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <span
+                style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:#4A6580">Stat
+                Weights</span>
+              <div style="width:8px;height:8px;border-radius:50%;background:#3D5168"></div>
+            </div>
+            <div class="stat-weight-row">
+              <span class="stat-weight-name">Total Life</span>
+              <span class="stat-positive">+12%</span>
+            </div>
+            <div class="stat-weight-row">
+              <span class="stat-weight-name">Crit Multi</span>
+              <span class="stat-neutral">+0%</span>
+            </div>
+            <div class="stat-weight-row">
+              <span class="stat-weight-name">Chaos Resistance</span>
+              <span class="stat-negative">−60%</span>
+            </div>
+          </div>
+
+          <div style="font-size:11px;color:#4A6580;margin-top:12px;line-height:1.6">
+            Positive: <code
+              style="font-family:'Share Tech Mono',monospace;color:#00D4B4">var(--color-positive)</code><br>
+            Neutral: <code style="font-family:'Share Tech Mono',monospace;color:#3D5168">var(--color-neutral)</code><br>
+            Negative: <code style="font-family:'Share Tech Mono',monospace;color:#E85D5D">var(--color-negative)</code>
+          </div>
+        </div>
+
+        <!-- STEP DROPDOWN / BUILD INFO -->
+        <div class="component-card">
+          <div class="card-label">Build Info + Step Dropdown</div>
+
+          <div style="margin-bottom:14px">
+            <div
+              style="font-size:9px;color:#3D5168;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:4px;display:flex;justify-content:space-between">
+              <span>Current Build</span>
+              <span style="color:#3D5168">v2.24 Necropolis</span>
+            </div>
+            <div
+              style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:#E8EEF5;letter-spacing:0.06em;text-transform:uppercase">
+              Bad Build</div>
+          </div>
+
+          <div class="step-dropdown">
+            <span>L15 - act 1</span>
+            <span class="chevron">▾</span>
+          </div>
+
+          <div style="font-size:11px;color:#4A6580;margin-top:12px;line-height:1.6">
+            Build name: <code style="font-family:'Share Tech Mono',monospace;color:#00D4B4">Rajdhani 700 ·
+              var(--text-primary)</code><br>
+            Dropdown: <code style="font-family:'Share Tech Mono',monospace;color:#00D4B4">bg: var(--bg-panel)</code>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TREE NODES -->
+      <div class="component-card" style="margin-bottom:20px">
+        <div class="card-label">Passive Tree — Node Colors</div>
+        <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;padding:16px 0">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div
+              style="width:12px;height:12px;border-radius:50%;background:#1E3D56;border:1.5px solid #2E5A7A;box-shadow:0 0 6px rgba(0,180,140,0.2)">
+            </div>
+            <span style="font-size:12px;color:#4A6580">Default node</span>
+            <code style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#3D5168">--node-default</code>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div
+              style="width:14px;height:14px;border-radius:50%;background:#00D4B4;box-shadow:0 0 10px rgba(0,212,180,0.6)">
+            </div>
+            <span style="font-size:12px;color:#4A6580">Active / selected</span>
+            <code style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#3D5168">--node-active</code>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:60px;height:1.5px;background:#00B89C;opacity:0.7"></div>
+            <span style="font-size:12px;color:#4A6580">Connector line</span>
+            <code style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#3D5168">--node-connector</code>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="display:flex;gap:2px;align-items:center">
+              <div style="width:8px;height:8px;border-radius:50%;background:#1E3D56;opacity:0.4"></div>
+              <div style="width:8px;height:8px;border-radius:50%;background:#1E3D56;opacity:0.6"></div>
+              <div style="width:8px;height:8px;border-radius:50%;background:#1E3D56;opacity:0.8"></div>
+            </div>
+            <span style="font-size:12px;color:#4A6580">Distance fade</span>
+            <code style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#3D5168">opacity: 0.4 → 1.0</code>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========== LIVE PREVIEW ========== -->
+    <div class="section" id="preview">
+      <div class="section-title">05 / Preview</div>
+      <div class="section-heading">Full UI Preview</div>
+
+      <div class="preview-wrapper">
+        <div class="preview-bar">
+          <div class="preview-dot" style="background:#E85D5D"></div>
+          <div class="preview-dot" style="background:#F0A442"></div>
+          <div class="preview-dot" style="background:#00D4B4"></div>
+          <div class="preview-label">Ethereal Navigator — Tree View</div>
+        </div>
+
+        <div class="preview-inner">
+          <!-- Sidebar -->
+          <div class="preview-sidebar">
+            <div class="app-name">
+              Navigator
+              <div class="app-sub">Exile Data Core</div>
+            </div>
+            <div class="nav-item active" style="font-size:12px;padding:8px 16px">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" style="color:#00D4B4">
+                <rect x="2" y="2" width="5" height="5" rx="1" />
+                <rect x="9" y="2" width="5" height="5" rx="1" />
+                <rect x="2" y="9" width="5" height="5" rx="1" />
+                <rect x="9" y="9" width="5" height="5" rx="1" />
+              </svg>
+              Tree
+            </div>
+            <div class="nav-item" style="font-size:12px;padding:8px 16px">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M3 4h10M5 8h6M7 12h2" />
+              </svg>
+              Builder
+            </div>
+            <div class="nav-item" style="font-size:12px;padding:8px 16px">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="2" y="4" width="12" height="9" rx="1" />
+                <path d="M5 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" />
+              </svg>
+              Market
+            </div>
+            <div style="flex:1"></div>
+            <div style="padding:0 12px 8px">
+              <button class="btn-optimize" style="font-size:10px;padding:7px 12px;width:100%;text-align:center">Optimize
+                Build</button>
+            </div>
+          </div>
+
+          <!-- Canvas -->
+          <div class="preview-canvas">
+            <div class="preview-dots"></div>
+            <!-- Simulated connector lines -->
+            <div class="connector-line" style="left:34%;top:42%;width:100px;transform:rotate(-28deg)"></div>
+            <div class="connector-line" style="left:40%;top:46%;width:80px;transform:rotate(15deg)"></div>
+            <!-- Simulated nodes -->
+            <div
+              style="position:absolute;left:33%;top:40%;width:9px;height:9px;border-radius:50%;background:#00D4B4;box-shadow:0 0 10px rgba(0,212,180,0.7)">
+            </div>
+            <div
+              style="position:absolute;left:47%;top:34%;width:8px;height:8px;border-radius:50%;background:#1E3D56;border:1.5px solid #2E5A7A">
+            </div>
+            <div
+              style="position:absolute;left:60%;top:48%;width:8px;height:8px;border-radius:50%;background:#1E3D56;border:1.5px solid #2E5A7A">
+            </div>
+            <!-- Zoom controls -->
+            <div style="position:absolute;right:16px;bottom:20px;display:flex;flex-direction:column;gap:4px">
+              <div
+                style="width:30px;height:30px;background:#111927;border:1px solid rgba(255,255,255,0.08);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#7A8FA8;font-size:16px;cursor:pointer">
+                +</div>
+              <div
+                style="width:30px;height:30px;background:#111927;border:1px solid rgba(255,255,255,0.08);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#7A8FA8;font-size:16px;cursor:pointer">
+                −</div>
+            </div>
+          </div>
+
+          <!-- Right Panel -->
+          <div class="preview-panel">
+            <div class="preview-panel build-label">Current Build <span style="float:right;color:#3D5168">v2.24</span>
+            </div>
+            <div class="preview-panel build-name">Bad Build</div>
+
+            <div class="step-dropdown" style="font-size:12px;margin-bottom:14px">
+              <span>L15 - act 1</span>
+              <span class="chevron">▾</span>
+            </div>
+
+            <div class="preview-mini-card">
+              <div class="plabel">Passive Points <span style="float:right;opacity:0.5">⊞</span></div>
+              <div class="pnum" style="color:#00D4B4">0 <span class="ptotal">/ 123</span></div>
+            </div>
+
+            <div class="preview-mini-card">
+              <div class="plabel">Ascendancy <span style="float:right;opacity:0.5">⊕</span></div>
+              <div class="pnum" style="color:#A87BE8">0 <span class="ptotal">/ 8</span></div>
+            </div>
+
+            <div class="preview-mini-card">
+              <div class="plabel" style="margin-bottom:10px">Stat Weights</div>
+              <div class="stat-weight-row" style="padding:6px 0">
+                <span class="stat-weight-name" style="font-size:12px">Total Life</span>
+                <span class="stat-positive" style="font-size:11px">+12%</span>
+              </div>
+              <div class="stat-weight-row" style="padding:6px 0">
+                <span class="stat-weight-name" style="font-size:12px">Crit Multi</span>
+                <span class="stat-neutral" style="font-size:11px">+0%</span>
+              </div>
+              <div class="stat-weight-row" style="padding:6px 0;border:none">
+                <span class="stat-weight-name" style="font-size:12px">Chaos Resistance</span>
+                <span class="stat-negative" style="font-size:11px">−60%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========== QUICK REFERENCE ========== -->
+    <div class="section">
+      <div class="section-title">06 / Quick Reference</div>
+      <div class="section-heading">Find & Replace Cheatsheet</div>
+
+      <table class="diff-table">
+        <thead>
+          <tr>
+            <th>Element</th>
+            <th>BonsaiBuilds value</th>
+            <th>Ethereal Navigator replacement</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Page background</td>
+            <td><span class="old-val">#0D0B09</span></td>
+            <td><span class="new-val">var(--bg-canvas) → #080C12</span></td>
+          </tr>
+          <tr>
+            <td>Sidebar / panel background</td>
+            <td><span class="old-val">#1A1410</span></td>
+            <td><span class="new-val">var(--bg-panel) → #111927</span></td>
+          </tr>
+          <tr>
+            <td>Card background</td>
+            <td><span class="old-val">#1E1A14</span></td>
+            <td><span class="new-val">var(--bg-card) → #151F2E</span></td>
+          </tr>
+          <tr>
+            <td>Primary accent (icons, highlights)</td>
+            <td><span class="old-val">#C8952A</span></td>
+            <td><span class="new-val">var(--accent-primary) → #00D4B4</span></td>
+          </tr>
+          <tr>
+            <td>Icon fill (sidebar)</td>
+            <td><span class="old-val">#C8952A / amber filter</span></td>
+            <td><span class="new-val">currentColor — active items inherit #00D4B4</span></td>
+          </tr>
+          <tr>
+            <td>Active nav border</td>
+            <td><span class="old-val">none / amber background</span></td>
+            <td><span class="new-val">border-left: 2px solid #00D4B4</span></td>
+          </tr>
+          <tr>
+            <td>Stat number (passive points)</td>
+            <td><span class="old-val">color: #C8952A; font: Georgia</span></td>
+            <td><span class="new-val">color: #00D4B4; font: Rajdhani 700</span></td>
+          </tr>
+          <tr>
+            <td>Stat number (ascendancy)</td>
+            <td><span class="old-val">color: #C8952A; font: Georgia</span></td>
+            <td><span class="new-val">color: #A87BE8; font: Rajdhani 700</span></td>
+          </tr>
+          <tr>
+            <td>Section label / uppercase text</td>
+            <td><span class="old-val">serif / tracking 0.06em / #6B5840</span></td>
+            <td><span class="new-val">Share Tech Mono / tracking 0.15em / #4A6580</span></td>
+          </tr>
+          <tr>
+            <td>Tree node (inactive)</td>
+            <td><span class="old-val">#3D2A14</span></td>
+            <td><span class="new-val">var(--node-default) → #1E3D56</span></td>
+          </tr>
+          <tr>
+            <td>Tree connector line</td>
+            <td><span class="old-val">#A07828 (amber)</span></td>
+            <td><span class="new-val">var(--node-connector) → #00B89C</span></td>
+          </tr>
+          <tr>
+            <td>Tree background (canvas)</td>
+            <td><span class="old-val">#0A0806 (very warm dark)</span></td>
+            <td><span class="new-val">#0A1018 (very cool dark)</span></td>
+          </tr>
+          <tr>
+            <td>Positive stat weight</td>
+            <td><span class="old-val">#C8952A</span></td>
+            <td><span class="new-val">var(--color-positive) → #00D4B4</span></td>
+          </tr>
+          <tr>
+            <td>Negative stat weight</td>
+            <td><span class="old-val">#E85D5D</span></td>
+            <td><span class="new-val">var(--color-negative) → #E85D5D (unchanged)</span></td>
+          </tr>
+          <tr>
+            <td>Button (Optimize Build)</td>
+            <td><span class="old-val">solid amber fill</span></td>
+            <td><span class="new-val">transparent + border: 1px solid #00D4B4; color: #00D4B4</span></td>
+          </tr>
+          <tr>
+            <td>Dropdown / select</td>
+            <td><span class="old-val">warm dark background</span></td>
+            <td><span class="new-val">bg: var(--bg-panel); border: rgba(255,255,255,0.08)</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</body>
+
+</html>

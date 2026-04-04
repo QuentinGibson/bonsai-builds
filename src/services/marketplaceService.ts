@@ -5,9 +5,11 @@ import type { Breakpoint } from "./buildStorage";
 
 export interface MarketplaceComment {
   id: string;
+  parentId: string | null;
   authorId: string;
   authorName: string;
   body: string;
+  score: number;
   createdAt: number;
 }
 
@@ -100,6 +102,32 @@ class MarketplaceService {
     }
   }
 
+  async updateListing(id: string, args: PublishArgs): Promise<boolean> {
+    try {
+      const { userId } = await this.#user;
+      await this.#client.mutation(api.marketplace.update, {
+        id: id as Id<"marketplaceListings">,
+        userId,
+        name: args.name,
+        description: args.description,
+        className: args.className,
+        ascendancy: args.ascendancy,
+        breakpoints: args.breakpoints.map((bp) => ({
+          name: bp.name,
+          level: bp.level,
+          allocatedNodes: bp.allocatedNodes,
+          allocatedAscendancyNodes: bp.allocatedAscendancyNodes,
+          selectedClass: bp.selectedClass ?? undefined,
+          selectedAscendancy: bp.selectedAscendancy ?? undefined,
+        })),
+      });
+      return true;
+    } catch (error) {
+      console.error("Error updating listing:", error);
+      return false;
+    }
+  }
+
   async deleteListing(id: string): Promise<boolean> {
     try {
       const { userId } = await this.#user;
@@ -115,8 +143,10 @@ class MarketplaceService {
 
   async incrementDownload(id: string): Promise<void> {
     try {
+      const { userId } = await this.#user;
       await this.#client.mutation(api.marketplace.incrementDownload, {
         id: id as Id<"marketplaceListings">,
+        userId,
       });
     } catch (error) {
       console.error("Error incrementing download:", error);
@@ -168,12 +198,13 @@ class MarketplaceService {
     });
   }
 
-  async addComment(listingId: string, body: string): Promise<string | null> {
+  async addComment(listingId: string, body: string, parentId?: string): Promise<string | null> {
     try {
       const { userId, username } = await this.#user;
       if (userId === "anon") return null;
       return (await this.#client.mutation(api.marketplace.addComment, {
         listingId: listingId as Id<"marketplaceListings">,
+        ...(parentId ? { parentId: parentId as Id<"marketplaceComments"> } : {}),
         authorId: userId,
         authorName: username,
         body,
@@ -181,6 +212,32 @@ class MarketplaceService {
     } catch (error) {
       console.error("Error adding comment:", error);
       return null;
+    }
+  }
+
+  async voteComment(commentId: string, value: 1 | -1 | 0): Promise<void> {
+    try {
+      const { userId } = await this.#user;
+      if (userId === "anon") return;
+      await this.#client.mutation(api.marketplace.voteComment, {
+        commentId: commentId as Id<"marketplaceComments">,
+        userId,
+        value,
+      });
+    } catch (error) {
+      console.error("Error voting on comment:", error);
+    }
+  }
+
+  async getUserCommentVotes(listingId: string): Promise<Record<string, number>> {
+    try {
+      const { userId } = await this.#user;
+      return (await this.#client.query(api.marketplace.getUserCommentVotes, {
+        listingId: listingId as Id<"marketplaceListings">,
+        userId,
+      })) as Record<string, number>;
+    } catch {
+      return {};
     }
   }
 
@@ -192,6 +249,46 @@ class MarketplaceService {
         userId,
       });
       return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async toggleHideComment(commentId: string): Promise<boolean> {
+    try {
+      const { userId } = await this.#user;
+      if (userId === "anon") return false;
+      return (await this.#client.mutation(api.marketplace.toggleHideComment, {
+        commentId: commentId as Id<"marketplaceComments">,
+        userId,
+      })) as boolean;
+    } catch {
+      return false;
+    }
+  }
+
+  async getUserHiddenComments(listingId: string): Promise<string[]> {
+    try {
+      const { userId } = await this.#user;
+      return (await this.#client.query(api.marketplace.getUserHiddenComments, {
+        listingId: listingId as Id<"marketplaceListings">,
+        userId,
+      })) as string[];
+    } catch {
+      return [];
+    }
+  }
+
+  async reportContent(targetId: string, targetType: "comment" | "listing", reason: string): Promise<boolean> {
+    try {
+      const { userId } = await this.#user;
+      if (userId === "anon") return false;
+      return (await this.#client.mutation(api.marketplace.reportContent, {
+        reporterId: userId,
+        targetId,
+        targetType,
+        reason,
+      })) as boolean;
     } catch {
       return false;
     }

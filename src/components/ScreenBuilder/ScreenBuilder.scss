@@ -603,12 +603,51 @@
 	}
 }
 
-.new-build-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+.new-build-inline {
   display: flex;
   align-items: center;
-  justify-content: center;
-  z-index: 1000;
+  gap: 4px;
+  padding: 6px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+  .new-build-input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(200, 149, 45, 0.3);
+    border-radius: 3px;
+    color: var(--text-primary);
+    font-size: 11px;
+    padding: 4px 6px;
+    outline: none;
+
+    &:focus {
+      border-color: rgba(200, 149, 45, 0.6);
+    }
+  }
+
+  .new-build-confirm {
+    padding: 4px 8px;
+    background: rgba(200, 149, 45, 0.15);
+    border: 1px solid rgba(200, 149, 45, 0.35);
+    border-radius: 3px;
+    color: var(--accent-gold);
+    font-size: 10px;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &:disabled { opacity: 0.4; cursor: default; }
+    &:not(:disabled):hover { background: rgba(200, 149, 45, 0.25); }
+  }
+
+  .new-build-cancel {
+    padding: 4px 6px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 10px;
+    cursor: pointer;
+
+    &:hover { border-color: rgba(255, 255, 255, 0.25); color: rgba(255, 255, 255, 0.7); }
+  }
 }

@@ -3,7 +3,6 @@ import { buildStorage, BuildSet, Breakpoint } from "../../services/buildStorage"
 import { useEventBus } from "../../hooks/use-event-bus";
 import { kAppPopups, kAppScreens } from "../../config/enums";
 import { classNames } from "../../utils";
-import { AddBuildSet } from "../AddBuildSet/AddBuildSet";
 
 import "./ScreenBuilder.scss";
 
@@ -153,7 +152,7 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
     if (classIsDirty) {
       await buildStorage.updateBuildSet(selectedBuild.id, {
         className: pendingClass || undefined,
-        ascendancy: undefined,
+        ascendancy: pendingAscendancy || undefined,
       });
     } else if (ascendancyIsDirty) {
       await buildStorage.updateBuildSet(selectedBuild.id, {
@@ -177,10 +176,14 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
     );
   }, [selectedBuild]);
 
-  const [showNewBuild, setShowNewBuild] = useState(false);
+  const [showNewBuildForm, setShowNewBuildForm] = useState(false);
+  const [newBuildName, setNewBuildName] = useState('');
 
-  const handleCreateBuild = async (name: string) => {
-    setShowNewBuild(false);
+  const submitNewBuild = async () => {
+    const name = newBuildName.trim();
+    if (!name) return;
+    setShowNewBuildForm(false);
+    setNewBuildName('');
     const newBuild = await buildStorage.createBuildSet(name);
     await refreshBuilds();
     setSelectedId(newBuild.id);
@@ -247,12 +250,38 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
           <span className="sidebar-title">My Builds</span>
           <button
             className="new-build-btn"
-            onClick={() => setShowNewBuild(true)}
+            onClick={() => { setShowNewBuildForm(true); setNewBuildName(''); }}
             title="Create a new build"
           >
             + New Build
           </button>
         </div>
+
+        {showNewBuildForm && (
+          <div className="new-build-inline">
+            <input
+              className="new-build-input"
+              type="text"
+              placeholder="Build name"
+              value={newBuildName}
+              onChange={(e) => setNewBuildName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') submitNewBuild();
+                if (e.key === 'Escape') setShowNewBuildForm(false);
+              }}
+              autoFocus
+            />
+            <button
+              className="new-build-confirm"
+              onClick={submitNewBuild}
+              disabled={!newBuildName.trim()}
+            >Create</button>
+            <button
+              className="new-build-cancel"
+              onClick={() => setShowNewBuildForm(false)}
+            >✕</button>
+          </div>
+        )}
 
         <div className="build-list">
           {builds.length === 0 && (
@@ -484,16 +513,6 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
         )}
       </div>
 
-      {showNewBuild && (
-        <div className="new-build-overlay" onClick={() => setShowNewBuild(false)}>
-          <div onClick={(e) => e.stopPropagation()}>
-            <AddBuildSet
-              onClose={() => setShowNewBuild(false)}
-              onSubmit={handleCreateBuild}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 }

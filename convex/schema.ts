@@ -35,11 +35,19 @@ export default defineSchema({
 
   marketplaceComments: defineTable({
     listingId: v.id("marketplaceListings"),
+    parentId: v.optional(v.id("marketplaceComments")),
     authorId: v.string(),
     authorName: v.string(),
     body: v.string(),
+    score: v.number(),
     createdAt: v.number(),
   }).index("by_listing", ["listingId"]),
+
+  marketplaceCommentVotes: defineTable({
+    commentId: v.id("marketplaceComments"),
+    userId: v.string(),
+    value: v.number(),
+  }).index("by_comment_user", ["commentId", "userId"]),
 
   marketplaceRatings: defineTable({
     listingId: v.id("marketplaceListings"),
@@ -51,6 +59,24 @@ export default defineSchema({
     listingId: v.id("marketplaceListings"),
     userId: v.string(),
   }).index("by_listing_user", ["listingId", "userId"]),
+
+  marketplaceDownloads: defineTable({
+    listingId: v.id("marketplaceListings"),
+    userId: v.string(),
+  }).index("by_listing_user", ["listingId", "userId"]),
+
+  marketplaceHiddenComments: defineTable({
+    userId: v.string(),
+    commentId: v.id("marketplaceComments"),
+  }).index("by_user_comment", ["userId", "commentId"]),
+
+  marketplaceReports: defineTable({
+    reporterId: v.string(),
+    targetId: v.string(),
+    targetType: v.union(v.literal("comment"), v.literal("listing")),
+    reason: v.string(),
+    createdAt: v.number(),
+  }).index("by_reporter_target", ["reporterId", "targetId"]),
 
   buildSets: defineTable({
     userId: v.string(),
