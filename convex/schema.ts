@@ -78,6 +78,20 @@ export default defineSchema({
     createdAt: v.number(),
   }).index("by_reporter_target", ["reporterId", "targetId"]),
 
+  feedback: defineTable({
+    userId: v.string(),
+    contact: v.string(),
+    message: v.string(),
+    createdAt: v.number(),
+  }).index("by_createdAt", ["createdAt"]),
+
+  bugReports: defineTable({
+    userId: v.string(),
+    contact: v.string(),
+    message: v.string(),
+    createdAt: v.number(),
+  }).index("by_createdAt", ["createdAt"]),
+
   buildSets: defineTable({
     userId: v.string(),
     name: v.string(),

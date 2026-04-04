@@ -4,46 +4,96 @@
 // Variables
 
 :root {
-  --font-display: 'Cinzel', serif;
-  --font-body: 'Lato', sans-serif;
+  --font-display: 'Rajdhani', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'Share Tech Mono', monospace;
 
-  --text-text-pure: #f5f0e8;
-  --text-text-primary: #e0d5c0;
-  --text-text-secondary: #e0d5c0;
-  --text-text-tertiary: #b0a080;
-  --dev-console-codes-texts-primary-text-color: #c8bfaa;
-  --surface-surface-brand: #c0392b;
-  --surface-surface-brand-hover: #e74c3c;
-  --surface-surface-primary: #16130d;
-  --surface-surface-secondary: #1e1b13;
-  --surface-surface-tertiary: #28241a;
-  --surface-surface-quaternary: #332e22;
-  --surface-surface-tooltip: #3d3828;
-  --icon-icon-primary: #e0d5c0;
-  --icon-icon-secondary: #908070;
-  --border-border-primary: rgba(200, 149, 45, 0.5);
-  --border-border-secondary: rgba(200, 149, 45, 0.3);
-  --border-border-tertiary: rgba(200, 149, 45, 0.15);
-  --border-border-quaternary: rgba(200, 149, 45, 0.07);
-  --hover-hover-secondary-dark: rgba(200, 149, 45, 0.08);
-  --hover-hover-tertiary: #28241a;
-  --hover-hover-quaternary: #332e22;
-  --surface-surface-pure: #0a0806;
-  --dev-console-codes-primary-primary-color: var(--surface-surface-brand);
-  --dev-console-codes-surfaces-pure-surface-color: #0a0806;
-  --status-normal: #27ae60;
-  --status-warning: #e67e22;
-  --status-error: #e74c3c;
-  --window-icon-pure: #f5f0e8;
-  --window-icon-primary: #e0d5c0;
-  --window-icon-secondary: #b0a080;
-  --accent-gold: #c8952d;
-  --accent-gold-bright: #f0c060;
-  --accent-gold-dim: rgba(200, 149, 45, 0.12);
+  /* Background layers */
+  --bg-canvas:   #080C12;
+  --bg-surface:  #0E1520;
+  --bg-panel:    #111927;
+  --bg-card:     #151F2E;
+  --bg-elevated: #1D2A3A;
+
+  /* Accent */
+  --accent-primary: #00D4B4;
+  --accent-glow:    rgba(0, 212, 180, 0.15);
+  --accent-border:  rgba(0, 212, 180, 0.35);
+  --accent-hover:   #00EDCA;
+
+  /* Legacy alias kept for components that reference it directly */
+  --accent-gold:       #00D4B4;
+  --accent-gold-bright:#00EDCA;
+  --accent-gold-dim:   rgba(0, 212, 180, 0.12);
+
+  /* Text */
+  --text-primary:   #E8EEF5;
+  --text-secondary: #7A8FA8;
+  --text-muted:     #3D5168;
+  --text-accent:    #00D4B4;
+  --text-label:     #4A6580;
+
+  /* Legacy text aliases */
+  --text-text-pure:      #E8EEF5;
+  --text-text-primary:   #E8EEF5;
+  --text-text-secondary: #7A8FA8;
+  --text-text-tertiary:  #4A6580;
+
+  /* Semantic */
+  --color-positive:    #00D4B4;
+  --color-negative:    #E85D5D;
+  --color-neutral:     #7A8FA8;
+  --color-ascendancy:  #A87BE8;
+
+  /* Borders */
+  --border-subtle:  rgba(0, 212, 180, 0.08);
+  --border-default: rgba(0, 212, 180, 0.15);
+  --border-strong:  rgba(0, 212, 180, 0.35);
+  --border-panel:   rgba(255, 255, 255, 0.05);
+
+  /* Legacy border aliases */
+  --border-border-primary:    rgba(0, 212, 180, 0.5);
+  --border-border-secondary:  rgba(0, 212, 180, 0.3);
+  --border-border-tertiary:   rgba(0, 212, 180, 0.15);
+  --border-border-quaternary: rgba(0, 212, 180, 0.07);
+
+  /* Legacy surface aliases */
+  --surface-surface-pure:        #040810;
+  --surface-surface-primary:     #080C12;
+  --surface-surface-secondary:   #0E1520;
+  --surface-surface-tertiary:    #111927;
+  --surface-surface-quaternary:  #151F2E;
+  --surface-surface-tooltip:     #1D2A3A;
+  --surface-surface-brand:       #00D4B4;
+  --surface-surface-brand-hover: #00EDCA;
+
+  /* Legacy hover aliases */
+  --hover-hover-secondary-dark: rgba(0, 212, 180, 0.08);
+  --hover-hover-tertiary:       #111927;
+  --hover-hover-quaternary:     #151F2E;
+
+  /* Legacy icon aliases */
+  --icon-icon-primary:   #E8EEF5;
+  --icon-icon-secondary: #4A6580;
+
+  /* Misc */
+  --dev-console-codes-texts-primary-text-color:         #E8EEF5;
+  --dev-console-codes-primary-primary-color:            var(--surface-surface-brand);
+  --dev-console-codes-surfaces-pure-surface-color:      #040810;
+  --status-normal:   #27ae60;
+  --status-warning:  #e67e22;
+  --status-error:    #E85D5D;
+  --window-icon-pure:    #E8EEF5;
+  --window-icon-primary: #E8EEF5;
+  --window-icon-secondary: #4A6580;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
 }
 
 // Fonts
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Inter:wght@300;400;500&display=swap');
 
 // Reset
 
@@ -153,7 +203,7 @@ body {
   height: 100vh;
   line-height: 24px;
   color: var(--text-text-primary);
-  font-family: Lato, sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 16px;
   font-weight: 400;
   letter-spacing: 0.32px;

@@ -5,9 +5,9 @@
 	right: 0;
 	z-index: 5;
 	height: 64px;
-	background: rgba(10, 8, 6, 0.82);
+	background: rgba(8, 12, 18, 0.88);
 	backdrop-filter: blur(6px);
-	border-top: 1px solid rgba(200, 149, 45, 0.12);
+	border-top: 1px solid rgba(0, 212, 180, 0.12);
 	display: flex;
 	align-items: center;
 	padding: 0 16px;
@@ -17,10 +17,10 @@
 		flex-shrink: 0;
 		width: 28px;
 		height: 28px;
-		background: rgba(200, 149, 45, 0.06);
-		border: 1px solid rgba(200, 149, 45, 0.18);
+		background: rgba(0, 212, 180, 0.06);
+		border: 1px solid rgba(0, 212, 180, 0.18);
 		border-radius: 4px;
-		color: rgba(200, 149, 45, 0.6);
+		color: rgba(0, 212, 180, 0.6);
 		font-size: 18px;
 		line-height: 1;
 		cursor: pointer;
@@ -31,9 +31,9 @@
 		padding: 0;
 
 		&:hover:not(:disabled) {
-			border-color: rgba(200, 149, 45, 0.45);
-			color: var(--accent-gold);
-			background: rgba(200, 149, 45, 0.1);
+			border-color: rgba(0, 212, 180, 0.45);
+			color: #00D4B4;
+			background: rgba(0, 212, 180, 0.1);
 		}
 
 		&:disabled {
@@ -51,10 +51,10 @@
 	}
 
 	.timeline-empty {
-		font-family: var(--font-display);
+		font-family: var(--font-mono);
 		font-size: 9px;
-		letter-spacing: 0.8px;
-		color: rgba(176, 160, 128, 0.3);
+		letter-spacing: 0.12em;
+		color: #3D5168;
 		font-style: italic;
 		white-space: nowrap;
 		overflow: hidden;
@@ -67,7 +67,7 @@
 		right: 0;
 		top: 50%;
 		height: 1px;
-		background: rgba(200, 149, 45, 0.18);
+		background: rgba(0, 212, 180, 0.18);
 		transform: translateY(-50%);
 		pointer-events: none;
 	}
@@ -90,47 +90,47 @@
 			width: 10px;
 			height: 10px;
 			border-radius: 50%;
-			border: 2px solid rgba(200, 149, 45, 0.35);
-			background: rgba(10, 8, 6, 0.9);
+			border: 2px solid rgba(0, 212, 180, 0.35);
+			background: rgba(8, 12, 18, 0.9);
 			transition: all 0.18s ease;
 			display: block;
 		}
 
 		&.past::before {
-			background: rgba(200, 149, 45, 0.7);
-			border-color: rgba(200, 149, 45, 0.8);
+			background: rgba(0, 212, 180, 0.7);
+			border-color: rgba(0, 212, 180, 0.8);
 		}
 
 		&.active::before {
 			width: 14px;
 			height: 14px;
-			background: #c8952d;
-			border-color: #f0c060;
-			box-shadow: 0 0 8px rgba(200, 149, 45, 0.7), 0 0 16px rgba(200, 149, 45, 0.3);
+			background: #00D4B4;
+			border-color: #00EDCA;
+			box-shadow: 0 0 8px rgba(0, 212, 180, 0.7), 0 0 16px rgba(0, 212, 180, 0.3);
 		}
 
 		&.future::before {
-			background: rgba(10, 8, 6, 0.9);
-			border-color: rgba(200, 149, 45, 0.25);
+			background: rgba(8, 12, 18, 0.9);
+			border-color: rgba(0, 212, 180, 0.25);
 		}
 
 		&:hover::before {
-			border-color: rgba(200, 149, 45, 0.7);
-			background: rgba(200, 149, 45, 0.15);
+			border-color: rgba(0, 212, 180, 0.7);
+			background: rgba(0, 212, 180, 0.15);
 		}
 
 		&.active:hover::before {
-			background: #c8952d;
-			border-color: #f0c060;
+			background: #00D4B4;
+			border-color: #00EDCA;
 		}
 	}
 
 	.dot-label {
-		font-family: var(--font-display);
+		font-family: var(--font-mono);
 		font-size: 8px;
 		font-weight: 600;
-		letter-spacing: 0.5px;
-		color: rgba(176, 160, 128, 0.55);
+		letter-spacing: 0.1em;
+		color: #4A6580;
 		line-height: 1;
 		white-space: nowrap;
 		pointer-events: none;
@@ -139,7 +139,7 @@
 	.dot-name {
 		font-family: var(--font-body);
 		font-size: 7px;
-		color: rgba(176, 160, 128, 0.35);
+		color: #3D5168;
 		line-height: 1;
 		white-space: nowrap;
 		overflow: hidden;
@@ -150,34 +150,34 @@
 	}
 
 	.timeline-dot.active .dot-label {
-		color: rgba(200, 149, 45, 0.85);
+		color: rgba(0, 212, 180, 0.85);
 	}
 
 	.timeline-dot.active .dot-name {
 		display: block;
-		color: rgba(200, 149, 45, 0.5);
+		color: rgba(0, 212, 180, 0.5);
 	}
 
 	.timeline-add-btn {
 		flex-shrink: 0;
 		padding: 5px 10px;
-		background: rgba(200, 149, 45, 0.06);
-		border: 1px solid rgba(200, 149, 45, 0.2);
+		background: rgba(0, 212, 180, 0.06);
+		border: 1px solid rgba(0, 212, 180, 0.2);
 		border-radius: 4px;
-		color: rgba(200, 149, 45, 0.65);
+		color: rgba(0, 212, 180, 0.65);
 		font-family: var(--font-display);
 		font-size: 8px;
 		font-weight: 600;
-		letter-spacing: 1.2px;
+		letter-spacing: 1.5px;
 		text-transform: uppercase;
 		cursor: pointer;
 		white-space: nowrap;
 		transition: all 0.15s ease;
 
 		&:hover {
-			border-color: rgba(200, 149, 45, 0.45);
-			color: var(--accent-gold);
-			background: rgba(200, 149, 45, 0.1);
+			border-color: rgba(0, 212, 180, 0.45);
+			color: #00D4B4;
+			background: rgba(0, 212, 180, 0.1);
 		}
 	}
 }

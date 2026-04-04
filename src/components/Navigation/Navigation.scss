@@ -4,8 +4,8 @@
   align-items: stretch;
   width: 100%;
   height: 100%;
-  background: #0a0806;
-  border-right: 1px solid rgba(200, 149, 45, 0.12);
+  background: #080C12;
+  border-right: 1px solid rgba(0, 212, 180, 0.12);
   padding-top: 6px;
 
   .menu-item {
@@ -19,9 +19,9 @@
     font-size: 8.5px;
     font-family: var(--font-display);
     font-weight: 600;
-    letter-spacing: 1.4px;
+    letter-spacing: 1.8px;
     text-transform: uppercase;
-    color: #6a5f50;
+    color: #3D5168;
     cursor: pointer;
     transition: color 0.2s ease, background 0.2s ease;
 
@@ -37,27 +37,27 @@
       top: 18%;
       height: 64%;
       width: 2px;
-      background: var(--accent-gold);
+      background: #00D4B4;
       border-radius: 0 1px 1px 0;
       opacity: 0;
       transition: opacity 0.2s ease;
     }
 
     &:hover {
-      color: var(--accent-gold);
-      background: rgba(200, 149, 45, 0.06);
+      color: #00D4B4;
+      background: rgba(0, 212, 180, 0.06);
 
       svg {
-        color: var(--accent-gold);
+        color: #00D4B4;
       }
     }
 
     &.selected {
-      color: var(--accent-gold);
-      background: rgba(200, 149, 45, 0.07);
+      color: #00D4B4;
+      background: rgba(0, 212, 180, 0.07);
 
       svg {
-        color: var(--accent-gold);
+        color: #00D4B4;
       }
 
       &::before {
@@ -73,10 +73,10 @@
     justify-content: center;
     padding: 10px 8px;
     font-size: 14px;
-    color: #4a4035;
+    color: #3D5168;
     cursor: pointer;
     transition: color 0.2s ease, background 0.2s ease;
-    border-top: 1px solid rgba(200, 149, 45, 0.08);
+    border-top: 1px solid rgba(0, 212, 180, 0.08);
 
     svg {
       font-size: 14px;
@@ -84,11 +84,11 @@
     }
 
     &:hover {
-      color: var(--accent-gold);
-      background: rgba(200, 149, 45, 0.06);
+      color: #00D4B4;
+      background: rgba(0, 212, 180, 0.06);
 
       svg {
-        color: var(--accent-gold);
+        color: #00D4B4;
       }
     }
   }

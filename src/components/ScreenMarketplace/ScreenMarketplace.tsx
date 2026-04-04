@@ -54,6 +54,24 @@ function StarRating({
   );
 }
 
+const CLASS_FALLBACK_ASCENDANCY: Record<string, string> = {
+  "Warrior":   "Titan",
+  "Ranger":    "Pathfinder",
+  "Huntress":  "Amazon",
+  "Mercenary": "Tactician",
+  "Sorceress": "Stormweaver",
+  "Witch":     "Lich",
+  "Monk":      "Invoker",
+  "Druid":     "Oracle",
+};
+
+function getCardImageUrl(className: string, ascendancy?: string | null, width = 400): string {
+  const asc = ascendancy || CLASS_FALLBACK_ASCENDANCY[className] || "";
+  if (!className || !asc) return "";
+  const slug = `${className}-${asc}`.toLowerCase().replace(/\s+/g, "-");
+  return `https://cdn.mobalytics.gg/cdn-cgi/image/format=auto,width=${width}/assets/poe-2/images/game/classes/header/${slug}.jpg?v4`;
+}
+
 function ListingCard({
   listing,
   onOpen,
@@ -61,30 +79,28 @@ function ListingCard({
   listing: MarketplaceBuild;
   onOpen: () => void;
 }) {
+  const bgUrl = listing.className ? getCardImageUrl(listing.className, listing.ascendancy) : "";
+
   return (
     <div className="ListingCard" onClick={onOpen}>
-      <div className="card-header">
+      {bgUrl && (
+        <div className="card-bg" style={{ backgroundImage: `url(${bgUrl})` }} />
+      )}
+      <div className="card-overlay" />
+      <div className="card-content">
+        <span className="card-class">
+          {listing.className || "Unknown"}
+          {listing.ascendancy ? ` · ${listing.ascendancy}` : ""}
+        </span>
         <span className="card-name">{listing.name}</span>
-        {listing.className && (
-          <span className="card-class">
-            {listing.className}
-            {listing.ascendancy ? ` · ${listing.ascendancy}` : ""}
-          </span>
-        )}
-      </div>
-
-      <p className="card-description">{listing.description || "No description."}</p>
-
-      <div className="card-meta">
-        <span className="card-author">by {listing.authorName}</span>
-
-        <div className="card-stats">
-          <StarRating value={listing.averageRating} />
-          {listing.ratingCount > 0 && (
-            <span className="stat-count">({listing.ratingCount})</span>
-          )}
-          <span className="stat">♥ {listing.likeCount}</span>
-          <span className="stat">↓ {listing.downloadCount}</span>
+        <p className="card-description">{listing.description || "No description."}</p>
+        <div className="card-meta">
+          <span className="card-author">by {listing.authorName}</span>
+          <div className="card-stats">
+            <StarRating value={listing.averageRating} />
+            <span className="stat">♥ {listing.likeCount}</span>
+            <span className="stat">↓ {listing.downloadCount}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -157,7 +173,7 @@ function DetailView({
   const [myVotes, setMyVotes] = useState<Record<string, number>>({});
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
-  const [hiddenComments, setHiddenComments] = useState<Set<string>>(new Set());
+  const [collapsedComments, setCollapsedComments] = useState<Set<string>>(new Set());
   const [reportTarget, setReportTarget] = useState<{ id: string; type: "comment" | "listing" } | null>(null);
   const [reportedIds, setReportedIds] = useState<Set<string>>(new Set());
   const [showEdit, setShowEdit] = useState(false);
@@ -172,14 +188,12 @@ function DetailView({
       marketplaceService.getUserLike(listingId),
       marketplaceService.getUserRating(listingId),
       marketplaceService.getUserCommentVotes(listingId),
-      marketplaceService.getUserHiddenComments(listingId),
-    ]).then(([detail, userLiked, userRating, userVotes, userHidden]) => {
+    ]).then(([detail, userLiked, userRating, userVotes]) => {
       if (cancelled) return;
       setListing(detail);
       setLiked(userLiked);
       setMyRating(userRating);
       setMyVotes(userVotes);
-      setHiddenComments(new Set(userHidden));
       setLoading(false);
     });
     return () => { cancelled = true; };
@@ -261,14 +275,12 @@ function DetailView({
     setSubmittingComment(false);
   };
 
-  const handleHideComment = async (commentId: string) => {
-    const isHidden = hiddenComments.has(commentId);
-    setHiddenComments((prev) => {
+  const handleCollapseComment = (commentId: string) => {
+    setCollapsedComments((prev) => {
       const next = new Set(prev);
-      isHidden ? next.delete(commentId) : next.add(commentId);
+      next.has(commentId) ? next.delete(commentId) : next.add(commentId);
       return next;
     });
-    await marketplaceService.toggleHideComment(commentId);
   };
 
   const handleReport = async (reason: string) => {
@@ -309,20 +321,10 @@ function DetailView({
   };
 
   const renderComment = (node: CommentNode, depth: number): React.ReactNode => {
-    const isHidden = hiddenComments.has(node.id);
-
-    if (isHidden) {
-      return (
-        <div key={node.id} className="comment comment-hidden" style={{ marginLeft: depth * 16 }}>
-          <span className="hidden-label">[comment hidden]</span>
-          <button className="unhide-btn" onClick={() => handleHideComment(node.id)}>Unhide</button>
-          {node.replies.length > 0 && node.replies.map((child) => renderComment(child, depth + 1))}
-        </div>
-      );
-    }
+    const isCollapsed = collapsedComments.has(node.id);
 
     return (
-      <div key={node.id} className={classNames("comment", { nested: depth > 0 })} style={{ marginLeft: depth * 16 }}>
+      <div key={node.id} className={classNames("comment", { nested: depth > 0, collapsed: isCollapsed })} style={{ marginLeft: depth * 16 }}>
         <div className="comment-vote-col">
           <button
             className={classNames("vote-btn up", { active: (myVotes[node.id] ?? 0) === 1 })}
@@ -339,52 +341,58 @@ function DetailView({
 
         <div className="comment-body-col">
           <div className="comment-header">
+            <button className="collapse-btn" onClick={() => handleCollapseComment(node.id)} title={isCollapsed ? "Expand" : "Collapse"}>
+              {isCollapsed ? "[+]" : "[−]"}
+            </button>
             <span className="comment-author">{node.authorName}</span>
             <span className="comment-date">{new Date(node.createdAt).toLocaleDateString()}</span>
-            {myUserId !== "anon" && (
+            {!isCollapsed && myUserId !== "anon" && (
               <button className="reply-btn" onClick={() => {
                 setReplyingTo(replyingTo === node.id ? null : node.id);
                 setReplyText("");
               }}>Reply</button>
             )}
-            <button className="hide-btn" onClick={() => handleHideComment(node.id)}>Hide</button>
-            {!reportedIds.has(node.id) ? (
+            {!isCollapsed && !reportedIds.has(node.id) ? (
               <button className="report-btn" onClick={() => setReportTarget({ id: node.id, type: "comment" })}>
                 Report
               </button>
-            ) : (
+            ) : !isCollapsed ? (
               <span className="reported-label">Reported</span>
-            )}
-            {node.authorId === myUserId && (
+            ) : null}
+            {!isCollapsed && node.authorId === myUserId && (
               <button className="comment-delete" onClick={() => handleDeleteComment(node.id)}>×</button>
             )}
           </div>
 
-          <p className="comment-body">{node.body}</p>
+          {!isCollapsed && (
+            <>
+              <p className="comment-body">{node.body}</p>
 
-          {replyingTo === node.id && (
-            <div className="reply-input-row">
-              <input
-                className="comment-input"
-                placeholder="Write a reply…"
-                value={replyText}
-                onChange={(e) => setReplyText(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSubmitComment(node.id);
-                  if (e.key === "Escape") setReplyingTo(null);
-                }}
-                autoFocus
-              />
-              <button
-                className="comment-submit"
-                disabled={!replyText.trim() || submittingComment}
-                onClick={() => handleSubmitComment(node.id)}
-              >Reply</button>
-              <button className="reply-cancel" onClick={() => setReplyingTo(null)}>Cancel</button>
-            </div>
+              {replyingTo === node.id && (
+                <div className="reply-input-row">
+                  <input
+                    className="comment-input"
+                    placeholder="Write a reply…"
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleSubmitComment(node.id);
+                      if (e.key === "Escape") setReplyingTo(null);
+                    }}
+                    autoFocus
+                  />
+                  <button
+                    className="comment-submit"
+                    disabled={!replyText.trim() || submittingComment}
+                    onClick={() => handleSubmitComment(node.id)}
+                  >Reply</button>
+                  <button className="reply-cancel" onClick={() => setReplyingTo(null)}>Cancel</button>
+                </div>
+              )}
+
+              {node.replies.map((child) => renderComment(child, depth + 1))}
+            </>
           )}
-
-          {node.replies.map((child) => renderComment(child, depth + 1))}
         </div>
       </div>
     );
@@ -454,18 +462,31 @@ function DetailView({
         />
       )}
 
-      <div className="detail-header">
-        <div className="detail-title-row">
-          <h2 className="detail-name">{listing.name}</h2>
-          {listing.className && (
-            <span className="detail-class">
+      {listing.className && (
+        <div
+          className="detail-hero"
+          style={{ backgroundImage: `url(${getCardImageUrl(listing.className, listing.ascendancy, 1456)})` }}
+        >
+          <div className="detail-hero-overlay" />
+          <div className="detail-hero-content">
+            <span className="detail-hero-class">
               {listing.className}
               {listing.ascendancy ? ` · ${listing.ascendancy}` : ""}
             </span>
-          )}
+            <h2 className="detail-hero-name">{listing.name}</h2>
+            <span className="detail-hero-author">by {listing.authorName}</span>
+          </div>
         </div>
-        <span className="detail-author">by {listing.authorName}</span>
-      </div>
+      )}
+
+      {!listing.className && (
+        <div className="detail-header">
+          <div className="detail-title-row">
+            <h2 className="detail-name">{listing.name}</h2>
+          </div>
+          <span className="detail-author">by {listing.authorName}</span>
+        </div>
+      )}
 
       <p className="detail-description">{listing.description || "No description."}</p>
 

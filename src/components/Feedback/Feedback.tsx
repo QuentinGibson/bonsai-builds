@@ -1,12 +1,18 @@
 import { useMemo, useState } from 'react'
-
-import { useEventBus } from '../../hooks/use-event-bus'
+import { ConvexHttpClient } from 'convex/browser'
+import { api } from '../../../convex/_generated/api'
 import { classNames } from '../../utils'
-
 import './Feedback.scss'
 
-import { Tip } from '../Tip/Tip'
+const client = new ConvexHttpClient(process.env.CONVEX_URL!)
 
+function resolveUserId(): Promise<string> {
+  return new Promise((resolve) => {
+    overwolf.profile.getCurrentUser((result) => {
+      resolve(result.success && result.userId ? result.userId : 'anon')
+    })
+  })
+}
 
 export type FeedbackProps = {
   className?: string
@@ -14,43 +20,29 @@ export type FeedbackProps = {
 }
 
 export function Feedback({ className, onClose }: FeedbackProps) {
-  const eventBus = useEventBus()
-
   const [contact, setContact] = useState('')
   const [message, setMessage] = useState('')
-
-  const submit = () => eventBus.emit('submitFeedback')
+  const [submitting, setSubmitting] = useState(false)
 
   const isContactValid = useMemo(() => contact.length > 3, [contact])
+  const isMessageValid = useMemo(() => message.length > 3 && message.length <= 450, [message])
+  const isFeedbackValid = isContactValid && isMessageValid
 
-  const isMessageValid = useMemo(() => {
-    return message.length > 3 && message.length <= 450
-  }, [message])
-
-  const isFeedbackValid = useMemo(() => {
-    return isContactValid && isMessageValid
-  }, [isContactValid, isMessageValid])
+  const submit = async () => {
+    if (!isFeedbackValid || submitting) return
+    setSubmitting(true)
+    try {
+      const userId = await resolveUserId()
+      await client.mutation(api.feedback.submit, { userId, contact, message })
+    } catch (e) {
+      console.error('Failed to submit feedback:', e)
+    }
+    setSubmitting(false)
+    onClose()
+  }
 
   return (
     <div className={classNames('Feedback', className)}>
-      <Tip
-        top="38px"
-        right="24px"
-        position="leftEdge bottom"
-        arrowPosition="center bottom"
-      >
-        <h6>Feedback Form Fields</h6>
-        <p>
-          Make sure to include relevant fields in your feedback form to
-          collect the needed information.
-        </p>
-        <p>
-          The Email/Discord field will allow you to contact your users in a
-          more convenient way, the free-form text field will allow your users
-          to elaborate on what they want to say.
-        </p>
-      </Tip>
-
       <h3>Write Us a Feedback</h3>
 
       <div className="content">
@@ -63,7 +55,7 @@ export function Feedback({ className, onClose }: FeedbackProps) {
         />
         <textarea
           className={classNames('text text-area', { invalid: !isMessageValid })}
-          placeholder='I would like to let you know that&hellip;'
+          placeholder='I would like to let you know that…'
           value={message}
           onChange={e => setMessage(e.target.value)}
         />
@@ -75,8 +67,8 @@ export function Feedback({ className, onClose }: FeedbackProps) {
         <button
           className="action submit"
           onClick={submit}
-          disabled={!isFeedbackValid}
-        >Send</button>
+          disabled={!isFeedbackValid || submitting}
+        >{submitting ? 'Sending…' : 'Send'}</button>
       </div>
     </div>
   )

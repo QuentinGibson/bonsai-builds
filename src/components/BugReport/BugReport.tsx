@@ -1,12 +1,18 @@
 import { useMemo, useState } from 'react'
-
-import { useEventBus } from '../../hooks/use-event-bus'
+import { ConvexHttpClient } from 'convex/browser'
+import { api } from '../../../convex/_generated/api'
 import { classNames } from '../../utils'
-
 import './BugReport.scss'
 
-import { Tip } from '../Tip/Tip'
+const client = new ConvexHttpClient(process.env.CONVEX_URL!)
 
+function resolveUserId(): Promise<string> {
+  return new Promise((resolve) => {
+    overwolf.profile.getCurrentUser((result) => {
+      resolve(result.success && result.userId ? result.userId : 'anon')
+    })
+  })
+}
 
 export type BugReportProps = {
   className?: string
@@ -14,40 +20,29 @@ export type BugReportProps = {
 }
 
 export function BugReport({ className, onClose }: BugReportProps) {
-  const eventBus = useEventBus()
-
   const [contact, setContact] = useState('')
   const [message, setMessage] = useState('')
-
-  const submit = () => eventBus.emit('submitBugReport')
+  const [submitting, setSubmitting] = useState(false)
 
   const isContactValid = useMemo(() => contact.length > 3, [contact])
+  const isMessageValid = useMemo(() => message.length > 3 && message.length <= 450, [message])
+  const isBugReportValid = isContactValid && isMessageValid
 
-  const isMessageValid = useMemo(() => {
-    return message.length > 3 && message.length <= 450
-  }, [message])
-
-  const isBugReportValid = useMemo(() => {
-    return isContactValid && isMessageValid
-  }, [isContactValid, isMessageValid])
+  const submit = async () => {
+    if (!isBugReportValid || submitting) return
+    setSubmitting(true)
+    try {
+      const userId = await resolveUserId()
+      await client.mutation(api.bugReports.submit, { userId, contact, message })
+    } catch (e) {
+      console.error('Failed to submit bug report:', e)
+    }
+    setSubmitting(false)
+    onClose()
+  }
 
   return (
     <div className={classNames('BugReport', className)}>
-      <Tip
-        top="38px"
-        right="24px"
-        position="leftEdge bottom"
-        arrowPosition="center bottom"
-      >
-        <h6>Bug Report</h6>
-        <p>
-          Ensure your bug report form includes essential fields for effective
-          troubleshooting. The Email/Discord field provides a convenient means
-          of contacting users, while the free-form text field allows users to
-          provide detailed information about the bug they&apos;re reporting.
-        </p>
-      </Tip>
-
       <h3>Bug Report</h3>
 
       <div className="content">
@@ -60,7 +55,7 @@ export function BugReport({ className, onClose }: BugReportProps) {
         />
         <textarea
           className={classNames('text text-area', { invalid: !isMessageValid })}
-          placeholder='Your message&hellip;'
+          placeholder='Your message…'
           value={message}
           onChange={e => setMessage(e.target.value)}
         />
@@ -72,8 +67,8 @@ export function BugReport({ className, onClose }: BugReportProps) {
         <button
           className="action submit"
           onClick={submit}
-          disabled={!isBugReportValid}
-        >Send</button>
+          disabled={!isBugReportValid || submitting}
+        >{submitting ? 'Sending…' : 'Send'}</button>
       </div>
     </div>
   )

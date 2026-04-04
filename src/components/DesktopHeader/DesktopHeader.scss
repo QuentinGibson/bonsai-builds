@@ -4,8 +4,8 @@
   position: relative;
   height: 34px;
   padding-left: 12px;
-  background: #0a0806;
-  border-bottom: 1px solid rgba(200, 149, 45, 0.2);
+  background: #080C12;
+  border-bottom: 1px solid rgba(0, 212, 180, 0.2);
 
   &::before {
     content: '';
@@ -18,7 +18,7 @@
     background-size: contain;
     pointer-events: none;
     opacity: 0.92;
-    filter: drop-shadow(0 0 6px rgba(200, 149, 45, 0.18));
+    filter: drop-shadow(0 0 6px rgba(0, 212, 180, 0.25)) brightness(0) invert(1) sepia(1) saturate(3) hue-rotate(130deg);
   }
 
   .status {
@@ -43,10 +43,10 @@
     flex: 0 0 auto;
     margin-left: auto;
     margin-right: 123px;
-    color: var(--text-text-tertiary);
+    color: #4A6580;
     font-size: 11px;
     font-weight: 600;
-    letter-spacing: 1.2px;
+    letter-spacing: 1.8px;
     text-transform: uppercase;
     font-family: var(--font-display);
     transition: color 150ms ease-in-out;
@@ -57,17 +57,17 @@
       width: 16px;
       height: 16px;
       margin-right: 6px;
-      background-color: var(--text-text-tertiary);
+      background-color: #4A6580;
       mask: url('../../images/window-feedback.svg') no-repeat center center;
       mask-size: contain;
       transition: background-color 150ms ease-in-out;
     }
 
     &:hover {
-      color: var(--accent-gold);
+      color: #00D4B4;
 
       &::before {
-        background-color: var(--accent-gold);
+        background-color: #00D4B4;
       }
     }
   }
@@ -88,7 +88,7 @@
       margin: auto;
       width: 1px;
       height: 18px;
-      background-color: rgba(200, 149, 45, 0.2);
+      background-color: rgba(0, 212, 180, 0.2);
     }
   }
 
@@ -105,15 +105,15 @@
       height: 100%;
       mask: center center no-repeat;
       mask-size: 18px;
-      background-color: var(--window-icon-secondary);
+      background-color: #4A6580;
       transition: background-color 150ms ease-in-out;
     }
 
     &:hover {
-      background-color: var(--hover-hover-secondary-dark);
+      background-color: rgba(0, 212, 180, 0.08);
 
       &::before {
-        background-color: var(--accent-gold);
+        background-color: #00D4B4;
       }
     }
 
@@ -139,10 +139,10 @@
       }
 
       &:hover {
-        background-color: var(--surface-surface-brand);
+        background-color: #E85D5D;
 
         &::before {
-          background: var(--window-icon-pure);
+          background: #E8EEF5;
         }
       }
     }
@@ -153,8 +153,8 @@
     top: 100%;
     right: 60px;
     z-index: 10000001;
-    border: 1px solid rgba(200, 149, 45, 0.25);
-    background-color: #1a1710;
+    border: 1px solid rgba(0, 212, 180, 0.25);
+    background-color: #0E1520;
     visibility: hidden;
     opacity: 0;
     transition: all 150ms ease-in-out;
@@ -166,14 +166,14 @@
       padding: 8px 14px;
       font-size: 11px;
       font-family: var(--font-display);
-      letter-spacing: 0.8px;
-      color: var(--text-text-tertiary);
+      letter-spacing: 1.2px;
+      color: #4A6580;
       text-transform: uppercase;
       transition: all 150ms ease-in-out;
 
       &:hover {
-        background-color: rgba(200, 149, 45, 0.1);
-        color: var(--accent-gold);
+        background-color: rgba(0, 212, 180, 0.1);
+        color: #00D4B4;
       }
     }
   }
