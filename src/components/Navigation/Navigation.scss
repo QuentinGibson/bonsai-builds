@@ -66,6 +66,41 @@
     }
   }
 
+  .premium-item {
+    margin-top: auto;
+    border-top: 1px solid rgba(0, 212, 180, 0.08);
+    color: #F0B429;
+    opacity: 0.7;
+
+    svg { color: #F0B429; }
+
+    &::before { background: #F0B429; }
+
+    &:hover {
+      color: #F0B429;
+      background: rgba(240, 180, 41, 0.07);
+      opacity: 1;
+      svg { color: #F0B429; }
+    }
+
+    &.selected {
+      color: #F0B429;
+      background: rgba(240, 180, 41, 0.09);
+      opacity: 1;
+      svg { color: #F0B429; }
+      &::before { opacity: 1; }
+    }
+
+    &.subscribed {
+      color: #00D4B4;
+      opacity: 1;
+      svg { color: #00D4B4; }
+      &::before { background: #00D4B4; }
+      &:hover { color: #00D4B4; background: rgba(0, 212, 180, 0.06); svg { color: #00D4B4; } }
+      &.selected { color: #00D4B4; background: rgba(0, 212, 180, 0.07); svg { color: #00D4B4; } }
+    }
+  }
+
   .nav-toggle-btn {
     margin-top: auto;
     display: flex;

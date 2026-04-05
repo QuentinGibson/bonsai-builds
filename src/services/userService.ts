@@ -1,5 +1,6 @@
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../convex/_generated/api";
+import { kPremiumPlanId } from "../config/constants";
 
 function resolveOverwolfUserId(): Promise<string> {
   return new Promise((resolve) => {
@@ -29,28 +30,43 @@ class UserService {
     }
   }
 
-  /**
-   * TODO: Hook this up to a payment/subscription flow.
-   *
-   * To grant a user premium (removes ads):
-   *   userService.setPremium(true)
-   *
-   * To revoke:
-   *   userService.setPremium(false)
-   *
-   * Options for triggering this:
-   *  - Overwolf Subscriptions API: overwolf.profile.subscriptions.getActivePlans()
-   *    fires a callback with active plan IDs — call setPremium(true) if the user
-   *    has a matching plan, setPremium(false) if not.
-   *  - Manual/admin: call setPremium directly from a dev tool or Convex dashboard.
-   *
-   * The status is stored in Convex (users table) and loaded into the common store
-   * at app startup via background.ts → userService.getIsPremium().
-   */
   async setPremium(isPremium: boolean): Promise<void> {
     const userId = await this.#userId;
     if (userId === "anon") return;
     await this.#client.mutation(api.users.setPremium, { userId, isPremium });
+  }
+
+  /**
+   * Checks the user's active Overwolf subscriptions and syncs the result to
+   * Convex. Call this on app startup instead of getIsPremium().
+   *
+   * Once you have a plan ID, set kPremiumPlanId in config/constants.ts.
+   * Until then the check is a no-op and everyone stays non-premium.
+   */
+  async checkAndSyncSubscription(): Promise<boolean> {
+    // Plan ID not configured yet — skip the API call
+    if (kPremiumPlanId === 0) {
+      return this.getIsPremium();
+    }
+
+    return new Promise((resolve) => {
+      try {
+        ;(overwolf.profile.subscriptions as any).getActivePlans(
+          (result: { success: boolean; plans?: Array<{ id: number }> }) => {
+            const isActive =
+              result?.success === true &&
+              Array.isArray(result.plans) &&
+              result.plans.some(p => p.id === kPremiumPlanId)
+
+            this.setPremium(isActive).catch(console.error)
+            resolve(isActive)
+          }
+        )
+      } catch {
+        // Subscriptions API unavailable — fall back to stored value
+        this.getIsPremium().then(resolve).catch(() => resolve(false))
+      }
+    })
   }
 }
 

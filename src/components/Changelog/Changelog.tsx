@@ -27,19 +27,18 @@ export function Changelog({ className, onClose }: ChangelogProps) {
 
 	return (
 		<div className={classNames("Changelog", className)}>
-			<h3>Change Log v.{version}</h3>
+			<h3>Welcome to Bonsai Builds v.{version}</h3>
 
 			<div className="content">
-				<h4>0.4.0d</h4>
-				<ul>
-					<li>Fixed ascendancy trees not displaying for classes with multi-word names (Blood Mage, Smith of Kitava, Gemling Legionnaire, Acolyte of Chayula, Disciple of Varashta)</li>
-				</ul>
+				<p>Thanks for installing Bonsai Builds — the step-by-step passive tree planner for Path of Exile 2.</p>
 
-				<h4>0.4.0c</h4>
+				<h4>What's included</h4>
 				<ul>
-					<li>Fixed passive tree errors and added dock image</li>
-					<li>Fixed errors on checklist</li>
-					<li>Fixed ad errors</li>
+					<li>Full Path of Exile 2 passive skill tree with all classes and ascendancies</li>
+					<li>Build steps system — plan your leveling path breakpoint by breakpoint</li>
+					<li>Builder screen to manage your builds and steps</li>
+					<li>Marketplace to browse and share builds with the community</li>
+					<li>In-game overlay — press <strong>Ctrl+T</strong> to show/hide</li>
 				</ul>
 			</div>
 

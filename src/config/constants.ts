@@ -13,6 +13,14 @@ export const kDefaultLocale = "en-GB";
 
 export const kDiscordUrl = "https://discord.gg/cC6UcM9H";
 
+// TODO: Replace with your Overwolf subscription plan ID once registered in the Overwolf dev console.
+// Plan IDs are assigned at https://dev.overwolf.com when you create a subscription plan.
+// While this is 0, the subscription check is disabled and no one will be granted premium.
+export const kPremiumPlanId = 0;
+
+// TODO: Replace with your Overwolf app store URL once the subscription plan is live.
+export const kSubscriptionUrl = "";
+
 // Path of Exile 2 configuration
 export const kPoe2GameId = 24886;
 

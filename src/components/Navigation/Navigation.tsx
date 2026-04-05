@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import {
+	AiOutlineCrown,
 	AiOutlineHome,
 	AiOutlineLeft,
 	AiOutlineRight,
@@ -23,7 +24,7 @@ export type NavigationProps = {
 export function Navigation({ className, collapsed, onToggle }: NavigationProps) {
 	const eventBus = useEventBus();
 
-	const { screen } = useContext(CommonStoreContext);
+	const { screen, isPremium } = useContext(CommonStoreContext);
 
 	const setScreen = (newScreen: kAppScreens) => {
 		eventBus.emit("setScreen", newScreen);

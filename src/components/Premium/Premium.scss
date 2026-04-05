@@ -1,97 +1,169 @@
-@use '../../styles/mixins.scss';
-
 .Premium {
-  .primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 40px 24px 320px;
+
+  .premium-content {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    @include mixins.desktopPrimary;
+    align-items: center;
+    gap: 32px;
+    max-width: 400px;
+    width: 100%;
+  }
 
-    h2 {
-      position: relative;
-      flex: 0 0 auto;
-      margin-bottom: 40px;
-      font-size: 22px;
-      font-weight: 700;
-      line-height: 28px;
-      letter-spacing: 0.44px;
+  .premium-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+  }
+
+  .premium-crown {
+    font-size: 40px;
+    color: #F0B429;
+    opacity: 0.9;
+  }
+
+  h2 {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #E8EEF5;
+  }
+
+  .premium-subtitle {
+    font-size: 13px;
+    color: #5A7A96;
+    line-height: 1.5;
+  }
+
+  // ── Plan card ────────────────────────────────────────────────────────────
+
+  .plan-card {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 32px 28px;
+    background: #0E1520;
+    border: 1px solid rgba(0, 212, 180, 0.2);
+    border-radius: 8px;
+    position: relative;
+
+    &--active {
+      border-color: rgba(0, 212, 180, 0.5);
+      background: rgba(0, 212, 180, 0.04);
     }
   }
 
-  .select-billing {
-    display: flex;
-    align-items: center;
+  .plan-badge {
     position: absolute;
-    top: 24px;
-    right: 24px;
-    gap: 24px;
+    top: -11px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #00D4B4;
+    color: #080C12;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 3px 12px;
+    border-radius: 99px;
+  }
 
-    .billed {
+  h3 {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: #E8EEF5;
+  }
+
+  .plan-price {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+
+  .plan-price-amount {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 700;
+    color: #00D4B4;
+    line-height: 1;
+  }
+
+  .plan-price-period {
+    font-size: 13px;
+    color: #5A7A96;
+  }
+
+  .plan-perks {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+
+    li {
       display: flex;
       align-items: center;
-      gap: 12px;
-      font-size: 16px;
-      line-height: 24px;
-      letter-spacing: 0.32px;
+      gap: 10px;
+      font-size: 13px;
+      color: #7A8FA8;
 
-      &::before {
-        content: '';
-        display: block;
-        width: 20px;
-        height: 20px;
-        background: url('../../images/radio.svg') no-repeat center center;
-        transition: background-image 150ms ease-in-out;
-      }
-
-      &.active::before {
-        background-image: url('../../images/radio-active.svg');
+      svg {
+        font-size: 16px;
+        color: #00D4B4;
+        flex-shrink: 0;
       }
     }
   }
 
-  .plans {
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    height: 100%;
-  }
-
-  .plan {
-    display: flex;
+  .subscribe-btn {
     width: 100%;
-    padding: 20px;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    background-color: var(--surface-surface-tertiary);
+    padding: 11px 24px;
+    background: rgba(0, 212, 180, 0.1);
+    border: 1px solid rgba(0, 212, 180, 0.4);
+    border-radius: 4px;
+    color: #00D4B4;
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 
-    h3 {
-      font-size: 18px;
-      font-weight: 700;
-      line-height: 24px;
-      letter-spacing: 0.36px;
-      text-align: center;
+    &:hover:not(:disabled) {
+      background: rgba(0, 212, 180, 0.18);
+      border-color: rgba(0, 212, 180, 0.7);
+      color: #00EDCA;
     }
 
-    button {
-      min-width: 96px;
-      height: 32px;
-      padding: 6px 16px;
-      border: 1px solid var(--border-border-secondary);
-      text-align: center;
-      font-size: 14px;
-      font-weight: 600;
-      line-height: 20px;
-      letter-spacing: 0.56px;
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
   }
 
-  .secondary {
-    @include mixins.desktopSecondary;
+  .plan-note {
+    font-size: 11px;
+    color: #3D5168;
+    text-align: center;
+    line-height: 1.5;
+  }
 
-    font-size: 18px;
-    font-weight: 700;
-    line-height: 24px;
-    letter-spacing: 0.36px;
+  .plan-thankyou {
+    font-size: 12px;
+    color: rgba(0, 212, 180, 0.6);
+    text-align: center;
+    font-style: italic;
   }
 }

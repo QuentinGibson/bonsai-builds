@@ -73,7 +73,7 @@ class BackgroundController {
 			this.#updateViewports(),
 		]);
 
-		this.#state.isPremium = await userService.getIsPremium();
+		this.#state.isPremium = await userService.checkAndSyncSubscription();
 
 		await this.#initHotkeys();
 

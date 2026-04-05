@@ -94,39 +94,48 @@ export function FTUE({ className }: FTUEProps) {
 	const step = TOUR_STEPS[currentStep];
 	const isFirstStep = currentStep === 0;
 	const isLastStep = currentStep === TOUR_STEPS.length - 1;
+	const hasSpotlight = step.highlightSelector && !!spotlightStyle.width;
 
 	// Update spotlight position when step changes
 	useEffect(() => {
-		if (step.highlightSelector) {
-			if (step.highlightSelector === "Navigation") {
-				console.log(`Current Step Highlight: ${step.highlightSelector}`);
+		if (!step.highlightSelector) {
+			setSpotlightStyle({})
+			return
+		}
+
+		let retryId: ReturnType<typeof setTimeout>
+		const retryDelays = [0, 100, 250, 500, 1000]
+		let attempt = 0
+
+		const updateSpotlight = () => {
+			const element = document.getElementById(step.highlightSelector!)
+			if (element) {
+				const rect = element.getBoundingClientRect()
+				setSpotlightStyle({
+					top: `${rect.top}px`,
+					left: `${rect.left}px`,
+					width: `${rect.width}px`,
+					height: `${rect.height}px`,
+				})
+				return
 			}
-			const updateSpotlight = () => {
-				const element = document.getElementById(step.highlightSelector!);
-				if (element) {
-					const rect = element.getBoundingClientRect();
-					setSpotlightStyle({
-						top: `${rect.top}px`,
-						left: `${rect.left}px`,
-						width: `${rect.width}px`,
-						height: `${rect.height}px`,
-					});
-				}
-			};
 
-			// Initial update
-			updateSpotlight();
+			// Element not found yet — retry up to the limit, then give up gracefully
+			attempt++
+			if (attempt < retryDelays.length) {
+				retryId = setTimeout(updateSpotlight, retryDelays[attempt])
+			} else {
+				console.warn(`FTUE: element #${step.highlightSelector} not found — showing step without highlight`)
+				setSpotlightStyle({})
+			}
+		}
 
-			// Update on window resize
-			window.addEventListener("resize", updateSpotlight);
+		retryId = setTimeout(updateSpotlight, retryDelays[0])
+		window.addEventListener("resize", updateSpotlight)
 
-			// Use a short timeout to ensure DOM is ready
-			const timeoutId = setTimeout(updateSpotlight, 100);
-
-			return () => {
-				window.removeEventListener("resize", updateSpotlight);
-				clearTimeout(timeoutId);
-			};
+		return () => {
+			clearTimeout(retryId)
+			window.removeEventListener("resize", updateSpotlight)
 		}
 	}, [step.highlightSelector]);
 
@@ -136,12 +145,12 @@ export function FTUE({ className }: FTUEProps) {
 			<div className="drag" onMouseDown={drag} />
 
 			{/* Dark overlay - only show when no spotlight */}
-			{!step.highlightSelector && (
+			{!hasSpotlight && (
 				<div className="ftue-overlay" onClick={nextStep} />
 			)}
 
-			{/* Spotlight highlight */}
-			{step.highlightSelector && (
+			{/* Spotlight highlight — only render when element was actually found */}
+			{hasSpotlight && (
 				<div
 					ref={spotlightRef}
 					className="ftue-spotlight"
