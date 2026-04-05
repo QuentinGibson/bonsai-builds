@@ -56,6 +56,17 @@ export class PassiveTreeManager {
   private currentBreakpointId: string | null = null
   private initialized = false // prevents repeated auto-select on every loadBuildSets call
 
+  // Element caches — populated once after setup to avoid querySelector in hot paths
+  private nodeElements = new Map<string, SVGElement>()
+  private connElements = new Map<string, SVGElement>()
+  // Track which nodes/conns currently have preview classes so clearPreview is O(previewed) not O(all)
+  private previewedNodeIds = new Set<string>()
+  private previewedConnIds = new Set<string>()
+  // RAF flag — throttles drag-pan to one viewBox update per frame
+  private dragRafPending = false
+  // Track last tooltip node to skip redundant innerHTML writes on mousemove
+  private tooltipNodeId: string | null = null
+
   constructor(
     openAddBuildSetPopup: () => void,
     openAddBreakpointPopup: () => void,
@@ -162,14 +173,17 @@ export class PassiveTreeManager {
 
   async initialize(container: HTMLElement) {
     try {
-      // Load SVG and tree data
+      // Load SVG and tree data in parallel
       const [svgContent, treeData] = await Promise.all([
         fetch('/assets-static/poe2snippet.html').then(r => r.text()),
         fetch('/assets-static/data_us.json').then(r => r.json())
       ])
 
-      container.innerHTML = svgContent
-      this.svg = container.querySelector('#passive_skill_tree')
+      // Parse into a detached element so ALL setup mutations (node moves, image inserts,
+      // class changes) happen off-screen without triggering layout/paint per operation.
+      const temp = document.createElement('div')
+      temp.innerHTML = svgContent
+      this.svg = temp.querySelector('#passive_skill_tree')
       this.treeData = treeData
 
       if (!this.svg || !this.treeData) {
@@ -177,6 +191,9 @@ export class PassiveTreeManager {
       }
 
       this.setupTree()
+
+      // Insert into the live DOM only once — after all mutations are complete
+      container.appendChild(this.svg)
     } catch (err) {
       console.error('Failed to initialize passive tree:', err)
       container.innerHTML = '<div style="color: white; padding: 20px;">Failed to load tree.</div>'
@@ -225,13 +242,45 @@ export class PassiveTreeManager {
 
     // Setup build management
     this.setupBuildManagement()
+
+    // Cache element references for hot-path use
+    this.buildElementCaches()
+  }
+
+  private buildElementCaches() {
+    if (!this.svg) return
+
+    // Cache all node circles
+    this.svg.querySelectorAll('circle[id^="n"]').forEach(el => {
+      this.nodeElements.set(el.id.slice(1), el as SVGElement)
+    })
+
+    // Cache all connection lines/paths (main tree + ascendancy groups)
+    this.svg.querySelectorAll(
+      '#connections line, #connections path, g[id^="ascendancy-"] line, g[id^="ascendancy-"] path'
+    ).forEach(el => {
+      if (el.id) this.connElements.set(el.id, el as SVGElement)
+    })
   }
 
   private setupAscendancyGroups() {
     if (!this.svg) return
 
+    // Build a connection lookup: nodeId -> [connElement] from ONE querySelectorAll.
+    // This replaces ~380 per-node substring querySelectorAll calls (one per ascendancy node).
+    const connsByNode = new Map<string, Element[]>()
+    this.svg.querySelectorAll('#connections line[id], #connections path[id]').forEach(el => {
+      const m = el.id.match(/^c(\d+)-(\d+)$/)
+      if (!m) return
+      if (!connsByNode.has(m[1])) connsByNode.set(m[1], [])
+      if (!connsByNode.has(m[2])) connsByNode.set(m[2], [])
+      connsByNode.get(m[1])!.push(el)
+      connsByNode.get(m[2])!.push(el)
+    })
+
     Object.keys(this.ascendancyData).forEach(ascName => {
       const { nodes: nodeIds, transform } = this.ascendancyData[ascName]
+      const nodeSet = new Set(nodeIds)
 
       const group = document.createElementNS('http://www.w3.org/2000/svg', 'g')
       group.id = `ascendancy-${ascName}`
@@ -239,32 +288,22 @@ export class PassiveTreeManager {
       group.setAttribute('data-ascendancy', ascName)
       group.style.display = 'none'
 
-      const pathsToMove: Element[] = []
+      // Find connections where both endpoints are in this ascendancy group
+      const pathsToMove = new Set<Element>()
       nodeIds.forEach(nodeId => {
-        const connectedPaths = this.svg!.querySelectorAll(`path[id^="c${nodeId}-"], line[id^="c${nodeId}-"], path[id*="-${nodeId}"], line[id*="-${nodeId}"]`)
-        connectedPaths.forEach(path => {
-          const pathId = path.id
-          const match = pathId.match(/c(\d+)-(\d+)/)
-          if (match) {
-            const [, node1, node2] = match
-            if (nodeIds.includes(node1) && nodeIds.includes(node2)) {
-              if (!pathsToMove.includes(path)) {
-                pathsToMove.push(path)
-              }
-            }
+        ;(connsByNode.get(nodeId) || []).forEach(conn => {
+          const m = conn.id.match(/^c(\d+)-(\d+)$/)
+          if (m && nodeSet.has(m[1]) && nodeSet.has(m[2])) {
+            pathsToMove.add(conn)
           }
         })
       })
 
-      pathsToMove.forEach(path => {
-        group.appendChild(path)
-      })
+      pathsToMove.forEach(path => group.appendChild(path))
 
       nodeIds.forEach(nodeId => {
         const circle = this.svg!.querySelector(`#n${nodeId}`)
-        if (circle) {
-          group.appendChild(circle)
-        }
+        if (circle) group.appendChild(circle)
       })
 
       this.svg.appendChild(group)
@@ -275,37 +314,36 @@ export class PassiveTreeManager {
     if (!this.svg || !this.treeData) return
 
     const nodes = this.treeData.nodes
-    Object.keys(nodes).forEach(nodeId => {
+
+    // Query all circles once instead of one querySelector per node (was 4,701 queries)
+    this.svg.querySelectorAll('circle[id^="n"]').forEach(circle => {
+      const nodeId = circle.id.slice(1)
       const nodeData = nodes[nodeId]
-      const circle = this.svg!.querySelector(`#n${nodeId}`)
+      if (!nodeData?.icon) return
 
-      if (circle && nodeData.icon) {
-        const img = document.createElementNS('http://www.w3.org/2000/svg', 'image')
-        const cx = parseFloat(circle.getAttribute('cx') || '0')
-        const cy = parseFloat(circle.getAttribute('cy') || '0')
-        const r = parseFloat(circle.getAttribute('r') || '0')
+      const img = document.createElementNS('http://www.w3.org/2000/svg', 'image')
+      const cx = parseFloat(circle.getAttribute('cx') || '0')
+      const cy = parseFloat(circle.getAttribute('cy') || '0')
+      const r = parseFloat(circle.getAttribute('r') || '0')
 
-        const imgSize = r * 1.5
-        img.setAttribute('x', (cx - imgSize / 2).toString())
-        img.setAttribute('y', (cy - imgSize / 2).toString())
-        img.setAttribute('width', imgSize.toString())
-        img.setAttribute('height', imgSize.toString())
+      const imgSize = r * 1.5
+      img.setAttribute('x', (cx - imgSize / 2).toString())
+      img.setAttribute('y', (cy - imgSize / 2).toString())
+      img.setAttribute('width', imgSize.toString())
+      img.setAttribute('height', imgSize.toString())
 
-        const passivesPath = nodeData.icon.match(/passives\/(.+)\.webp/)
-        const skillIconPath = nodeData.icon.match(/SkillIcons\/([^/]+)\.webp/)
+      const passivesPath = nodeData.icon.match(/passives\/(.+)\.webp/)
+      const skillIconPath = nodeData.icon.match(/SkillIcons\/([^/]+)\.webp/)
 
-        if (passivesPath) {
-          const localPath = passivesPath[1].toLowerCase()
-          img.setAttribute('href', `/assets-static/images/passives/${localPath}.png`)
-        } else if (skillIconPath) {
-          const filename = skillIconPath[1].toLowerCase()
-          img.setAttribute('href', `/assets-static/images/${filename}.png`)
-        }
-
-        img.setAttribute('pointer-events', 'none')
-        img.classList.add('node-icon')
-        circle.parentNode?.insertBefore(img, circle.nextSibling)
+      if (passivesPath) {
+        img.setAttribute('href', `/assets-static/images/passives/${passivesPath[1].toLowerCase()}.png`)
+      } else if (skillIconPath) {
+        img.setAttribute('href', `/assets-static/images/${skillIconPath[1].toLowerCase()}.png`)
       }
+
+      img.setAttribute('pointer-events', 'none')
+      img.classList.add('node-icon')
+      circle.parentNode?.insertBefore(img, circle.nextSibling)
     })
   }
 
@@ -375,6 +413,8 @@ export class PassiveTreeManager {
     this.svg.addEventListener('mousemove', (e) => this.handleTooltipMove(e))
   }
 
+  private lastNotifiedZoom = -1
+
   private updateViewBox() {
     if (!this.svg) return
 
@@ -392,7 +432,11 @@ export class PassiveTreeManager {
 
     this.svg.setAttribute('viewBox', `${x} ${y} ${width} ${height}`)
 
-    document.dispatchEvent(new CustomEvent('treezoomchange', { detail: { zoom: this.zoom } }))
+    // Only notify React when zoom actually changed — panning must not trigger re-renders
+    if (this.zoom !== this.lastNotifiedZoom) {
+      this.lastNotifiedZoom = this.zoom
+      document.dispatchEvent(new CustomEvent('treezoomchange', { detail: { zoom: this.zoom } }))
+    }
   }
 
   private handleMouseDown(e: MouseEvent) {
@@ -404,19 +448,27 @@ export class PassiveTreeManager {
   }
 
   private handleMouseMove(e: MouseEvent) {
-    if (this.isDragging) {
-      const dx = e.clientX - this.lastX
-      const dy = e.clientY - this.lastY
-      this.panX += dx * 50 / this.zoom
-      this.panY += dy * 50 / this.zoom
+    if (!this.isDragging) return
 
-      const maxPan = 45000
-      this.panX = Math.max(-maxPan, Math.min(maxPan, this.panX))
-      this.panY = Math.max(-maxPan, Math.min(maxPan, this.panY))
+    const dx = e.clientX - this.lastX
+    const dy = e.clientY - this.lastY
+    this.panX += dx * 50 / this.zoom
+    this.panY += dy * 50 / this.zoom
 
-      this.lastX = e.clientX
-      this.lastY = e.clientY
-      this.updateViewBox()
+    const maxPan = 45000
+    this.panX = Math.max(-maxPan, Math.min(maxPan, this.panX))
+    this.panY = Math.max(-maxPan, Math.min(maxPan, this.panY))
+
+    this.lastX = e.clientX
+    this.lastY = e.clientY
+
+    // Throttle viewBox writes to one per animation frame
+    if (!this.dragRafPending) {
+      this.dragRafPending = true
+      requestAnimationFrame(() => {
+        this.dragRafPending = false
+        this.updateViewBox()
+      })
     }
   }
 
@@ -504,7 +556,7 @@ export class PassiveTreeManager {
           this.allocatedAscendancyNodes.delete(nodeId)
 
           disconnected.forEach(discNodeId => {
-            const discNode = this.svg!.querySelector(`#n${discNodeId}`)
+            const discNode = this.nodeElements.get(discNodeId)
             if (discNode) {
               discNode.classList.remove('allocated')
               this.allocatedAscendancyNodes.delete(discNodeId)
@@ -516,7 +568,7 @@ export class PassiveTreeManager {
           this.allocatedNodes.delete(nodeId)
 
           disconnected.forEach(discNodeId => {
-            const discNode = this.svg!.querySelector(`#n${discNodeId}`)
+            const discNode = this.nodeElements.get(discNodeId)
             if (discNode) {
               discNode.classList.remove('allocated')
               this.allocatedNodes.delete(discNodeId)
@@ -540,7 +592,7 @@ export class PassiveTreeManager {
             this.allocatedAscendancyNodes.add(nodeId)
 
             path.forEach(pathNodeId => {
-              const pathNode = this.svg!.querySelector(`#n${pathNodeId}`)
+              const pathNode = this.nodeElements.get(pathNodeId)
               if (pathNode && !this.allocatedAscendancyNodes.has(pathNodeId)) {
                 pathNode.classList.add('allocated')
                 this.allocatedAscendancyNodes.add(pathNodeId)
@@ -554,7 +606,7 @@ export class PassiveTreeManager {
             this.allocatedNodes.add(nodeId)
 
             path.forEach(pathNodeId => {
-              const pathNode = this.svg!.querySelector(`#n${pathNodeId}`)
+              const pathNode = this.nodeElements.get(pathNodeId)
               if (pathNode && !this.allocatedNodes.has(pathNodeId)) {
                 pathNode.classList.add('allocated')
                 this.allocatedNodes.add(pathNodeId)
@@ -588,11 +640,14 @@ export class PassiveTreeManager {
   private handleTooltipMove(e: MouseEvent) {
     const target = e.target as HTMLElement
     if (target.tagName === 'circle' && target.id.startsWith('n')) {
-      const nodeId = target.id.replace('n', '')
+      const nodeId = target.id.slice(1)
       this.showTooltip(nodeId, e)
     } else {
-      const tooltip = document.getElementById('node-tooltip')
-      if (tooltip) tooltip.style.display = 'none'
+      if (this.tooltipNodeId !== null) {
+        this.tooltipNodeId = null
+        const tooltip = document.getElementById('node-tooltip')
+        if (tooltip) tooltip.style.display = 'none'
+      }
     }
   }
 
@@ -641,37 +696,32 @@ export class PassiveTreeManager {
   }
 
   private findDisconnectedNodes(removedNodeId: string): string[] {
-    const disconnected: string[] = []
+    if (!this.startingNodeId) return []
 
-    this.allocatedNodes.forEach(nodeId => {
-      if (nodeId === this.startingNodeId || nodeId === removedNodeId) return
+    // Single BFS from start (excluding removedNodeId) — O(nodes) instead of O(nodes²)
+    const reachable = new Set<string>()
+    const queue = [this.startingNodeId]
+    reachable.add(this.startingNodeId)
 
-      const queue = [nodeId]
-      const visited = new Set([nodeId, removedNodeId])
-      let foundStart = false
-
-      while (queue.length > 0) {
-        const currentId = queue.shift()!
-
-        if (currentId === this.startingNodeId) {
-          foundStart = true
-          break
+    while (queue.length > 0) {
+      const currentId = queue.shift()!
+      for (const neighborId of (this.connectionGraph.get(currentId) || [])) {
+        if (!reachable.has(neighborId) &&
+            neighborId !== removedNodeId &&
+            this.allocatedNodes.has(neighborId) &&
+            !this.allAscendancyNodeIds.has(neighborId)) {
+          reachable.add(neighborId)
+          queue.push(neighborId)
         }
-
-        const neighbors = this.connectionGraph.get(currentId) || []
-        neighbors.forEach(neighborId => {
-          if (!visited.has(neighborId) && this.allocatedNodes.has(neighborId) && !this.allAscendancyNodeIds.has(neighborId)) {
-            visited.add(neighborId)
-            queue.push(neighborId)
-          }
-        })
       }
+    }
 
-      if (!foundStart) {
+    const disconnected: string[] = []
+    this.allocatedNodes.forEach(nodeId => {
+      if (nodeId !== removedNodeId && !reachable.has(nodeId)) {
         disconnected.push(nodeId)
       }
     })
-
     return disconnected
   }
 
@@ -714,87 +764,64 @@ export class PassiveTreeManager {
   }
 
   private findDisconnectedNodesAscendancy(removedNodeId: string): string[] {
-    const disconnected: string[] = []
+    if (!this.ascendancyStartingNodeId) return []
 
-    this.allocatedAscendancyNodes.forEach(nodeId => {
-      if (nodeId === this.ascendancyStartingNodeId || nodeId === removedNodeId) return
+    // Single BFS from ascendancy start (excluding removedNodeId)
+    const reachable = new Set<string>()
+    const queue = [this.ascendancyStartingNodeId]
+    reachable.add(this.ascendancyStartingNodeId)
 
-      const queue = [nodeId]
-      const visited = new Set([nodeId, removedNodeId])
-      let foundStart = false
-
-      while (queue.length > 0) {
-        const currentId = queue.shift()!
-
-        if (currentId === this.ascendancyStartingNodeId) {
-          foundStart = true
-          break
+    while (queue.length > 0) {
+      const currentId = queue.shift()!
+      for (const neighborId of (this.connectionGraph.get(currentId) || [])) {
+        if (!reachable.has(neighborId) &&
+            neighborId !== removedNodeId &&
+            this.allocatedAscendancyNodes.has(neighborId) &&
+            this.isAscendancyNode(neighborId)) {
+          reachable.add(neighborId)
+          queue.push(neighborId)
         }
-
-        const neighbors = this.connectionGraph.get(currentId) || []
-        neighbors.forEach(neighborId => {
-          if (!visited.has(neighborId) && this.allocatedAscendancyNodes.has(neighborId) && this.isAscendancyNode(neighborId)) {
-            visited.add(neighborId)
-            queue.push(neighborId)
-          }
-        })
       }
+    }
 
-      if (!foundStart) {
+    const disconnected: string[] = []
+    this.allocatedAscendancyNodes.forEach(nodeId => {
+      if (nodeId !== removedNodeId && !reachable.has(nodeId)) {
         disconnected.push(nodeId)
       }
     })
-
     return disconnected
   }
 
   private updateAllConnections() {
-    if (!this.svg) return
-
-    // Update main tree connections
-    const mainConnections = this.svg.querySelectorAll('#connections line, #connections path')
-    mainConnections.forEach(conn => {
-      const connId = conn.id
-      const parts = connId.replace('c', '').split('-')
-      if (parts.length === 2) {
-        const n1 = this.svg!.querySelector(`#n${parts[0]}`)
-        const n2 = this.svg!.querySelector(`#n${parts[1]}`)
-        if (n1 && n2 && n1.classList.contains('allocated') && n2.classList.contains('allocated')) {
-          conn.classList.add('active')
-        } else {
-          conn.classList.remove('active')
-        }
-      }
-    })
-
-    // Update ascendancy connections
-    const ascendancyConnections = this.svg.querySelectorAll('g[id^="ascendancy-"] line, g[id^="ascendancy-"] path')
-    ascendancyConnections.forEach(conn => {
-      const connId = conn.id
-      const parts = connId.replace('c', '').split('-')
-      if (parts.length === 2) {
-        const n1 = this.svg!.querySelector(`#n${parts[0]}`)
-        const n2 = this.svg!.querySelector(`#n${parts[1]}`)
-        if (n1 && n2 && n1.classList.contains('allocated') && n2.classList.contains('allocated')) {
-          conn.classList.add('active')
-        } else {
-          conn.classList.remove('active')
-        }
+    this.connElements.forEach((conn, connId) => {
+      const parts = connId.slice(1).split('-')
+      if (parts.length !== 2) return
+      const n1 = this.nodeElements.get(parts[0])
+      const n2 = this.nodeElements.get(parts[1])
+      if (n1 && n2 && n1.classList.contains('allocated') && n2.classList.contains('allocated')) {
+        conn.classList.add('active')
+      } else {
+        conn.classList.remove('active')
       }
     })
   }
 
   private clearPreview() {
-    if (!this.svg) return
-
-    const previewNodes = this.svg.querySelectorAll('circle.preview, circle.preview-remove')
-    previewNodes.forEach(node => {
-      node.classList.remove('preview')
-      node.classList.remove('preview-remove')
+    this.previewedNodeIds.forEach(id => {
+      const node = this.nodeElements.get(id)
+      if (node) {
+        node.classList.remove('preview')
+        node.classList.remove('preview-remove')
+      }
     })
+    this.previewedNodeIds.clear()
 
-    const previewConns = this.svg.querySelectorAll('#connections line.preview, #connections path.preview')
-    previewConns.forEach(conn => conn.classList.remove('preview'))
+    this.previewedConnIds.forEach(id => {
+      const conn = this.connElements.get(id)
+      if (conn) conn.classList.remove('preview')
+    })
+    this.previewedConnIds.clear()
   }
 
   private showPreview(nodeId: string) {
@@ -803,45 +830,48 @@ export class PassiveTreeManager {
 
     if (this.allocatedNodes.has(nodeId)) {
       const disconnected = this.findDisconnectedNodes(nodeId)
-      const targetNode = this.svg!.querySelector(`#n${nodeId}`)
-      if (targetNode && nodeId !== this.startingNodeId) {
-        targetNode.classList.add('preview-remove')
+      if (nodeId !== this.startingNodeId) {
+        const targetNode = this.nodeElements.get(nodeId)
+        if (targetNode) {
+          targetNode.classList.add('preview-remove')
+          this.previewedNodeIds.add(nodeId)
+        }
       }
-
       disconnected.forEach(discNodeId => {
-        const discNode = this.svg!.querySelector(`#n${discNodeId}`)
+        const discNode = this.nodeElements.get(discNodeId)
         if (discNode) {
           discNode.classList.add('preview-remove')
+          this.previewedNodeIds.add(discNodeId)
         }
       })
     } else {
       const path = this.findShortestPath(nodeId)
-
       if (path !== null) {
-        const targetNode = this.svg!.querySelector(`#n${nodeId}`)
+        const targetNode = this.nodeElements.get(nodeId)
         if (targetNode) {
           targetNode.classList.add('preview')
+          this.previewedNodeIds.add(nodeId)
         }
-
         path.forEach(pathNodeId => {
-          const pathNode = this.svg!.querySelector(`#n${pathNodeId}`)
-          if (pathNode && !this.allocatedNodes.has(pathNodeId)) {
-            pathNode.classList.add('preview')
+          if (!this.allocatedNodes.has(pathNodeId)) {
+            const pathNode = this.nodeElements.get(pathNodeId)
+            if (pathNode) {
+              pathNode.classList.add('preview')
+              this.previewedNodeIds.add(pathNodeId)
+            }
           }
         })
 
-        const previewNodeIds = new Set([nodeId, ...path])
-        const allConnections = this.svg!.querySelectorAll('#connections line, #connections path')
-        allConnections.forEach(conn => {
-          const connId = conn.id
-          if (connId.startsWith('c')) {
-            const parts = connId.substring(1).split('-')
-            if (parts.length === 2) {
-              const [id1, id2] = parts
-              if ((previewNodeIds.has(id1) || this.allocatedNodes.has(id1)) &&
-                (previewNodeIds.has(id2) || this.allocatedNodes.has(id2))) {
-                conn.classList.add('preview')
-              }
+        const previewSet = new Set([nodeId, ...path])
+        this.connElements.forEach((conn, connId) => {
+          if (!connId.startsWith('c')) return
+          const parts = connId.slice(1).split('-')
+          if (parts.length === 2) {
+            const [id1, id2] = parts
+            if ((previewSet.has(id1) || this.allocatedNodes.has(id1)) &&
+                (previewSet.has(id2) || this.allocatedNodes.has(id2))) {
+              conn.classList.add('preview')
+              this.previewedConnIds.add(connId)
             }
           }
         })
@@ -856,29 +886,29 @@ export class PassiveTreeManager {
     if (!nodeData) return
 
     const tooltip = document.getElementById('node-tooltip')
-    const tooltipTitle = tooltip?.querySelector('.tooltip-title')
-    const tooltipStats = tooltip?.querySelector('.tooltip-stats')
+    if (!tooltip) return
 
-    if (tooltip && tooltipTitle && tooltipStats) {
-      tooltipTitle.textContent = nodeData.name || 'Unknown Node'
-      tooltipTitle.className = 'tooltip-title'
+    // Only rewrite content when hovering a different node
+    if (this.tooltipNodeId !== nodeId) {
+      this.tooltipNodeId = nodeId
+      const tooltipTitle = tooltip.querySelector('.tooltip-title')
+      const tooltipStats = tooltip.querySelector('.tooltip-stats')
 
-      if (nodeData.isKeystone) {
-        tooltipTitle.classList.add('keystone')
-      } else if (nodeData.isNotable) {
-        tooltipTitle.classList.add('notable')
+      if (tooltipTitle && tooltipStats) {
+        tooltipTitle.textContent = nodeData.name || 'Unknown Node'
+        tooltipTitle.className = 'tooltip-title'
+        if (nodeData.isKeystone) tooltipTitle.classList.add('keystone')
+        else if (nodeData.isNotable) tooltipTitle.classList.add('notable')
+
+        tooltipStats.innerHTML = nodeData.stats?.length
+          ? nodeData.stats.map(stat => `<div>${stat}</div>`).join('')
+          : '<div style="color: #888; font-style: italic;">No stats</div>'
       }
-
-      if (nodeData.stats && nodeData.stats.length > 0) {
-        tooltipStats.innerHTML = nodeData.stats.map(stat => `<div>${stat}</div>`).join('')
-      } else {
-        tooltipStats.innerHTML = '<div style="color: #888; font-style: italic;">No stats</div>'
-      }
-
-      tooltip.style.left = (e.clientX + 15) + 'px'
-      tooltip.style.top = (e.clientY + 15) + 'px'
-      tooltip.style.display = 'block'
     }
+
+    tooltip.style.left = (e.clientX + 15) + 'px'
+    tooltip.style.top = (e.clientY + 15) + 'px'
+    tooltip.style.display = 'block'
   }
 
   private setupDropdowns() {

@@ -68,13 +68,11 @@
 		circle:hover {
 			stroke: #00EDCA;
 			stroke-width: 14;
-			filter: drop-shadow(0 0 4px rgba(0, 212, 180, 0.6));
 		}
 
 		circle.allocated {
 			fill: #0E1520;
 			stroke: #00D4B4;
-			filter: drop-shadow(0 0 3px rgba(0, 212, 180, 0.6));
 		}
 
 		circle.preview {
@@ -116,7 +114,6 @@
 			stroke: #00D4B4;
 			stroke-opacity: 0.85;
 			stroke-width: 20;
-			filter: drop-shadow(0 0 3px rgba(0, 212, 180, 0.4));
 		}
 
 		#connections line.preview,
