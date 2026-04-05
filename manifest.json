@@ -4,7 +4,7 @@
   "meta": {
     "name": "BonsaiBuilds",
     "description": "Step-by-step passive tree planning for your Path of Exile 2 leveling journey.",
-    "version": "0.4.0",
+    "version": "0.1.0",
     "minimum-overwolf-version": "0.165.0",
     "author": "quentmadeit",
     "icon": "assets-static/bonsai-dock.png",
