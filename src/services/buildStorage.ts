@@ -17,6 +17,14 @@ export interface SupportSkill {
   additional_text?: string;
 }
 
+export interface InventorySlot {
+  inventory_id: string;
+  level_interval: number[];
+  slot_x: number;
+  slot_y: number;
+  additional_text: string;
+}
+
 export interface Skill {
   id: string;
   level_interval: number[];
@@ -40,6 +48,7 @@ export interface Breakpoint {
   order: number;
   passives: PassiveNode[];
   skills: Skill[];
+  inventory_slots: InventorySlot[];
   selectedAscendancy: string | null;
   createdAt: number;
 }
@@ -145,7 +154,7 @@ class BuildStorageService {
 
   async addBreakpoint(
     buildSetId: string,
-    breakpoint: Omit<Breakpoint, "id" | "createdAt" | "order" | "skills"> & { order?: number; skills?: Skill[] }
+    breakpoint: Omit<Breakpoint, "id" | "createdAt" | "order" | "skills" | "inventory_slots"> & { order?: number; skills?: Skill[]; inventory_slots?: InventorySlot[] }
   ): Promise<Breakpoint | null> {
     try {
       const id = await this.#client.mutation(api.breakpoints.add, {
@@ -154,6 +163,7 @@ class BuildStorageService {
         ...(breakpoint.order !== undefined ? { order: breakpoint.order } : {}),
         passives: breakpoint.passives,
         ...(breakpoint.skills !== undefined ? { skills: breakpoint.skills } : {}),
+        ...(breakpoint.inventory_slots !== undefined ? { inventory_slots: breakpoint.inventory_slots } : {}),
         ...(breakpoint.selectedAscendancy != null
           ? { selectedAscendancy: breakpoint.selectedAscendancy }
           : {}),
@@ -179,6 +189,7 @@ class BuildStorageService {
         ...(updates.order !== undefined ? { order: updates.order } : {}),
         ...(updates.passives !== undefined ? { passives: updates.passives } : {}),
         ...(updates.skills !== undefined ? { skills: updates.skills } : {}),
+        ...(updates.inventory_slots !== undefined ? { inventory_slots: updates.inventory_slots } : {}),
         // Empty string clears the field on the server
         ...(updates.selectedAscendancy !== undefined
           ? { selectedAscendancy: updates.selectedAscendancy ?? "" }

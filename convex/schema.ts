@@ -20,6 +20,14 @@ export const skillValidator = v.object({
   support_skills: v.array(supportSkillValidator),
 });
 
+export const inventorySlotValidator = v.object({
+  inventory_id: v.string(),
+  level_interval: v.array(v.number()),
+  slot_x: v.number(),
+  slot_y: v.number(),
+  additional_text: v.string(),
+});
+
 export default defineSchema({
   users: defineTable({
     userId: v.string(),
@@ -39,6 +47,7 @@ export default defineSchema({
       order: v.number(),
       passives: v.array(passiveNodeValidator),
       skills: v.optional(v.array(skillValidator)),
+      inventory_slots: v.optional(v.array(inventorySlotValidator)),
       selectedAscendancy: v.optional(v.string()),
     })),
     likeCount: v.number(),
@@ -125,7 +134,7 @@ export default defineSchema({
     order: v.number(),
     passives: v.array(passiveNodeValidator),
     skills: v.optional(v.array(skillValidator)),
-    inventory_slots: v.optional(v.array(v.object({ inventory_id: v.string() }))),
+    inventory_slots: v.optional(v.array(inventorySlotValidator)),
     selectedAscendancy: v.optional(v.string()),
     createdAt: v.number(),
   }).index("by_build", ["buildSetId"]),

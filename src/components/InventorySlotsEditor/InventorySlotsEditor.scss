@@ -1,0 +1,175 @@
+.InventorySlotsEditor {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .ise-slot-row {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 5px;
+    overflow: hidden;
+
+    &.expanded {
+      border-color: rgba(255, 255, 255, 0.14);
+    }
+  }
+
+  .ise-slot-header {
+    align-items: center;
+    background: rgba(255, 255, 255, 0.04);
+    border: none;
+    color: #aaa;
+    cursor: pointer;
+    display: flex;
+    font-size: 12px;
+    gap: 8px;
+    padding: 6px 10px;
+    text-align: left;
+    width: 100%;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.07);
+      color: #ccc;
+    }
+
+    &.has-data { color: #ddd; }
+  }
+
+  .ise-slot-name {
+    font-weight: 600;
+    min-width: 100px;
+  }
+
+  .ise-slot-preview {
+    color: #999;
+    flex: 1;
+    font-size: 11px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ise-slot-chevron {
+    color: #666;
+    font-size: 10px;
+  }
+
+  .ise-slot-body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 10px;
+  }
+
+  .ise-actions-row {
+    display: flex;
+    gap: 6px;
+  }
+
+  .ise-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 4px;
+    color: #ccc;
+    cursor: pointer;
+    font-size: 11px;
+    padding: 4px 10px;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #eee;
+    }
+
+    &.primary {
+      background: rgba(180, 140, 60, 0.2);
+      border-color: rgba(180, 140, 60, 0.4);
+      color: #d4a843;
+
+      &:hover {
+        background: rgba(180, 140, 60, 0.3);
+      }
+    }
+  }
+
+  .ise-level-row {
+    align-items: center;
+    display: flex;
+    gap: 6px;
+  }
+
+  .ise-level-label {
+    color: #888;
+    font-size: 11px;
+    min-width: 70px;
+  }
+
+  .ise-level-input {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    color: #ddd;
+    font-size: 12px;
+    outline: none;
+    padding: 3px 6px;
+    width: 52px;
+
+    &:focus { border-color: rgba(255, 255, 255, 0.25); }
+  }
+
+  .ise-level-sep {
+    color: #666;
+    font-size: 12px;
+  }
+}
+
+.ise-mod-value-overlay {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  position: fixed;
+  z-index: 1100;
+}
+
+.ise-mod-value-dialog {
+  background: #1c1c20;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  width: 300px;
+
+  .ise-mod-value-title {
+    color: #999;
+    font-size: 11px;
+  }
+
+  .ise-mod-value-name {
+    color: #ddd;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .ise-mod-value-input {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    box-sizing: border-box;
+    color: #eee;
+    font-size: 13px;
+    outline: none;
+    padding: 6px 10px;
+    width: 100%;
+
+    &:focus { border-color: rgba(255, 255, 255, 0.3); }
+  }
+
+  .ise-mod-value-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+}

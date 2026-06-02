@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { buildStorage, BuildSet, Breakpoint, type Skill } from "../../services/buildStorage";
+import { buildStorage, BuildSet, Breakpoint, type Skill, type InventorySlot } from "../../services/buildStorage";
 import { useEventBus } from "../../hooks/use-event-bus";
 import { kAppPopups, kAppScreens } from "../../config/enums";
 import { classNames } from "../../utils";
 import { BuildTree } from "../BuildTree/BuildTree";
 import { SkillsEditor } from "../SkillsEditor/SkillsEditor";
+import { InventorySlotsEditor } from "../InventorySlotsEditor/InventorySlotsEditor";
 import { parseBuildFile, serializeBuildFile, parseFilename, type BuildFileData } from "../../../convex/build_file";
 import { resolveAscendancy } from "../../services/class-ascendancy-map";
 
@@ -293,10 +294,17 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
   const [editStepOrder, setEditStepOrder] = useState<number>(0);
 
   const [expandedSkillsStepId, setExpandedSkillsStepId] = useState<string | null>(null);
+  const [expandedInventoryStepId, setExpandedInventoryStepId] = useState<string | null>(null);
 
   const handleSkillsChange = async (step: Breakpoint, skills: Skill[]) => {
     if (!selectedBuild) return;
     await buildStorage.updateBreakpoint(selectedBuild.id, step.id, { skills });
+    await refreshBuilds();
+  };
+
+  const handleInventorySlotsChange = async (step: Breakpoint, inventory_slots: InventorySlot[]) => {
+    if (!selectedBuild) return;
+    await buildStorage.updateBreakpoint(selectedBuild.id, step.id, { inventory_slots });
     await refreshBuilds();
   };
 
@@ -592,13 +600,28 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
                                   active: expandedSkillsStepId === step.id,
                                 })}
                                 title="Edit skills for this step"
-                                onClick={() =>
+                                onClick={() => {
+                                  setExpandedInventoryStepId(null);
                                   setExpandedSkillsStepId(
                                     expandedSkillsStepId === step.id ? null : step.id
-                                  )
-                                }
+                                  );
+                                }}
                               >
                                 Skills {step.skills.length > 0 && `(${step.skills.length})`}
+                              </button>
+                              <button
+                                className={classNames("step-skills-toggle", {
+                                  active: expandedInventoryStepId === step.id,
+                                })}
+                                title="Edit inventory for this step"
+                                onClick={() => {
+                                  setExpandedSkillsStepId(null);
+                                  setExpandedInventoryStepId(
+                                    expandedInventoryStepId === step.id ? null : step.id
+                                  );
+                                }}
+                              >
+                                Inventory {step.inventory_slots.length > 0 && `(${step.inventory_slots.length})`}
                               </button>
                               <button
                                 className="step-rename"
@@ -634,6 +657,14 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
                                 <SkillsEditor
                                   skills={step.skills}
                                   onChange={(skills) => handleSkillsChange(step, skills)}
+                                />
+                              </div>
+                            )}
+                            {expandedInventoryStepId === step.id && (
+                              <div className="step-skills-panel">
+                                <InventorySlotsEditor
+                                  slots={step.inventory_slots}
+                                  onChange={(inventory_slots) => handleInventorySlotsChange(step, inventory_slots)}
                                 />
                               </div>
                             )}

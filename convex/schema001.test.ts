@@ -377,3 +377,135 @@ test("build file import: className set on BuildSet and selectedAscendancy set on
   expect(imported!.className).toBe("Warrior");
   expect(imported!.breakpoints[0].selectedAscendancy).toBe(ascendancy);
 });
+
+test("breakpoints.add accepts inventory_slots and buildSets.get returns them", async () => {
+  const t = convexTest(schema, modules);
+
+  const buildSetId = await t.mutation(api.buildSets.create, {
+    userId: "user-inv-slots",
+    name: "Inventory Build",
+  });
+
+  await t.mutation(api.breakpoints.add, {
+    buildSetId,
+    name: "Early",
+    passives: [],
+    inventory_slots: [
+      {
+        inventory_id: "Weapon1",
+        level_interval: [1, 40],
+        slot_x: 0,
+        slot_y: 0,
+        additional_text: "",
+      },
+    ],
+  });
+
+  const result = await t.query(api.buildSets.get, { id: buildSetId });
+  expect(result).not.toBeNull();
+  const bp = result!.breakpoints[0];
+  expect(bp.inventory_slots).toEqual([
+    {
+      inventory_id: "Weapon1",
+      level_interval: [1, 40],
+      slot_x: 0,
+      slot_y: 0,
+      additional_text: "",
+    },
+  ]);
+});
+
+test("breakpoints.update replaces inventory_slots", async () => {
+  const t = convexTest(schema, modules);
+
+  const buildSetId = await t.mutation(api.buildSets.create, {
+    userId: "user-inv-update",
+    name: "Inv Update Build",
+  });
+
+  const bpId = await t.mutation(api.breakpoints.add, {
+    buildSetId,
+    name: "Step",
+    passives: [],
+    inventory_slots: [
+      { inventory_id: "Helm1", level_interval: [1, 20], slot_x: 2, slot_y: 0, additional_text: "" },
+    ],
+  });
+
+  await t.mutation(api.breakpoints.update, {
+    id: bpId as any,
+    buildSetId,
+    inventory_slots: [
+      { inventory_id: "BodyArmour1", level_interval: [20, 60], slot_x: 2, slot_y: 1, additional_text: "Good armor" },
+    ],
+  });
+
+  const result = await t.query(api.buildSets.get, { id: buildSetId });
+  expect(result!.breakpoints[0].inventory_slots).toEqual([
+    { inventory_id: "BodyArmour1", level_interval: [20, 60], slot_x: 2, slot_y: 1, additional_text: "Good armor" },
+  ]);
+});
+
+test("marketplace.publish snapshot includes inventory_slots", async () => {
+  const t = convexTest(schema, modules);
+
+  const listingId = await t.mutation(api.marketplace.publish, {
+    authorId: "user-mp-inv",
+    authorName: "Alice",
+    name: "Inv Build",
+    description: "test",
+    className: "Warrior",
+    breakpoints: [
+      {
+        name: "Mid",
+        order: 0,
+        passives: [],
+        inventory_slots: [
+          { inventory_id: "Weapon1", level_interval: [1, 40], slot_x: 0, slot_y: 0, additional_text: "" },
+        ],
+      },
+    ],
+  });
+
+  const listing = await t.query(api.marketplace.get, { id: listingId });
+  expect(listing).not.toBeNull();
+  expect(listing!.breakpoints[0].inventory_slots).toEqual([
+    { inventory_id: "Weapon1", level_interval: [1, 40], slot_x: 0, slot_y: 0, additional_text: "" },
+  ]);
+});
+
+test("marketplace.update snapshot includes inventory_slots", async () => {
+  const t = convexTest(schema, modules);
+
+  const listingId = await t.mutation(api.marketplace.publish, {
+    authorId: "user-mp-inv-upd",
+    authorName: "Bob",
+    name: "Build",
+    description: "test",
+    className: "Witch",
+    breakpoints: [{ name: "Early", order: 0, passives: [], inventory_slots: [] }],
+  });
+
+  await t.mutation(api.marketplace.update, {
+    id: listingId as any,
+    userId: "user-mp-inv-upd",
+    name: "Build",
+    description: "test",
+    className: "Witch",
+    breakpoints: [
+      {
+        name: "Early",
+        order: 0,
+        passives: [],
+        inventory_slots: [
+          { inventory_id: "Ring1", level_interval: [30, 70], slot_x: 1, slot_y: 3, additional_text: "Coral Ring" },
+        ],
+      },
+    ],
+  });
+
+  const listing = await t.query(api.marketplace.get, { id: listingId as any });
+  expect(listing!.breakpoints[0].inventory_slots).toEqual([
+    { inventory_id: "Ring1", level_interval: [30, 70], slot_x: 1, slot_y: 3, additional_text: "Coral Ring" },
+  ]);
+});
