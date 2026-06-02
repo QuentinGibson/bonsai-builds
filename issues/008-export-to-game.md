@@ -18,4 +18,4 @@ Add a one-click "Export to game" action per Breakpoint that writes the `.build` 
 
 ## Blocked by
 
-None — can start immediately
+- #011 (serializeBuildFile and export-to-computer must exist first — this issue writes the same payload to the game folder via Overwolf FS)

@@ -3,6 +3,7 @@ import { buildStorage, BuildSet, Breakpoint } from "../../services/buildStorage"
 import { useEventBus } from "../../hooks/use-event-bus";
 import { kAppPopups, kAppScreens } from "../../config/enums";
 import { classNames } from "../../utils";
+import { BuildTree } from "../BuildTree/BuildTree";
 
 import "./ScreenBuilder.scss";
 
@@ -282,28 +283,11 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
         )}
 
         <div className="build-list">
-          {builds.length === 0 && (
-            <div className="build-list-empty">No builds yet.<br />Click "+ New Build" to get started.</div>
-          )}
-          {builds.map((b) => {
-            const isActive = b.id === selectedId;
-            const stepCount = b.breakpoints.length;
-            return (
-              <button
-                key={b.id}
-                className={classNames("build-list-item", { active: isActive })}
-                onClick={() => selectBuild(b.id)}
-              >
-                <span className="item-name">{b.name}</span>
-                {b.className && (
-                  <span className="item-class">{b.className}</span>
-                )}
-                <span className="item-steps">
-                  {stepCount === 0 ? "No steps" : stepCount === 1 ? "1 step" : `${stepCount} steps`}
-                </span>
-              </button>
-            );
-          })}
+          <BuildTree
+            builds={builds}
+            selectedBuildId={selectedId}
+            onSelectBuild={selectBuild}
+          />
         </div>
       </aside>
 

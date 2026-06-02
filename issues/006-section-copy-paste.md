@@ -23,4 +23,4 @@ Let build authors copy an entire section (passives, skills, or inventory) from o
 
 ## Blocked by
 
-- #001 (allocatedNodes shape must be settled before copying passive sections)
+- #013 (all three sections — passives, skills, inventory_slots — must be settled before section copy-paste can work across all of them)

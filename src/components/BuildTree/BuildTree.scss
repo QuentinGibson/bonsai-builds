@@ -1,0 +1,73 @@
+.BuildTree {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.tree-build {
+  display: flex;
+  flex-direction: column;
+}
+
+.tree-folder-row,
+.tree-breakpoint-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 8px;
+  text-align: left;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  border-radius: 4px;
+  transition: background 0.1s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+}
+
+.tree-folder-row {
+  &.active {
+    background: rgba(255, 255, 255, 0.12);
+  }
+}
+
+.tree-breakpoint-row {
+  padding-left: 28px;
+  font-size: 0.9em;
+  opacity: 0.8;
+  cursor: default;
+}
+
+.tree-toggle {
+  width: 14px;
+  font-size: 10px;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.5);
+
+  &.hidden {
+    visibility: hidden;
+  }
+}
+
+.tree-icon {
+  flex-shrink: 0;
+  font-size: 13px;
+}
+
+.tree-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tree-meta {
+  font-size: 0.8em;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
