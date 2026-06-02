@@ -207,7 +207,7 @@
 <body>
 
 <h1>Bonsai Builds — 0.5 Issues</h1>
-<p class="subtitle">10 issues &nbsp;·&nbsp; update-tree-0.5 branch</p>
+<p class="subtitle">11 issues &nbsp;·&nbsp; update-tree-0.5 branch</p>
 
 <div class="issue-list">
 
@@ -601,6 +601,57 @@
         <li>No <code>isPremium</code> check gates the Publish button or any step of the publish modal</li>
         <li><code>isPremium</code> is still present in the <code>users</code> table schema (not removed)</li>
         <li>Anonymous users still cannot publish (existing <code>authorId === "anon"</code> guard is untouched)</li>
+      </ul>
+
+      <div class="section-label">Blocked by</div>
+      <p class="none">None — can start immediately</p>
+    </div>
+  </div>
+
+  <!-- 014 -->
+  <div class="issue">
+    <div class="issue-header" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="issue-num">#014</span>
+      <span class="issue-title">Update passive tree to 0.4</span>
+      <span class="ready-badge">ready</span>
+    </div>
+    <div class="issue-body">
+      <div class="section-label">What to build</div>
+      <p class="desc">Update the passive skill tree to match the 0.4 version of Path of Exile 2. Source of truth is the Path of Building repo at <code>PathOfBuilding-PoE2/src/TreeData/0_4/tree.json</code> (4,701 nodes). The hardcoded data in <code>passiveTreeLogic.ts</code> is mostly updated, but two static assets are stale and Abyssal Lich is entirely missing.</p>
+
+      <div class="layer">Database</div>
+      <p class="desc">None.</p>
+
+      <div class="layer">Routes</div>
+      <p class="desc">None.</p>
+
+      <div class="layer">Assets</div>
+      <ul class="bullets">
+        <li>Replace <code>public/data_us.json</code> (4,455 nodes, poe2db.tw icon URLs) with data from <code>tree.json</code> — 4,701 nodes, icons remapped to <code>public/images/passives/</code></li>
+        <li>Regenerate <code>public/poe2snippet.html</code> SVG from 0_4 node positions using the formula: <code>x = group.x + sin(angle) × orbitRadii[orbit]</code>, <code>y = group.y − cos(angle) × orbitRadii[orbit]</code></li>
+        <li>Copy new <code>.png</code> node icons from <code>PathOfBuilding-PoE2/src/TreeData/0_4/</code> into <code>public/images/passives/</code></li>
+      </ul>
+
+      <div class="layer">passiveTreeLogic.ts</div>
+      <ul class="bullets">
+        <li>Add <code>"Abyssal Lich"</code> to <code>classAscendancies.Witch</code> (Witch should have 4: Infernalist, Blood Mage, Lich, Abyssal Lich)</li>
+        <li>Add Abyssal Lich entry to <code>ascendancyData</code> (node ID list + SVG transform from <code>tree.json</code>)</li>
+        <li>Add <code>"Abyssal Lich": "Abyssal Lich"</code> to <code>ascendancyNames</code></li>
+        <li>Add Abyssal Lich start node (the node with <code>isAscendancyStart: true</code> in the Abyssal Lich group) to <code>ascendancyStartNodes</code></li>
+        <li>Verify all existing ascendancy node lists in <code>ascendancyData</code> against 0_4 (no stale IDs)</li>
+      </ul>
+
+      <div class="section-label">Acceptance criteria</div>
+      <ul class="checklist">
+        <li><code>public/data_us.json</code> contains 4,701 nodes with no poe2db.tw icon URLs</li>
+        <li><code>public/poe2snippet.html</code> is regenerated from 0_4 node positions; node and connection IDs match the new data</li>
+        <li>New node icons are present in <code>public/images/passives/</code> and resolve correctly</li>
+        <li>Witch shows all four ascendancy options: Infernalist, Blood Mage, Lich, Abyssal Lich</li>
+        <li>Abyssal Lich start node is correct and the ascendancy tree is clickable/allocatable</li>
+        <li>All existing ascendancy node lists verified against 0_4 — no stale node IDs</li>
+        <li>All 8 class start nodes load without errors</li>
+        <li>No visible regression on existing ascendancies (Titan, Deadeye, etc.)</li>
       </ul>
 
       <div class="section-label">Blocked by</div>
