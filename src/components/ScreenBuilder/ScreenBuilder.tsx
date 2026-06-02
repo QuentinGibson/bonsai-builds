@@ -340,6 +340,31 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
     eventBus.emit("setScreen", kAppScreens.Main);
   };
 
+  // ── Build reorder ─────────────────────────────────────────────────────────
+
+  const handleReorderBuilds = useCallback(async (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return;
+
+    const sorted = builds.slice().sort((a, b) => a.order - b.order);
+    const newSorted = sorted.slice();
+    const [moved] = newSorted.splice(fromIndex, 1);
+    newSorted.splice(toIndex, 0, moved);
+
+    // Assign sequential order values and find what changed
+    const updates = newSorted
+      .map((b, i) => ({ id: b.id, order: i }))
+      .filter(({ id, order }) => {
+        const original = sorted.find((b) => b.id === id);
+        return original?.order !== order;
+      });
+
+    // Optimistic update
+    const orderMap = new Map(newSorted.map((b, i) => [b.id, i]));
+    setBuilds((prev) => prev.map((b) => ({ ...b, order: orderMap.get(b.id) ?? b.order })));
+
+    await buildStorage.reorderBuildSets(updates);
+  }, [builds]);
+
   // ── Build actions ─────────────────────────────────────────────────────────
 
   const handleDeleteBuild = async (id: string, name: string) => {
@@ -432,6 +457,7 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
             builds={builds}
             selectedBuildId={selectedId}
             onSelectBuild={selectBuild}
+            onReorder={handleReorderBuilds}
           />
         </div>
       </aside>

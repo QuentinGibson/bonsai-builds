@@ -7,10 +7,13 @@ type Props = {
   builds: BuildSet[];
   selectedBuildId: string | null;
   onSelectBuild: (id: string) => void;
+  onReorder?: (fromIndex: number, toIndex: number) => void;
 };
 
-export function BuildTree({ builds, selectedBuildId, onSelectBuild }: Props) {
+export function BuildTree({ builds, selectedBuildId, onSelectBuild, onReorder }: Props) {
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+  const [dragSrcIndex, setDragSrcIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   const sorted = sortedBuildsForTree(builds);
 
@@ -34,17 +37,50 @@ export function BuildTree({ builds, selectedBuildId, onSelectBuild }: Props) {
 
   return (
     <div className="BuildTree">
-      {sorted.map((build) => {
+      {sorted.map((build, index) => {
         const isActive = build.id === selectedBuildId;
         const isCollapsed = collapsed.has(build.id);
         const hasBreakpoints = build.breakpoints.length > 0;
+        const isDragging = dragSrcIndex === index;
+        const isDragOver = dragOverIndex === index && dragSrcIndex !== index;
 
         return (
-          <div key={build.id} className="tree-build">
+          <div
+            key={build.id}
+            className={`tree-build${isDragging ? " dragging" : ""}${isDragOver ? " drag-over" : ""}`}
+            draggable
+            onDragStart={(e) => {
+              setDragSrcIndex(index);
+              e.dataTransfer.effectAllowed = "move";
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.dataTransfer.dropEffect = "move";
+              if (dragOverIndex !== index) setDragOverIndex(index);
+            }}
+            onDragLeave={(e) => {
+              if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                setDragOverIndex(null);
+              }
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              if (dragSrcIndex !== null && dragSrcIndex !== index) {
+                onReorder?.(dragSrcIndex, index);
+              }
+              setDragSrcIndex(null);
+              setDragOverIndex(null);
+            }}
+            onDragEnd={() => {
+              setDragSrcIndex(null);
+              setDragOverIndex(null);
+            }}
+          >
             <button
               className={`tree-folder-row${isActive ? " active" : ""}`}
               onClick={() => onSelectBuild(build.id)}
             >
+              <span className="tree-drag-handle" aria-hidden title="Drag to reorder">⠿</span>
               <span
                 className={`tree-toggle${hasBreakpoints ? "" : " hidden"}`}
                 role="button"

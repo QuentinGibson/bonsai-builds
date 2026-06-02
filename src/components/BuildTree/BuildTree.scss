@@ -7,6 +7,16 @@
 .tree-build {
   display: flex;
   flex-direction: column;
+  border-top: 2px solid transparent;
+  transition: border-color 0.1s, opacity 0.1s;
+
+  &.dragging {
+    opacity: 0.35;
+  }
+
+  &.drag-over {
+    border-top-color: rgba(255, 255, 255, 0.5);
+  }
 }
 
 .tree-folder-row,
@@ -41,6 +51,20 @@
   font-size: 0.9em;
   opacity: 0.8;
   cursor: default;
+}
+
+.tree-drag-handle {
+  flex-shrink: 0;
+  width: 14px;
+  cursor: grab;
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 14px;
+  user-select: none;
+  line-height: 1;
+
+  &:hover {
+    color: rgba(255, 255, 255, 0.55);
+  }
 }
 
 .tree-toggle {

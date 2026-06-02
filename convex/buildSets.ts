@@ -112,3 +112,12 @@ export const remove = mutation({
     await ctx.db.delete(id);
   },
 });
+
+export const reorder = mutation({
+  args: {
+    updates: v.array(v.object({ id: v.id("buildSets"), order: v.number() })),
+  },
+  handler: async (ctx, { updates }) => {
+    await Promise.all(updates.map(({ id, order }) => ctx.db.patch(id, { order })));
+  },
+});
