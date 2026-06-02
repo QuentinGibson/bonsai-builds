@@ -8,12 +8,15 @@ type Props = {
   selectedBuildId: string | null;
   onSelectBuild: (id: string) => void;
   onReorder?: (fromIndex: number, toIndex: number) => void;
+  onReorderBreakpoints?: (buildSetId: string, fromIndex: number, toIndex: number) => void;
 };
 
-export function BuildTree({ builds, selectedBuildId, onSelectBuild, onReorder }: Props) {
+export function BuildTree({ builds, selectedBuildId, onSelectBuild, onReorder, onReorderBreakpoints }: Props) {
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const [dragSrcIndex, setDragSrcIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [bpDrag, setBpDrag] = useState<{ buildSetId: string; srcIndex: number } | null>(null);
+  const [bpDragOverIndex, setBpDragOverIndex] = useState<number | null>(null);
 
   const sorted = sortedBuildsForTree(builds);
 
@@ -96,12 +99,54 @@ export function BuildTree({ builds, selectedBuildId, onSelectBuild, onReorder }:
               )}
             </button>
 
-            {!isCollapsed && build.breakpoints.map((bp) => (
-              <div key={bp.id} className="tree-breakpoint-row">
-                <span className="tree-icon file-icon" aria-hidden>📄</span>
-                <span className="tree-name">{bp.name || "Unnamed"}</span>
-              </div>
-            ))}
+            {!isCollapsed && build.breakpoints.map((bp, bpIndex) => {
+              const isBpDragging = bpDrag?.buildSetId === build.id && bpDrag.srcIndex === bpIndex;
+              const isBpDragOver = bpDrag?.buildSetId === build.id && bpDragOverIndex === bpIndex && bpDrag.srcIndex !== bpIndex;
+              return (
+                <div
+                  key={bp.id}
+                  className={`tree-breakpoint-row${isBpDragging ? " dragging" : ""}${isBpDragOver ? " drag-over" : ""}`}
+                  draggable
+                  onDragStart={(e) => {
+                    e.stopPropagation();
+                    setBpDrag({ buildSetId: build.id, srcIndex: bpIndex });
+                    e.dataTransfer.effectAllowed = "move";
+                  }}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (bpDrag?.buildSetId === build.id) {
+                      e.dataTransfer.dropEffect = "move";
+                      if (bpDragOverIndex !== bpIndex) setBpDragOverIndex(bpIndex);
+                    } else {
+                      e.dataTransfer.dropEffect = "none";
+                    }
+                  }}
+                  onDragLeave={(e) => {
+                    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                      setBpDragOverIndex(null);
+                    }
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (bpDrag?.buildSetId === build.id && bpDrag.srcIndex !== bpIndex) {
+                      onReorderBreakpoints?.(build.id, bpDrag.srcIndex, bpIndex);
+                    }
+                    setBpDrag(null);
+                    setBpDragOverIndex(null);
+                  }}
+                  onDragEnd={() => {
+                    setBpDrag(null);
+                    setBpDragOverIndex(null);
+                  }}
+                >
+                  <span className="tree-drag-handle" aria-hidden title="Drag to reorder">⠿</span>
+                  <span className="tree-icon file-icon" aria-hidden>📄</span>
+                  <span className="tree-name">{bp.name || "Unnamed"}</span>
+                </div>
+              );
+            })}
           </div>
         );
       })}

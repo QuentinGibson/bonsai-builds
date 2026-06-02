@@ -10,11 +10,11 @@ Allow build authors to drag-reorder Breakpoints within their parent BuildSet. A 
 
 ## Acceptance criteria
 
-- [ ] Breakpoint rows have a drag handle
-- [ ] Dragging a Breakpoint within its BuildSet updates the displayed order
-- [ ] `breakpoints.reorder` only patches `order` on affected rows — other Breakpoints and other BuildSets are unchanged
-- [ ] Dropping a Breakpoint outside its parent BuildSet has no effect
-- [ ] Reorder survives a page reload
+- [x] Breakpoint rows have a drag handle
+- [x] Dragging a Breakpoint within its BuildSet updates the displayed order
+- [x] `breakpoints.reorder` only patches `order` on affected rows — other Breakpoints and other BuildSets are unchanged
+- [x] Dropping a Breakpoint outside its parent BuildSet has no effect
+- [x] Reorder survives a page reload
 
 ## Blocked by
 

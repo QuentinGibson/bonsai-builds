@@ -509,3 +509,65 @@ test("marketplace.update snapshot includes inventory_slots", async () => {
     { inventory_id: "Ring1", level_interval: [30, 70], slot_x: 1, slot_y: 3, additional_text: "Coral Ring" },
   ]);
 });
+
+test("breakpoints.reorder patches order on specified breakpoints", async () => {
+  const t = convexTest(schema, modules);
+
+  const buildSetId = await t.mutation(api.buildSets.create, {
+    userId: "user-reorder",
+    name: "Reorder Test",
+  });
+
+  const bp1 = await t.mutation(api.breakpoints.add, { buildSetId, name: "A", order: 0, passives: [] });
+  const bp2 = await t.mutation(api.breakpoints.add, { buildSetId, name: "B", order: 1, passives: [] });
+  const bp3 = await t.mutation(api.breakpoints.add, { buildSetId, name: "C", order: 2, passives: [] });
+
+  await t.mutation(api.breakpoints.reorder, {
+    updates: [
+      { id: bp1 as any, order: 2 },
+      { id: bp3 as any, order: 0 },
+    ],
+  });
+
+  const result = await t.query(api.buildSets.get, { id: buildSetId });
+  const byName = Object.fromEntries(result!.breakpoints.map((bp) => [bp.name, bp.order]));
+  expect(byName["A"]).toBe(2);
+  expect(byName["B"]).toBe(1);
+  expect(byName["C"]).toBe(0);
+});
+
+test("breakpoints.reorder does not touch breakpoints in a different BuildSet", async () => {
+  const t = convexTest(schema, modules);
+
+  const setA = await t.mutation(api.buildSets.create, { userId: "user-iso", name: "Set A" });
+  const setB = await t.mutation(api.buildSets.create, { userId: "user-iso", name: "Set B" });
+
+  const bpA = await t.mutation(api.breakpoints.add, { buildSetId: setA, name: "A1", order: 0, passives: [] });
+  const bpB = await t.mutation(api.breakpoints.add, { buildSetId: setB, name: "B1", order: 5, passives: [] });
+
+  // reorder only touches bpA
+  await t.mutation(api.breakpoints.reorder, {
+    updates: [{ id: bpA as any, order: 99 }],
+  });
+
+  const resultB = await t.query(api.buildSets.get, { id: setB });
+  expect(resultB!.breakpoints[0].order).toBe(5);
+});
+
+test("breakpoints.reorder does not touch unspecified breakpoints in the same BuildSet", async () => {
+  const t = convexTest(schema, modules);
+
+  const buildSetId = await t.mutation(api.buildSets.create, { userId: "user-partial", name: "Partial" });
+
+  const bp1 = await t.mutation(api.breakpoints.add, { buildSetId, name: "Stay", order: 7, passives: [] });
+  const bp2 = await t.mutation(api.breakpoints.add, { buildSetId, name: "Move", order: 1, passives: [] });
+
+  await t.mutation(api.breakpoints.reorder, {
+    updates: [{ id: bp2 as any, order: 3 }],
+  });
+
+  const result = await t.query(api.buildSets.get, { id: buildSetId });
+  const byName = Object.fromEntries(result!.breakpoints.map((bp) => [bp.name, bp.order]));
+  expect(byName["Stay"]).toBe(7);
+  expect(byName["Move"]).toBe(3);
+});

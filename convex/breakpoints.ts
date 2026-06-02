@@ -63,6 +63,15 @@ export const remove = mutation({
   },
 });
 
+export const reorder = mutation({
+  args: {
+    updates: v.array(v.object({ id: v.id("breakpoints"), order: v.number() })),
+  },
+  handler: async (ctx, { updates }) => {
+    await Promise.all(updates.map(({ id, order }) => ctx.db.patch(id, { order })));
+  },
+});
+
 export const clearAll = mutation({
   args: { buildSetId: v.id("buildSets") },
   handler: async (ctx, { buildSetId }) => {

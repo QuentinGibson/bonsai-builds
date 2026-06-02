@@ -365,6 +365,37 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
     await buildStorage.reorderBuildSets(updates);
   }, [builds]);
 
+  const handleReorderBreakpoints = useCallback(async (buildSetId: string, fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return;
+
+    const buildSet = builds.find((b) => b.id === buildSetId);
+    if (!buildSet) return;
+
+    const sorted = buildSet.breakpoints.slice().sort((a, b) => a.order - b.order);
+    const newSorted = sorted.slice();
+    const [moved] = newSorted.splice(fromIndex, 1);
+    newSorted.splice(toIndex, 0, moved);
+
+    const updates = newSorted
+      .map((bp, i) => ({ id: bp.id, order: i }))
+      .filter(({ id, order }) => {
+        const original = sorted.find((bp) => bp.id === id);
+        return original?.order !== order;
+      });
+
+    // Optimistic update
+    const orderMap = new Map(newSorted.map((bp, i) => [bp.id, i]));
+    setBuilds((prev) =>
+      prev.map((b) =>
+        b.id !== buildSetId
+          ? b
+          : { ...b, breakpoints: b.breakpoints.map((bp) => ({ ...bp, order: orderMap.get(bp.id) ?? bp.order })) }
+      )
+    );
+
+    await buildStorage.reorderBreakpoints(updates);
+  }, [builds]);
+
   // ── Build actions ─────────────────────────────────────────────────────────
 
   const handleDeleteBuild = async (id: string, name: string) => {
@@ -458,6 +489,7 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
             selectedBuildId={selectedId}
             onSelectBuild={selectBuild}
             onReorder={handleReorderBuilds}
+            onReorderBreakpoints={handleReorderBreakpoints}
           />
         </div>
       </aside>

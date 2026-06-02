@@ -224,6 +224,12 @@ class BuildStorageService {
     });
   }
 
+  async reorderBreakpoints(updates: Array<{ id: string; order: number }>): Promise<void> {
+    await this.#client.mutation(api.breakpoints.reorder, {
+      updates: updates.map(({ id, order }) => ({ id: this.#bpId(id), order })),
+    });
+  }
+
   async clearBreakpoints(buildSetId: string): Promise<boolean> {
     try {
       await this.#client.mutation(api.breakpoints.clearAll, {
