@@ -14,12 +14,12 @@ Expose the `additional_text` field on passive nodes in the passive tree UI. Buil
 
 ## Acceptance criteria
 
-- [ ] Clicking an allocated passive node opens the `additional_text` editor
-- [ ] Editor uses the shared markup textarea, live preview, and tag toolbar
-- [ ] Saving a note updates the node's `additional_text` in the `passives` array
-- [ ] Clearing a note removes `additional_text` from the node object entirely (no empty string stored)
-- [ ] Nodes with a note are visually distinguishable on the passive tree
-- [ ] Round-trips losslessly through export and import
+- [x] Clicking an allocated passive node opens the `additional_text` editor
+- [x] Editor uses the shared markup textarea, live preview, and tag toolbar
+- [x] Saving a note updates the node's `additional_text` in the `passives` array
+- [x] Clearing a note removes `additional_text` from the node object entirely (no empty string stored)
+- [x] Nodes with a note are visually distinguishable on the passive tree
+- [x] Round-trips losslessly through export and import
 
 ## Blocked by
 
