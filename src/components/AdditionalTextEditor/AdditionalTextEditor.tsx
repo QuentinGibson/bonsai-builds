@@ -15,9 +15,10 @@ const TAGS = [
 export type AdditionalTextEditorProps = {
   value: string;
   onChange: (value: string) => void;
+  readOnly?: boolean;
 };
 
-export function AdditionalTextEditor({ value, onChange }: AdditionalTextEditorProps) {
+export function AdditionalTextEditor({ value, onChange, readOnly = false }: AdditionalTextEditorProps) {
   const [expanded, setExpanded] = useState(false);
   const [draft, setDraft] = useState(value);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -73,20 +74,22 @@ export function AdditionalTextEditor({ value, onChange }: AdditionalTextEditorPr
 
       {expanded && (
         <>
-          <div className="ate-toolbar">
-            {TAGS.map(({ label, tag }) => (
-              <button
-                key={tag}
-                className="ate-tag-btn"
-                style={{ color: `#${tag}` }}
-                type="button"
-                onClick={() => insertTag(tag)}
-                title={`Insert ${label} color tag`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          {!readOnly && (
+            <div className="ate-toolbar">
+              {TAGS.map(({ label, tag }) => (
+                <button
+                  key={tag}
+                  className="ate-tag-btn"
+                  style={{ color: `#${tag}` }}
+                  type="button"
+                  onClick={() => insertTag(tag)}
+                  title={`Insert ${label} color tag`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
           <textarea
             ref={textareaRef}
             className="ate-textarea"
@@ -96,6 +99,8 @@ export function AdditionalTextEditor({ value, onChange }: AdditionalTextEditorPr
             onBlur={(e) => { focused.current = false; flushSave(e.target.value); }}
             placeholder="Additional notes… Use toolbar buttons to insert color tags."
             rows={3}
+            readOnly={readOnly}
+            disabled={readOnly}
           />
           {draft && (
             <div

@@ -1,6 +1,7 @@
 // Passive Tree Logic - Full implementation from index.html
 
-import { type BuildSet, buildStorage } from "../../services/buildStorage";
+import { type BuildSet, type PassiveNode, buildStorage } from "../../services/buildStorage";
+import { patchNodeNote } from "./passiveNodeNote";
 
 export type BuildStateSnapshot = {
 	buildSets: BuildSet[];
@@ -58,6 +59,10 @@ export class PassiveTreeManager {
 	private openAddBreakpointPopup: () => void;
 	private eventBus: any;
 	private onStateChange?: (state: BuildStateSnapshot) => void;
+	private onNodeNoteEdit?: (nodeId: string) => void;
+
+	// per-node notes — kept in sync with passives.additional_text across load/save
+	private nodeNotes = new Map<string, string>();
 
 	// Build management
 	private buildSets: BuildSet[] = [];
@@ -81,11 +86,13 @@ export class PassiveTreeManager {
 		openAddBreakpointPopup: () => void,
 		eventBus: any,
 		onStateChange?: (state: BuildStateSnapshot) => void,
+		onNodeNoteEdit?: (nodeId: string) => void,
 	) {
 		this.openAddBuildSetPopup = openAddBuildSetPopup;
 		this.openAddBreakpointPopup = openAddBreakpointPopup;
 		this.eventBus = eventBus;
 		this.onStateChange = onStateChange;
+		this.onNodeNoteEdit = onNodeNoteEdit;
 	}
 
 	private notifyStateChange() {
@@ -912,6 +919,7 @@ export class PassiveTreeManager {
 		this.svg.addEventListener("mouseleave", () => this.handleMouseUp());
 		this.svg.addEventListener("wheel", (e) => this.handleWheel(e));
 		this.svg.addEventListener("click", (e) => this.handleNodeClick(e));
+		this.svg.addEventListener("contextmenu", (e) => this.handleContextMenu(e));
 		this.svg.addEventListener("mouseover", (e) => this.handleNodeHover(e));
 		this.svg.addEventListener("mouseout", (e) => this.handleNodeOut(e));
 		this.svg.addEventListener("mousemove", (e) => this.handleTooltipMove(e));
@@ -1030,6 +1038,17 @@ export class PassiveTreeManager {
 		this.updateViewBox();
 	}
 
+	private buildPassivesWithNotes(): PassiveNode[] {
+		const toNode = (id: string): PassiveNode => {
+			const note = this.nodeNotes.get(id);
+			return note ? { id, additional_text: note } : { id };
+		};
+		return [
+			...Array.from(this.allocatedNodes).map(toNode),
+			...Array.from(this.allocatedAscendancyNodes).map(toNode),
+		];
+	}
+
 	/** Saves current tree state to storage without triggering a full state reload. */
 	private async autoSave(): Promise<void> {
 		if (!this.currentBuildSetId || !this.currentBreakpointId) return;
@@ -1038,10 +1057,7 @@ export class PassiveTreeManager {
 				this.currentBuildSetId,
 				this.currentBreakpointId,
 				{
-					passives: [
-						...Array.from(this.allocatedNodes).map((id) => ({ id })),
-						...Array.from(this.allocatedAscendancyNodes).map((id) => ({ id })),
-					],
+					passives: this.buildPassivesWithNotes(),
 					selectedAscendancy: this.currentSelectedAscendancy,
 				},
 			);
@@ -1139,6 +1155,15 @@ export class PassiveTreeManager {
 			this.updateAllConnections();
 			this.autoSave();
 		}
+	}
+
+	private handleContextMenu(e: Event) {
+		e.preventDefault();
+		const target = e.target as HTMLElement;
+		if (target.tagName !== "circle") return;
+		const nodeId = target.id.replace("n", "");
+		if (!this.allocatedNodes.has(nodeId) && !this.allocatedAscendancyNodes.has(nodeId)) return;
+		this.onNodeNoteEdit?.(nodeId);
 	}
 
 	private handleNodeHover(e: Event) {
@@ -1740,10 +1765,7 @@ export class PassiveTreeManager {
 				this.currentBuildSetId,
 				this.currentBreakpointId,
 				{
-					passives: [
-						...Array.from(this.allocatedNodes).map((id) => ({ id })),
-						...Array.from(this.allocatedAscendancyNodes).map((id) => ({ id })),
-					],
+					passives: this.buildPassivesWithNotes(),
 					selectedAscendancy: this.currentSelectedAscendancy,
 				},
 			);
@@ -1943,6 +1965,7 @@ export class PassiveTreeManager {
 		this.clearAllAllocations();
 
 		// Restore allocated nodes — split passives back into regular vs ascendancy
+		this.nodeNotes.clear();
 		breakpoint.passives.forEach((passive) => {
 			const nodeId = passive.id;
 			const node = this.svg?.querySelector(`#n${nodeId}`);
@@ -1954,6 +1977,7 @@ export class PassiveTreeManager {
 					this.allocatedNodes.add(nodeId);
 				}
 			}
+			if (passive.additional_text) this.nodeNotes.set(nodeId, passive.additional_text);
 		});
 
 		// Derive starting node from build class
@@ -2003,6 +2027,7 @@ export class PassiveTreeManager {
 
 		this.updatePointsDisplay();
 		this.updateAllConnections();
+		this.applyNoteIndicators();
 	}
 
 	clearAllAllocations() {
@@ -2024,6 +2049,7 @@ export class PassiveTreeManager {
 		});
 		this.allocatedAscendancyNodes.clear();
 
+		this.nodeNotes.clear();
 		this.startingNodeId = null;
 		this.ascendancyStartingNodeId = null;
 		this.currentSelectedAscendancy = null;
@@ -2265,6 +2291,34 @@ export class PassiveTreeManager {
 		} catch (error) {
 			console.error("Error deleting breakpoint:", error);
 		}
+	}
+
+	private applyNoteIndicators() {
+		this.nodeElements.forEach((el, nodeId) => {
+			if (this.nodeNotes.get(nodeId)) {
+				el.classList.add("has-note");
+			} else {
+				el.classList.remove("has-note");
+			}
+		});
+	}
+
+	getNodeNote(nodeId: string): string {
+		return this.nodeNotes.get(nodeId) ?? "";
+	}
+
+	getNodeName(nodeId: string): string {
+		return this.treeData?.nodes[nodeId]?.name ?? nodeId;
+	}
+
+	async updateNodeNote(nodeId: string, text: string): Promise<void> {
+		if (text) {
+			this.nodeNotes.set(nodeId, text);
+		} else {
+			this.nodeNotes.delete(nodeId);
+		}
+		this.applyNoteIndicators();
+		await this.autoSave();
 	}
 
 	updatePointsDisplay() {

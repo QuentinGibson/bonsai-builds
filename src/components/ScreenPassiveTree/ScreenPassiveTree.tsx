@@ -7,6 +7,7 @@ import { useEventBus } from "../../hooks/use-event-bus";
 import { kAppPopups } from "../../config/enums";
 import { BuildSelectorModal } from "../BuildSelectorModal/BuildSelectorModal";
 import { BreakpointTimeline } from "../BreakpointTimeline/BreakpointTimeline";
+import { AdditionalTextEditor } from "../AdditionalTextEditor/AdditionalTextEditor";
 
 import "./ScreenPassiveTree.scss";
 
@@ -26,6 +27,10 @@ export function ScreenPassiveTree({ className }: ScreenPassiveTreeProps) {
 	const [currentBreakpointId, setCurrentBreakpointId] = useState<string | null>(null);
 	const [isReadOnly, setIsReadOnly] = useState(true);
 	const [showBuildModal, setShowBuildModal] = useState(false);
+
+	// Node note editor
+	const [noteNodeId, setNoteNodeId] = useState<string | null>(null);
+	const [noteText, setNoteText] = useState("");
 
 	const ZOOM_MIN = 0.5;
 	const ZOOM_MAX = 10.0;
@@ -96,7 +101,12 @@ export function ScreenPassiveTree({ className }: ScreenPassiveTreeProps) {
 					setCurrentBuildSetId(state.currentBuildSetId);
 					setCurrentBreakpointId(state.currentBreakpointId);
 					setIsReadOnly(state.isReadOnly);
-				}
+				},
+				(nodeId) => {
+					const text = treeManagerRef.current?.getNodeNote(nodeId) ?? "";
+					setNoteNodeId(nodeId);
+					setNoteText(text);
+				},
 			);
 			treeManagerRef.current.initialize(treeContainerRef.current);
 		}
@@ -257,6 +267,32 @@ export function ScreenPassiveTree({ className }: ScreenPassiveTreeProps) {
 										))}
 									</select>
 								)}
+							</div>
+						)}
+
+						{/* Node note editor — opens when a node is right-clicked */}
+						{noteNodeId && (
+							<div className="node-note-panel">
+								<div className="node-note-header">
+									<span className="node-note-label">Node Note</span>
+									<button
+										className="node-note-close"
+										type="button"
+										onClick={() => setNoteNodeId(null)}
+										title="Close"
+									>×</button>
+								</div>
+								<div className="node-note-name">
+									{treeManagerRef.current?.getNodeName(noteNodeId)}
+								</div>
+								<AdditionalTextEditor
+									value={noteText}
+									readOnly={isReadOnly}
+									onChange={(text) => {
+										setNoteText(text);
+										treeManagerRef.current?.updateNodeNote(noteNodeId, text);
+									}}
+								/>
 							</div>
 						)}
 

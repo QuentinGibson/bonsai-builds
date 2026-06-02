@@ -87,6 +87,12 @@
 			fill-opacity: 0.8;
 		}
 
+		circle.allocated.has-note {
+			fill: #0E1520;
+			stroke: #ffe566;
+			filter: drop-shadow(0 0 3px rgba(255, 229, 102, 0.5));
+		}
+
 		.node-icon {
 			opacity: 0.7;
 			transition: opacity 0.2s ease;
@@ -624,6 +630,56 @@
 		font-style: italic;
 		padding: 3px 0;
 		line-height: 1.4;
+	}
+
+	// ── Node note panel ────────────────────────────────────────────────────
+
+	.node-note-panel {
+		margin-top: 10px;
+		border: 1px solid rgba(255, 229, 102, 0.25);
+		border-radius: 4px;
+		background: rgba(255, 229, 102, 0.03);
+		padding: 8px 10px 6px;
+
+		.node-note-header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-bottom: 6px;
+
+			.node-note-label {
+				font-family: var(--font-mono);
+				font-size: 7px;
+				font-weight: 700;
+				letter-spacing: 0.2em;
+				text-transform: uppercase;
+				color: rgba(255, 229, 102, 0.6);
+			}
+
+			.node-note-close {
+				width: 16px;
+				height: 16px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: transparent;
+				border: none;
+				color: rgba(255, 229, 102, 0.4);
+				cursor: pointer;
+				font-size: 14px;
+				line-height: 1;
+				padding: 0;
+
+				&:hover { color: rgba(255, 229, 102, 0.85); }
+			}
+		}
+
+		.node-note-name {
+			font-size: 10px;
+			color: rgba(232, 238, 245, 0.7);
+			margin-bottom: 6px;
+			font-style: italic;
+		}
 	}
 
 	// ── Build management (hidden — DOM nodes kept for passiveTreeLogic) ────
