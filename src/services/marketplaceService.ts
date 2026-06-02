@@ -1,7 +1,7 @@
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
-import type { AllocatedNode } from "./buildStorage";
+import type { PassiveNode } from "./buildStorage";
 
 export interface MarketplaceComment {
   id: string;
@@ -35,8 +35,7 @@ export interface MarketplaceBuild {
 export interface BreakpointSnapshot {
   name: string;
   order: number;
-  allocatedNodes: AllocatedNode[];
-  allocatedAscendancyNodes: string[];
+  passives: PassiveNode[];
   selectedAscendancy?: string;
 }
 
@@ -98,8 +97,7 @@ class MarketplaceService {
         breakpoints: args.breakpoints.map((bp) => ({
           name: bp.name,
           order: bp.order,
-          allocatedNodes: bp.allocatedNodes,
-          allocatedAscendancyNodes: bp.allocatedAscendancyNodes,
+          passives: bp.passives,
           selectedAscendancy: bp.selectedAscendancy || undefined,
         })),
       })) as string;
@@ -122,8 +120,7 @@ class MarketplaceService {
         breakpoints: args.breakpoints.map((bp) => ({
           name: bp.name,
           order: bp.order,
-          allocatedNodes: bp.allocatedNodes,
-          allocatedAscendancyNodes: bp.allocatedAscendancyNodes,
+          passives: bp.passives,
           selectedAscendancy: bp.selectedAscendancy || undefined,
         })),
       });

@@ -4,8 +4,22 @@ import { useEventBus } from "../../hooks/use-event-bus";
 import { kAppPopups, kAppScreens } from "../../config/enums";
 import { classNames } from "../../utils";
 import { BuildTree } from "../BuildTree/BuildTree";
+import { parseBuildFile, serializeBuildFile, parseFilename, type BuildFileData } from "../../../convex/build_file";
+import { resolveAscendancy } from "../../services/class-ascendancy-map";
 
 import "./ScreenBuilder.scss";
+
+// ── Import dialog state ───────────────────────────────────────────────────────
+
+type ImportDialogState = {
+  data: BuildFileData;
+  buildSetName: string;
+  breakpointName: string;
+  inferredClassName: string;
+  inferredAscendancy: string;
+  mode: "create" | "append";
+  targetBuildSetId: string;
+};
 
 // ── Static class / ascendancy data ──────────────────────────────────────────
 
@@ -95,8 +109,7 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
 
       await buildStorage.addBreakpoint(currentId, {
         name: data.name,
-        allocatedNodes: lastStep?.allocatedNodes ?? [],
-        allocatedAscendancyNodes: lastStep?.allocatedAscendancyNodes ?? [],
+        passives: lastStep?.passives ?? [],
         selectedAscendancy: lastStep?.selectedAscendancy ?? null,
       });
       await refreshBuilds();
@@ -189,6 +202,91 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
     buildStorage.setCurrentBuildSetId(newBuild.id);
   };
 
+  // ── Import / Export ───────────────────────────────────────────────────────
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [importState, setImportState] = useState<ImportDialogState | null>(null);
+
+  const handleImportFile = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const json = JSON.parse(e.target?.result as string);
+        const data = parseBuildFile(json);
+        const { buildSetName, breakpointName } = parseFilename(file.name);
+        const resolved = resolveAscendancy(data.ascendancy);
+        const inferredClassName = resolved?.className ?? "";
+        const matchingBuild = builds.find((b) => b.className === inferredClassName);
+        setImportState({
+          data,
+          buildSetName: buildSetName || data.name || "Imported Build",
+          breakpointName: breakpointName || "Step 1",
+          inferredClassName,
+          inferredAscendancy: resolved?.ascendancy ?? "",
+          mode: "create",
+          targetBuildSetId: matchingBuild?.id ?? builds[0]?.id ?? "",
+        });
+      } catch (err) {
+        alert(`Failed to parse build file: ${err instanceof Error ? err.message : "Unknown error"}`);
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleConfirmImport = async () => {
+    if (!importState) return;
+    const { data, buildSetName, breakpointName, inferredClassName, inferredAscendancy, mode, targetBuildSetId } = importState;
+
+    let targetId: string;
+    if (mode === "create") {
+      const newBuild = await buildStorage.createBuildSet(
+        buildSetName.trim() || "Imported Build",
+        { className: inferredClassName || undefined },
+      );
+      targetId = newBuild.id;
+    } else {
+      targetId = targetBuildSetId;
+    }
+
+    await buildStorage.addBreakpoint(targetId, {
+      name: breakpointName.trim() || "Step 1",
+      passives: data.passives,
+      selectedAscendancy: inferredAscendancy || null,
+    });
+
+    setImportState(null);
+    await refreshBuilds();
+    setSelectedId(targetId);
+    buildStorage.setCurrentBuildSetId(targetId);
+
+    // Directly sync the UI selects — the useEffect only fires when the
+    // selected build's ID changes, which doesn't cover the "append to
+    // currently-selected build" case, and may lag in "create" mode.
+    if (mode === "create") {
+      setPendingClass(inferredClassName);
+      setPendingAscendancy(inferredAscendancy);
+    }
+  };
+
+  const handleExportStep = (step: Breakpoint) => {
+    if (!selectedBuild) return;
+    const fileData = serializeBuildFile(
+      { ...step, selectedAscendancy: step.selectedAscendancy ?? undefined },
+      selectedBuild,
+    );
+    const json = JSON.stringify(fileData, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${selectedBuild.name}~${step.name}.build`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   const [editingStepId, setEditingStepId] = useState<string | null>(null);
   const [editStepName, setEditStepName] = useState("");
   const [editStepOrder, setEditStepOrder] = useState<number>(0);
@@ -247,13 +345,33 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
       <aside className="builder-sidebar">
         <div className="sidebar-header">
           <span className="sidebar-title">My Builds</span>
-          <button
-            className="new-build-btn"
-            onClick={() => { setShowNewBuildForm(true); setNewBuildName(''); }}
-            title="Create a new build"
-          >
-            + New Build
-          </button>
+          <div className="sidebar-header-actions">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".build"
+              style={{ display: "none" }}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleImportFile(file);
+                e.target.value = "";
+              }}
+            />
+            <button
+              className="import-build-btn"
+              onClick={() => fileInputRef.current?.click()}
+              title="Import a .build file"
+            >
+              Import
+            </button>
+            <button
+              className="new-build-btn"
+              onClick={() => { setShowNewBuildForm(true); setNewBuildName(''); }}
+              title="Create a new build"
+            >
+              + New
+            </button>
+          </div>
         </div>
 
         {showNewBuildForm && (
@@ -282,7 +400,17 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
           </div>
         )}
 
-        <div className="build-list">
+        <div
+          className={classNames("build-list", { "drag-over": isDragOver })}
+          onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+          onDragLeave={() => setIsDragOver(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setIsDragOver(false);
+            const file = e.dataTransfer.files[0];
+            if (file) handleImportFile(file);
+          }}
+        >
           <BuildTree
             builds={builds}
             selectedBuildId={selectedId}
@@ -445,8 +573,8 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
                           <>
                             <span className="step-name">{step.name || "Unnamed"}</span>
                             <span className="step-nodes">
-                              {step.allocatedNodes.length > 0
-                                ? `${step.allocatedNodes.length} nodes`
+                              {step.passives.length > 0
+                                ? `${step.passives.length} nodes`
                                 : "Empty"}
                             </span>
                             <button
@@ -462,6 +590,13 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
                               onClick={() => handleEditStepTree(step.id)}
                             >
                               Edit Tree
+                            </button>
+                            <button
+                              className="step-export"
+                              title="Export to .build file"
+                              onClick={() => handleExportStep(step)}
+                            >
+                              Export
                             </button>
                             <button
                               className="step-delete"
@@ -491,6 +626,91 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
           </>
         )}
       </div>
+
+      {/* ── Import dialog ────────────────────────────────────────────────── */}
+      {importState && (() => {
+        const appendBuilds = importState.inferredClassName
+          ? builds.filter((b) => b.className === importState.inferredClassName)
+          : builds;
+        const targetBuilds = appendBuilds.length > 0 ? appendBuilds : builds;
+        return (
+          <div className="import-dialog-overlay" onClick={() => setImportState(null)}>
+            <div className="import-dialog" onClick={(e) => e.stopPropagation()}>
+              <div className="import-dialog-title">Import Build File</div>
+
+              {importState.inferredClassName && (
+                <div className="import-info">
+                  Detected: <strong>{importState.inferredClassName}</strong>
+                  {importState.inferredAscendancy && (
+                    <> &mdash; <strong>{importState.inferredAscendancy}</strong></>
+                  )}
+                </div>
+              )}
+
+              <div className="import-mode-tabs">
+                <button
+                  className={classNames("import-mode-tab", { active: importState.mode === "create" })}
+                  onClick={() => setImportState((s) => s && { ...s, mode: "create" })}
+                >
+                  Create New Build
+                </button>
+                <button
+                  className={classNames("import-mode-tab", { active: importState.mode === "append" })}
+                  onClick={() => setImportState((s) => s && { ...s, mode: "append" })}
+                  disabled={builds.length === 0}
+                >
+                  Add to Existing
+                </button>
+              </div>
+
+              {importState.mode === "create" ? (
+                <div className="import-field-group">
+                  <label className="field-label">Build Set Name</label>
+                  <input
+                    className="import-field-input"
+                    value={importState.buildSetName}
+                    onChange={(e) => setImportState((s) => s && { ...s, buildSetName: e.target.value })}
+                    onKeyDown={(e) => { if (e.key === "Enter") handleConfirmImport(); }}
+                    autoFocus
+                  />
+                </div>
+              ) : (
+                <div className="import-field-group">
+                  <label className="field-label">Target Build Set</label>
+                  <select
+                    className="field-select"
+                    value={importState.targetBuildSetId}
+                    onChange={(e) => setImportState((s) => s && { ...s, targetBuildSetId: e.target.value })}
+                  >
+                    {targetBuilds.map((b) => (
+                      <option key={b.id} value={b.id}>{b.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              <div className="import-field-group">
+                <label className="field-label">Step Name</label>
+                <input
+                  className="import-field-input"
+                  value={importState.breakpointName}
+                  onChange={(e) => setImportState((s) => s && { ...s, breakpointName: e.target.value })}
+                  onKeyDown={(e) => { if (e.key === "Enter") handleConfirmImport(); }}
+                />
+              </div>
+
+              <div className="import-node-count">
+                {importState.data.passives.length} passive nodes
+              </div>
+
+              <div className="import-actions">
+                <button className="import-cancel" onClick={() => setImportState(null)}>Cancel</button>
+                <button className="import-confirm" onClick={handleConfirmImport}>Import</button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
     </div>
   );

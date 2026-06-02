@@ -1,6 +1,12 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
+export const passiveNodeValidator = v.object({
+  id: v.string(),
+  weapon_set: v.optional(v.number()),
+  additional_text: v.optional(v.string()),
+});
+
 export default defineSchema({
   users: defineTable({
     userId: v.string(),
@@ -18,12 +24,7 @@ export default defineSchema({
     breakpoints: v.array(v.object({
       name: v.string(),
       order: v.number(),
-      allocatedNodes: v.array(v.object({
-        id: v.string(),
-        weapon_set: v.optional(v.number()),
-        additional_text: v.optional(v.string()),
-      })),
-      allocatedAscendancyNodes: v.array(v.string()),
+      passives: v.array(passiveNodeValidator),
       selectedAscendancy: v.optional(v.string()),
     })),
     likeCount: v.number(),
@@ -108,12 +109,9 @@ export default defineSchema({
     buildSetId: v.id("buildSets"),
     name: v.string(),
     order: v.number(),
-    allocatedNodes: v.array(v.object({
-      id: v.string(),
-      weapon_set: v.optional(v.number()),
-      additional_text: v.optional(v.string()),
-    })),
-    allocatedAscendancyNodes: v.array(v.string()),
+    passives: v.array(passiveNodeValidator),
+    skills: v.optional(v.array(v.object({ id: v.string() }))),
+    inventory_slots: v.optional(v.array(v.object({ inventory_id: v.string() }))),
     selectedAscendancy: v.optional(v.string()),
     createdAt: v.number(),
   }).index("by_build", ["buildSetId"]),

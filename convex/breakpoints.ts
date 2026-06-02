@@ -1,19 +1,13 @@
 import { mutation } from "./_generated/server";
 import { v } from "convex/values";
-
-const allocatedNodeValidator = v.object({
-  id: v.string(),
-  weapon_set: v.optional(v.number()),
-  additional_text: v.optional(v.string()),
-});
+import { passiveNodeValidator } from "./schema";
 
 export const add = mutation({
   args: {
     buildSetId: v.id("buildSets"),
     name: v.string(),
     order: v.optional(v.number()),
-    allocatedNodes: v.array(allocatedNodeValidator),
-    allocatedAscendancyNodes: v.array(v.string()),
+    passives: v.array(passiveNodeValidator),
     selectedAscendancy: v.optional(v.string()),
   },
   handler: async (ctx, { buildSetId, order, ...data }) => {
@@ -42,8 +36,7 @@ export const update = mutation({
     buildSetId: v.id("buildSets"),
     name: v.optional(v.string()),
     order: v.optional(v.number()),
-    allocatedNodes: v.optional(v.array(allocatedNodeValidator)),
-    allocatedAscendancyNodes: v.optional(v.array(v.string())),
+    passives: v.optional(v.array(passiveNodeValidator)),
     selectedAscendancy: v.optional(v.string()),
   },
   handler: async (ctx, { id, buildSetId, ...updates }) => {

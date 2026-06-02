@@ -239,8 +239,7 @@ function DetailView({
       await buildStorage.addBreakpoint(newBuild.id, {
         name: bp.name,
         order: bp.order,
-        allocatedNodes: bp.allocatedNodes,
-        allocatedAscendancyNodes: bp.allocatedAscendancyNodes,
+        passives: bp.passives,
         selectedAscendancy: bp.selectedAscendancy ?? null,
       });
     }
@@ -530,7 +529,7 @@ function DetailView({
                 <div key={i} className="step-row">
                   <span className="step-name">{bp.name || "Unnamed"}</span>
                   <span className="step-nodes">
-                    {bp.allocatedNodes.length} nodes
+                    {bp.passives.length} nodes
                   </span>
                 </div>
               ))}
@@ -609,15 +608,13 @@ function EditListingModal({
         ? syncBuild.breakpoints.map((bp) => ({
             name: bp.name,
             order: bp.order,
-            allocatedNodes: bp.allocatedNodes,
-            allocatedAscendancyNodes: bp.allocatedAscendancyNodes,
+            passives: bp.passives,
             selectedAscendancy: bp.selectedAscendancy || undefined,
           }))
         : (listing.breakpoints ?? []).map((bp) => ({
             name: bp.name,
             order: bp.order,
-            allocatedNodes: bp.allocatedNodes,
-            allocatedAscendancyNodes: bp.allocatedAscendancyNodes,
+            passives: bp.passives,
             selectedAscendancy: bp.selectedAscendancy || undefined,
           })),
     });
@@ -711,8 +708,7 @@ function PublishModal({
       breakpoints: build.breakpoints.map((bp) => ({
         name: bp.name,
         order: bp.order,
-        allocatedNodes: bp.allocatedNodes,
-        allocatedAscendancyNodes: bp.allocatedAscendancyNodes,
+        passives: bp.passives,
         selectedAscendancy: bp.selectedAscendancy || undefined,
       })),
     });

@@ -1038,8 +1038,10 @@ export class PassiveTreeManager {
 				this.currentBuildSetId,
 				this.currentBreakpointId,
 				{
-					allocatedNodes: Array.from(this.allocatedNodes).map((id) => ({ id })),
-					allocatedAscendancyNodes: Array.from(this.allocatedAscendancyNodes),
+					passives: [
+						...Array.from(this.allocatedNodes).map((id) => ({ id })),
+						...Array.from(this.allocatedAscendancyNodes).map((id) => ({ id })),
+					],
 					selectedAscendancy: this.currentSelectedAscendancy,
 				},
 			);
@@ -1738,8 +1740,10 @@ export class PassiveTreeManager {
 				this.currentBuildSetId,
 				this.currentBreakpointId,
 				{
-					allocatedNodes: Array.from(this.allocatedNodes).map((id) => ({ id })),
-					allocatedAscendancyNodes: Array.from(this.allocatedAscendancyNodes),
+					passives: [
+						...Array.from(this.allocatedNodes).map((id) => ({ id })),
+						...Array.from(this.allocatedAscendancyNodes).map((id) => ({ id })),
+					],
 					selectedAscendancy: this.currentSelectedAscendancy,
 				},
 			);
@@ -1848,8 +1852,10 @@ export class PassiveTreeManager {
 				this.currentBuildSetId,
 				{
 					name,
-					allocatedNodes: Array.from(this.allocatedNodes).map((id) => ({ id })),
-					allocatedAscendancyNodes: Array.from(this.allocatedAscendancyNodes),
+					passives: [
+						...Array.from(this.allocatedNodes).map((id) => ({ id })),
+						...Array.from(this.allocatedAscendancyNodes).map((id) => ({ id })),
+					],
 					selectedAscendancy: this.currentSelectedAscendancy,
 				},
 			);
@@ -1936,22 +1942,17 @@ export class PassiveTreeManager {
 		// Clear current allocations
 		this.clearAllAllocations();
 
-		// Restore allocated nodes
-		breakpoint.allocatedNodes.forEach((allocNode) => {
-			const nodeId = allocNode.id;
+		// Restore allocated nodes — split passives back into regular vs ascendancy
+		breakpoint.passives.forEach((passive) => {
+			const nodeId = passive.id;
 			const node = this.svg?.querySelector(`#n${nodeId}`);
 			if (node) {
 				node.classList.add("allocated");
-				this.allocatedNodes.add(nodeId);
-			}
-		});
-
-		// Restore ascendancy allocations
-		breakpoint.allocatedAscendancyNodes.forEach((nodeId) => {
-			const node = this.svg?.querySelector(`#n${nodeId}`);
-			if (node) {
-				node.classList.add("allocated");
-				this.allocatedAscendancyNodes.add(nodeId);
+				if (this.allAscendancyNodeIds.has(nodeId)) {
+					this.allocatedAscendancyNodes.add(nodeId);
+				} else {
+					this.allocatedNodes.add(nodeId);
+				}
 			}
 		});
 

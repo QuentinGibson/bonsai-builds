@@ -26,8 +26,7 @@ export const getAll = query({
             id: bp._id as string,
             name: bp.name,
             order: bp.order,
-            allocatedNodes: bp.allocatedNodes,
-            allocatedAscendancyNodes: bp.allocatedAscendancyNodes,
+            passives: bp.passives,
             selectedAscendancy: bp.selectedAscendancy ?? null,
             createdAt: bp.createdAt,
           })),
@@ -57,8 +56,7 @@ export const get = query({
         id: bp._id as string,
         name: bp.name,
         order: bp.order,
-        allocatedNodes: bp.allocatedNodes,
-        allocatedAscendancyNodes: bp.allocatedAscendancyNodes,
+        passives: bp.passives,
         selectedAscendancy: bp.selectedAscendancy ?? null,
         createdAt: bp.createdAt,
       })),
@@ -67,12 +65,13 @@ export const get = query({
 });
 
 export const create = mutation({
-  args: { userId: v.string(), name: v.string(), order: v.optional(v.number()) },
-  handler: async (ctx, { userId, name, order }) => {
+  args: { userId: v.string(), name: v.string(), className: v.optional(v.string()), order: v.optional(v.number()) },
+  handler: async (ctx, { userId, name, className, order }) => {
     const now = Date.now();
     const id = await ctx.db.insert("buildSets", {
       userId,
       name,
+      ...(className ? { className } : {}),
       order: order ?? 0,
       createdAt: now,
       updatedAt: now,

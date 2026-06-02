@@ -2,11 +2,14 @@ import { ConvexHttpClient } from "convex/browser";
 import type { Id } from "../../convex/_generated/dataModel";
 import { api } from "../../convex/_generated/api";
 
-export interface AllocatedNode {
+export interface PassiveNode {
   id: string;
   weapon_set?: number;
   additional_text?: string;
 }
+
+/** @deprecated Use PassiveNode */
+export type AllocatedNode = PassiveNode;
 
 export interface BuildSet {
   id: string;
@@ -22,8 +25,7 @@ export interface Breakpoint {
   id: string;
   name: string;
   order: number;
-  allocatedNodes: AllocatedNode[];
-  allocatedAscendancyNodes: string[];
+  passives: PassiveNode[];
   selectedAscendancy: string | null;
   createdAt: number;
 }
@@ -88,11 +90,12 @@ class BuildStorageService {
     }
   }
 
-  async createBuildSet(name: string, order?: number): Promise<BuildSet> {
+  async createBuildSet(name: string, options?: { order?: number; className?: string }): Promise<BuildSet> {
     const id = await this.#client.mutation(api.buildSets.create, {
       userId: await this.#userId,
       name,
-      order,
+      ...(options?.className ? { className: options.className } : {}),
+      ...(options?.order !== undefined ? { order: options.order } : {}),
     });
     return (await this.getBuildSet(id as string))!;
   }
@@ -135,8 +138,7 @@ class BuildStorageService {
         buildSetId: this.#id(buildSetId),
         name: breakpoint.name,
         ...(breakpoint.order !== undefined ? { order: breakpoint.order } : {}),
-        allocatedNodes: breakpoint.allocatedNodes,
-        allocatedAscendancyNodes: breakpoint.allocatedAscendancyNodes,
+        passives: breakpoint.passives,
         ...(breakpoint.selectedAscendancy != null
           ? { selectedAscendancy: breakpoint.selectedAscendancy }
           : {}),
@@ -160,12 +162,7 @@ class BuildStorageService {
         buildSetId: this.#id(buildSetId),
         ...(updates.name !== undefined ? { name: updates.name } : {}),
         ...(updates.order !== undefined ? { order: updates.order } : {}),
-        ...(updates.allocatedNodes !== undefined
-          ? { allocatedNodes: updates.allocatedNodes }
-          : {}),
-        ...(updates.allocatedAscendancyNodes !== undefined
-          ? { allocatedAscendancyNodes: updates.allocatedAscendancyNodes }
-          : {}),
+        ...(updates.passives !== undefined ? { passives: updates.passives } : {}),
         // Empty string clears the field on the server
         ...(updates.selectedAscendancy !== undefined
           ? { selectedAscendancy: updates.selectedAscendancy ?? "" }

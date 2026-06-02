@@ -1,15 +1,11 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { passiveNodeValidator } from "./schema";
 
 const breakpointSnapshot = v.object({
   name: v.string(),
   order: v.number(),
-  allocatedNodes: v.array(v.object({
-    id: v.string(),
-    weapon_set: v.optional(v.number()),
-    additional_text: v.optional(v.string()),
-  })),
-  allocatedAscendancyNodes: v.array(v.string()),
+  passives: v.array(passiveNodeValidator),
   selectedAscendancy: v.optional(v.string()),
 });
 

@@ -11,8 +11,10 @@
 import type * as breakpoints from "../breakpoints.js";
 import type * as bugReports from "../bugReports.js";
 import type * as buildSets from "../buildSets.js";
+import type * as build_file from "../build_file.js";
 import type * as feedback from "../feedback.js";
 import type * as marketplace from "../marketplace.js";
+import type * as migrations from "../migrations.js";
 import type * as users from "../users.js";
 
 import type {
@@ -25,8 +27,10 @@ declare const fullApi: ApiFromModules<{
   breakpoints: typeof breakpoints;
   bugReports: typeof bugReports;
   buildSets: typeof buildSets;
+  build_file: typeof build_file;
   feedback: typeof feedback;
   marketplace: typeof marketplace;
+  migrations: typeof migrations;
   users: typeof users;
 }>;
 
