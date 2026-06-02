@@ -10,10 +10,10 @@ Allow build authors to drag-reorder BuildSets in the list. Dropping a BuildSet a
 
 ## Acceptance criteria
 
-- [ ] BuildSet rows have a drag handle
-- [ ] Dragging a BuildSet to a new position and dropping updates the displayed order
-- [ ] `buildSets.reorder` only patches `order` on the moved rows — other BuildSets are unaffected
-- [ ] Reorder survives a page reload (order is persisted, not local state)
+- [x] BuildSet rows have a drag handle
+- [x] Dragging a BuildSet to a new position and dropping updates the displayed order
+- [x] `buildSets.reorder` only patches `order` on the moved rows — other BuildSets are unaffected
+- [x] Reorder survives a page reload (order is persisted, not local state)
 
 ## Blocked by
 
