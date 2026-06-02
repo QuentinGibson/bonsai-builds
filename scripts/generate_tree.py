@@ -2,7 +2,7 @@
 """
 Generate bonsai-builds passive tree files from PoB's tree.json.
 
-Reads:  PathOfBuilding-PoE2/src/TreeData/0_4/tree.json
+Reads:  PathOfBuilding-PoE2/src/TreeData/0_5/tree.json
 Writes: public/poe2snippet.html  (SVG)
         public/data_us.json      (node metadata)
 Prints: ascendancy data for passiveTreeLogic.ts
@@ -18,7 +18,7 @@ import re
 # Configuration
 # -------------------------------------------------------------------
 TREE_JSON = os.path.join(os.path.dirname(__file__),
-    '../../PathOfBuilding-PoE2/src/TreeData/0_4/tree.json')
+    '../../PathOfBuilding-PoE2/src/TreeData/0_5/tree.json')
 OUT_SVG = os.path.join(os.path.dirname(__file__), '../public/poe2snippet.html')
 OUT_JSON = os.path.join(os.path.dirname(__file__), '../public/data_us.json')
 
@@ -283,8 +283,32 @@ def build_data_json(tree):
     return {'nodes': nodes_out}
 
 
+def resolve_replace_ascendancies(classes, asc_nodes, asc_starts, asc_transforms):
+    """Propagate data from replaced ascendancies to their replacements.
+
+    In 0.5 'Abyssal Lich' replaces 'Lich': they share the same nodes,
+    start node, and transform.  The replacement ascendancy has no nodes
+    of its own in tree.json, so we copy from the source.
+    """
+    for cls in classes:
+        for asc in cls.get('ascendancies', []):
+            replace = asc.get('replace')
+            if not replace:
+                continue
+            name = asc['name']
+            if name in asc_nodes:
+                continue  # already has its own nodes
+            if replace not in asc_nodes:
+                continue
+            asc_nodes[name] = asc_nodes[replace]
+            if replace in asc_starts:
+                asc_starts[name] = asc_starts[replace]
+            if replace in asc_transforms:
+                asc_transforms[name] = asc_transforms[replace]
+
+
 def print_ascendancy_data(tree, positions):
-    """Print ascendancy data for manual insertion into passiveTreeLogic.ts."""
+    """Print ascendancy data for manual insertion into ascendancyConfig.ts."""
     nodes = tree['nodes']
     classes = tree['classes']
 
@@ -301,86 +325,60 @@ def print_ascendancy_data(tree, positions):
         if n.get('isAscendancyStart'):
             asc_starts[asc] = str(n['skill'])
 
-    # Map internalId -> ascendancy name
-    internal_to_name = {}
-    for cls in classes:
-        for asc in cls.get('ascendancies', []):
-            internal_to_name[asc.get('internalId', '')] = asc['name']
-
-    # Compute transforms: negate cluster center so ascendancies render
-    # at (0,0).  The main tree is scaled by MAIN_TREE_SCALE so its
-    # inner radius is large enough to not overlap.
+    # Compute transforms: negate cluster mean so ascendancies render at (0,0).
     asc_transforms = {}
     for asc_name, skill_ids in asc_nodes.items():
-        xs = []
-        ys = []
-        for sid in skill_ids:
-            if sid in positions:
-                xs.append(positions[sid][0])
-                ys.append(positions[sid][1])
+        xs = [positions[s][0] for s in skill_ids if s in positions]
+        ys = [positions[s][1] for s in skill_ids if s in positions]
         if xs:
-            cx = sum(xs) / len(xs)
-            cy = sum(ys) / len(ys)
-            asc_transforms[asc_name] = (-cx, -cy)
+            asc_transforms[asc_name] = (-sum(xs) / len(xs), -sum(ys) / len(ys))
 
-    # Map internal IDs for the app
-    # The app uses internal IDs as keys (Warrior1, Warrior2, etc.)
-    # We need to map from internal ID to actual ascendancy name
+    # Propagate data for replacement ascendancies (e.g. Abyssal Lich ← Lich)
+    resolve_replace_ascendancies(classes, asc_nodes, asc_starts, asc_transforms)
 
     print('\n' + '=' * 80)
-    print('ASCENDANCY DATA FOR passiveTreeLogic.ts')
+    print('ASCENDANCY DATA FOR ascendancyConfig.ts')
     print('=' * 80)
 
-    print('\n// ascendancyData:')
+    print('\nexport const ascendancyData = {')
     for cls in classes:
         for asc in cls.get('ascendancies', []):
-            iid = asc.get('internalId', '')
             name = asc['name']
             if name not in asc_nodes:
                 continue
             node_list = sorted(asc_nodes[name], key=int)
             tx, ty = asc_transforms.get(name, (0, 0))
-            nodes_str = ', '.join(f"'{n}'" for n in node_list)
-            print(f"    '{name}': {{ nodes: [{nodes_str}], "
-                  f"transform: 'translate({tx:.2f}, {ty:.2f})' }},")
+            nodes_str = ', '.join(f'"{n}"' for n in node_list)
+            print(f'    "{name}": {{ nodes: [{nodes_str}], '
+                  f'transform: "translate({tx:.2f}, {ty:.2f})" }},')
+    print('};')
 
-    print('\n// classAscendancies:')
+    print('\nexport const classAscendancies = {')
     for cls in classes:
         asc_list = []
         for asc in cls.get('ascendancies', []):
             name = asc['name']
             if name in asc_nodes:
-                asc_list.append(f"'{name}'")
+                asc_list.append(f'"{name}"')
         if asc_list:
-            print(f"    '{cls['name']}': [{', '.join(asc_list)}],")
+            print(f'    "{cls["name"]}": [{", ".join(asc_list)}],')
+    print('};')
 
-    print('\n// ascendancyNames (now identity map):')
+    print('\nexport const ascendancyNames = {')
     for cls in classes:
         for asc in cls.get('ascendancies', []):
             name = asc['name']
             if name in asc_nodes:
-                print(f"    '{name}': '{name}',")
+                print(f'    "{name}": "{name}",')
+    print('};')
 
-    print('\n// ascendancyStartNodes:')
+    print('\nexport const ascendancyStartNodes = {')
     for cls in classes:
         for asc in cls.get('ascendancies', []):
             name = asc['name']
             if name in asc_starts:
-                print(f"    '{name}': '{asc_starts[name]}',")
-
-    # Print class start nodes
-    print('\n// Class start nodes (for dropdown):')
-    for nid, n in nodes.items():
-        if n.get('classStartIndex') is not None:
-            print(f"//   skill={n['skill']}  name={n.get('name', '?')}")
-
-    # Print root node connections
-    root = None
-    for nid, n in nodes.items():
-        if nid == 'root' or (not n.get('skill') and n.get('out')):
-            root = n
-            print(f"// Root out: {n.get('out', [])}")
-            break
+                print(f'    "{name}": "{asc_starts[name]}",')
+    print('};')
 
 
 def main():
