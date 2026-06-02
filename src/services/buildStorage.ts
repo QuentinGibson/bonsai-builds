@@ -11,6 +11,19 @@ export interface PassiveNode {
 /** @deprecated Use PassiveNode */
 export type AllocatedNode = PassiveNode;
 
+export interface SupportSkill {
+  id: string;
+  level_interval: number[];
+  additional_text?: string;
+}
+
+export interface Skill {
+  id: string;
+  level_interval: number[];
+  additional_text?: string;
+  support_skills: SupportSkill[];
+}
+
 export interface BuildSet {
   id: string;
   name: string;
@@ -26,6 +39,7 @@ export interface Breakpoint {
   name: string;
   order: number;
   passives: PassiveNode[];
+  skills: Skill[];
   selectedAscendancy: string | null;
   createdAt: number;
 }
@@ -131,7 +145,7 @@ class BuildStorageService {
 
   async addBreakpoint(
     buildSetId: string,
-    breakpoint: Omit<Breakpoint, "id" | "createdAt" | "order"> & { order?: number }
+    breakpoint: Omit<Breakpoint, "id" | "createdAt" | "order" | "skills"> & { order?: number; skills?: Skill[] }
   ): Promise<Breakpoint | null> {
     try {
       const id = await this.#client.mutation(api.breakpoints.add, {
@@ -139,6 +153,7 @@ class BuildStorageService {
         name: breakpoint.name,
         ...(breakpoint.order !== undefined ? { order: breakpoint.order } : {}),
         passives: breakpoint.passives,
+        ...(breakpoint.skills !== undefined ? { skills: breakpoint.skills } : {}),
         ...(breakpoint.selectedAscendancy != null
           ? { selectedAscendancy: breakpoint.selectedAscendancy }
           : {}),
@@ -163,6 +178,7 @@ class BuildStorageService {
         ...(updates.name !== undefined ? { name: updates.name } : {}),
         ...(updates.order !== undefined ? { order: updates.order } : {}),
         ...(updates.passives !== undefined ? { passives: updates.passives } : {}),
+        ...(updates.skills !== undefined ? { skills: updates.skills } : {}),
         // Empty string clears the field on the server
         ...(updates.selectedAscendancy !== undefined
           ? { selectedAscendancy: updates.selectedAscendancy ?? "" }

@@ -1,0 +1,133 @@
+.SkillsEditor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .se-skill-row {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+
+  .se-skill-header {
+    align-items: center;
+    background: rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    display: flex;
+    gap: 8px;
+    padding: 6px 10px;
+  }
+
+  .se-skill-name {
+    color: #ddd;
+    flex: 1;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .se-skill-body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 10px;
+  }
+
+  .se-support-row {
+    align-items: flex-start;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 6px 8px;
+  }
+
+  .se-support-dot {
+    color: #555;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .se-support-name {
+    color: #aaa;
+    flex: 1;
+    font-size: 11px;
+    line-height: 1.6;
+    min-width: 80px;
+  }
+
+  .se-level-range {
+    align-items: center;
+    display: flex;
+    gap: 4px;
+  }
+
+  .se-level-input {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 3px;
+    color: #ccc;
+    font-size: 11px;
+    padding: 2px 4px;
+    text-align: center;
+    width: 44px;
+
+    &:focus { border-color: rgba(255, 255, 255, 0.3); outline: none; }
+    &::-webkit-inner-spin-button { opacity: 0.5; }
+  }
+
+  .se-level-sep {
+    color: #666;
+    font-size: 11px;
+  }
+
+  .se-remove {
+    background: none;
+    border: none;
+    color: #c84040;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    padding: 0 2px;
+
+    &:hover { color: #e05050; }
+  }
+
+  .se-add-support {
+    align-self: flex-start;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+    border-radius: 3px;
+    color: #888;
+    cursor: pointer;
+    font-size: 10px;
+    padding: 3px 8px;
+    transition: all 0.1s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #aaa;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+  }
+
+  .se-add-skill {
+    align-self: flex-start;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    color: #999;
+    cursor: pointer;
+    font-size: 11px;
+    padding: 5px 12px;
+    transition: all 0.1s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #bbb;
+      border-color: rgba(255, 255, 255, 0.35);
+    }
+  }
+}

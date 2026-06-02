@@ -1,0 +1,4747 @@
+[
+  {
+    "id": "AscendancyPoisonousConcoction",
+    "name": "Acidic Concoction",
+    "isSupport": false
+  },
+  {
+    "id": "AlchemistsBoon",
+    "name": "Alchemist's Boon",
+    "isSupport": false
+  },
+  {
+    "id": "AscendancyAlignFate",
+    "name": "Align Fate",
+    "isSupport": false
+  },
+  {
+    "id": "AncestralCry",
+    "name": "Ancestral Cry",
+    "isSupport": false
+  },
+  {
+    "id": "AncestralSpriits",
+    "name": "Ancestral Spirits",
+    "isSupport": false
+  },
+  {
+    "id": "AncestralWarriorTotem",
+    "name": "Ancestral Warrior Totem",
+    "isSupport": false
+  },
+  {
+    "id": "AnimusExchange",
+    "name": "Animus Exchange",
+    "isSupport": false
+  },
+  {
+    "id": "AnimusSplinters",
+    "name": "Animus Splinters",
+    "isSupport": false
+  },
+  {
+    "id": "Apocalypse",
+    "name": "Apocalypse",
+    "isSupport": false
+  },
+  {
+    "id": "Arc",
+    "name": "Arc",
+    "isSupport": false
+  },
+  {
+    "id": "Archmage",
+    "name": "Archmage",
+    "isSupport": false
+  },
+  {
+    "id": "ArchonOfChayula",
+    "name": "Archon of Chayula",
+    "isSupport": false
+  },
+  {
+    "id": "ArcticArmour",
+    "name": "Arctic Armour",
+    "isSupport": false
+  },
+  {
+    "id": "WolfArcticHowl",
+    "name": "Arctic Howl",
+    "isSupport": false
+  },
+  {
+    "id": "ArmourBreaker",
+    "name": "Armour Breaker",
+    "isSupport": false
+  },
+  {
+    "id": "ArmourPiercingRounds",
+    "name": "Armour Piercing Rounds",
+    "isSupport": false
+  },
+  {
+    "id": "ArtilleryBallista",
+    "name": "Artillery Ballista",
+    "isSupport": false
+  },
+  {
+    "id": "Attrition",
+    "name": "Attrition",
+    "isSupport": false
+  },
+  {
+    "id": "AzmerianSwarm",
+    "name": "Azmerian Swarms",
+    "isSupport": false
+  },
+  {
+    "id": "AzmerianWolf",
+    "name": "Azmerian Wolf",
+    "isSupport": false
+  },
+  {
+    "id": "BallLightning",
+    "name": "Ball Lightning",
+    "isSupport": false
+  },
+  {
+    "id": "Barkskin",
+    "name": "Barkskin",
+    "isSupport": false
+  },
+  {
+    "id": "Barrage",
+    "name": "Barrage",
+    "isSupport": false
+  },
+  {
+    "id": "BarrierInvocation",
+    "name": "Barrier Invocation",
+    "isSupport": false
+  },
+  {
+    "id": "Berserk",
+    "name": "Berserk",
+    "isSupport": false
+  },
+  {
+    "id": "BitterDead",
+    "name": "Bitter Dead",
+    "isSupport": false
+  },
+  {
+    "id": "BlackPowderBlitzReservation",
+    "name": "Black Powder Blitz",
+    "isSupport": false
+  },
+  {
+    "id": "Blasphemy",
+    "name": "Blasphemy",
+    "isSupport": false
+  },
+  {
+    "id": "AscendancyBleedingConcoction",
+    "name": "Bleeding Concoction",
+    "isSupport": false
+  },
+  {
+    "id": "BlinkReservation",
+    "name": "Blink",
+    "isSupport": false
+  },
+  {
+    "id": "BloodBoil",
+    "name": "Blood Boil",
+    "isSupport": false
+  },
+  {
+    "id": "BloodHunt",
+    "name": "Blood Hunt",
+    "isSupport": false
+  },
+  {
+    "id": "BloodhoundsMark",
+    "name": "Bloodhound's Mark",
+    "isSupport": false
+  },
+  {
+    "id": "BoneBlast",
+    "name": "Bone Blast",
+    "isSupport": false
+  },
+  {
+    "id": "BoneCage",
+    "name": "Bone Cage",
+    "isSupport": false
+  },
+  {
+    "id": "BoneOffering",
+    "name": "Bone Offering",
+    "isSupport": false
+  },
+  {
+    "id": "Boneshatter",
+    "name": "Boneshatter",
+    "isSupport": false
+  },
+  {
+    "id": "Bonestorm",
+    "name": "Bonestorm",
+    "isSupport": false
+  },
+  {
+    "id": "PlayerDefaultBow",
+    "name": "Bow Shot",
+    "isSupport": false
+  },
+  {
+    "id": "Briarpatch",
+    "name": "Briarpatch",
+    "isSupport": false
+  },
+  {
+    "id": "ExplodingPoisonToad",
+    "name": "Bursting Fen Toad",
+    "isSupport": false
+  },
+  {
+    "id": "HyenaCackle",
+    "name": "Cackling Companions",
+    "isSupport": false
+  },
+  {
+    "id": "MetaDeadeyeMarks",
+    "name": "Called Shots",
+    "isSupport": false
+  },
+  {
+    "id": "CastOnBlock",
+    "name": "Cast on Block",
+    "isSupport": false
+  },
+  {
+    "id": "CastOnCharmUse",
+    "name": "Cast on Charm Use",
+    "isSupport": false
+  },
+  {
+    "id": "CastOnCriticalStrike",
+    "name": "Cast on Critical",
+    "isSupport": false
+  },
+  {
+    "id": "CastOnDodge",
+    "name": "Cast on Dodge",
+    "isSupport": false
+  },
+  {
+    "id": "CastOnElementalAilment",
+    "name": "Cast on Elemental Ailment",
+    "isSupport": false
+  },
+  {
+    "id": "CastOnMeleeKill",
+    "name": "Cast on Melee Kill",
+    "isSupport": false
+  },
+  {
+    "id": "CastOnMeleeStun",
+    "name": "Cast on Melee Stun",
+    "isSupport": false
+  },
+  {
+    "id": "CastOnMinionDeath",
+    "name": "Cast on Minion Death",
+    "isSupport": false
+  },
+  {
+    "id": "Chaosbolt",
+    "name": "Chaos Bolt",
+    "isSupport": false
+  },
+  {
+    "id": "ChargeRegulation",
+    "name": "Charge Regulation",
+    "isSupport": false
+  },
+  {
+    "id": "ChargedStaff",
+    "name": "Charged Staff",
+    "isSupport": false
+  },
+  {
+    "id": "ClusterGrenade",
+    "name": "Cluster Grenade",
+    "isSupport": false
+  },
+  {
+    "id": "CoilingBolts",
+    "name": "Coiling Bolts",
+    "isSupport": false
+  },
+  {
+    "id": "CombatFrenzy",
+    "name": "Combat Frenzy",
+    "isSupport": false
+  },
+  {
+    "id": "Comet",
+    "name": "Comet",
+    "isSupport": false
+  },
+  {
+    "id": "SummonBeast",
+    "name": "Companion: {0}",
+    "isSupport": false
+  },
+  {
+    "id": "ConductiveRunes",
+    "name": "Conductive Runes",
+    "isSupport": false
+  },
+  {
+    "id": "StaffConsecrate",
+    "name": "Consecrate",
+    "isSupport": false
+  },
+  {
+    "id": "Contagion",
+    "name": "Contagion",
+    "isSupport": false
+  },
+  {
+    "id": "Convalescence",
+    "name": "Convalescence",
+    "isSupport": false
+  },
+  {
+    "id": "CracklingPalm",
+    "name": "Crackling Palm",
+    "isSupport": false
+  },
+  {
+    "id": "WolfCrossSlash",
+    "name": "Cross Slash",
+    "isSupport": false
+  },
+  {
+    "id": "PlayerDefaultCrossbow",
+    "name": "Crossbow Shot",
+    "isSupport": false
+  },
+  {
+    "id": "CrushingFear",
+    "name": "Crushing Fear",
+    "isSupport": false
+  },
+  {
+    "id": "CullTheWeak",
+    "name": "Cull The Weak",
+    "isSupport": false
+  },
+  {
+    "id": "CastCurseOnBlock",
+    "name": "Curse on Block",
+    "isSupport": false
+  },
+  {
+    "id": "DarkEffigy",
+    "name": "Dark Effigy",
+    "isSupport": false
+  },
+  {
+    "id": "CorpseCloud",
+    "name": "Decompose",
+    "isSupport": false
+  },
+  {
+    "id": "DefianceBanner",
+    "name": "Defiance Banner",
+    "isSupport": false
+  },
+  {
+    "id": "DemonForm",
+    "name": "Demon Form",
+    "isSupport": false
+  },
+  {
+    "id": "Despair",
+    "name": "Despair",
+    "isSupport": false
+  },
+  {
+    "id": "DetonateDead",
+    "name": "Detonate Dead",
+    "isSupport": false
+  },
+  {
+    "id": "DetonateLiving",
+    "name": "Detonate Living",
+    "isSupport": false
+  },
+  {
+    "id": "DetonateMinion",
+    "name": "Detonate Minion",
+    "isSupport": false
+  },
+  {
+    "id": "DetonatingArrow",
+    "name": "Detonating Arrow",
+    "isSupport": false
+  },
+  {
+    "id": "WyvernDevour",
+    "name": "Devour",
+    "isSupport": false
+  },
+  {
+    "id": "Discipline",
+    "name": "Discipline",
+    "isSupport": false
+  },
+  {
+    "id": "Disengage",
+    "name": "Disengage",
+    "isSupport": false
+  },
+  {
+    "id": "DreadBanner",
+    "name": "Dread Banner",
+    "isSupport": false
+  },
+  {
+    "id": "Earthquake",
+    "name": "Earthquake",
+    "isSupport": false
+  },
+  {
+    "id": "Earthshatter",
+    "name": "Earthshatter",
+    "isSupport": false
+  },
+  {
+    "id": "ElectrocutingArrow",
+    "name": "Electrocuting Arrow",
+    "isSupport": false
+  },
+  {
+    "id": "ElementalConflux",
+    "name": "Elemental Conflux",
+    "isSupport": false
+  },
+  {
+    "id": "AscendancyElementalExpression",
+    "name": "Elemental Expression",
+    "isSupport": false
+  },
+  {
+    "id": "ElementalInvocation",
+    "name": "Elemental Invocation",
+    "isSupport": false
+  },
+  {
+    "id": "AscendancyElementalStorm",
+    "name": "Elemental Storm",
+    "isSupport": false
+  },
+  {
+    "id": "ElementalSundering",
+    "name": "Elemental Sundering",
+    "isSupport": false
+  },
+  {
+    "id": "AscendancyTriggerElementalSurge",
+    "name": "Elemental Surge",
+    "isSupport": false
+  },
+  {
+    "id": "ElementalWeakness",
+    "name": "Elemental Weakness",
+    "isSupport": false
+  },
+  {
+    "id": "EmberFusillade",
+    "name": "Ember Fusillade",
+    "isSupport": false
+  },
+  {
+    "id": "EmergencyReload",
+    "name": "Emergency Reload",
+    "isSupport": false
+  },
+  {
+    "id": "AscendancyEncasedInJade",
+    "name": "Encase in Jade",
+    "isSupport": false
+  },
+  {
+    "id": "Enfeeble",
+    "name": "Enfeeble",
+    "isSupport": false
+  },
+  {
+    "id": "Entangle",
+    "name": "Entangle",
+    "isSupport": false
+  },
+  {
+    "id": "EscapeShot",
+    "name": "Escape Shot",
+    "isSupport": false
+  },
+  {
+    "id": "EssenceDrain",
+    "name": "Essence Drain",
+    "isSupport": false
+  },
+  {
+    "id": "EternalMarch",
+    "name": "Eternal March",
+    "isSupport": false
+  },
+  {
+    "id": "EternalRage",
+    "name": "Eternal Rage",
+    "isSupport": false
+  },
+  {
+    "id": "AscendancyExplosiveConcoction",
+    "name": "Explosive Concoction",
+    "isSupport": false
+  },
+  {
+    "id": "ExplosiveGrenade",
+    "name": "Explosive Grenade",
+    "isSupport": false
+  },
+  {
+    "id": "ExplosiveShot",
+    "name": "Explosive Shot",
+    "isSupport": false
+  },
+  {
+    "id": "ExplosiveSpear",
+    "name": "Explosive Spear",
+    "isSupport": false
+  },
+  {
+    "id": "ExplosiveTransmutation",
+    "name": "Explosive Transmutation",
+    "isSupport": false
+  },
+  {
+    "id": "Exsanguinate",
+    "name": "Exsanguinate",
+    "isSupport": false
+  },
+  {
+    "id": "EyeOfWinter",
+    "name": "Eye of Winter",
+    "isSupport": false
+  },
+  {
+    "id": "FallingThunder",
+    "name": "Falling Thunder",
+    "isSupport": false
+  },
+  {
+    "id": "FangsOfFrost",
+    "name": "Fangs of Frost",
+    "isSupport": false
+  },
+  {
+    "id": "FeastOfFlesh",
+    "name": "Feast of Flesh",
+    "isSupport": false
+  },
+  {
+    "id": "FeralInvocation",
+    "name": "Feral Invocation",
+    "isSupport": false
+  },
+  {
+    "id": "FerociousRoar",
+    "name": "Ferocious Roar",
+    "isSupport": false
+  },
+  {
+    "id": "CastFireSpellOnHit",
+    "name": "Fire Spell on Hit",
+    "isSupport": false
+  },
+  {
+    "id": "Fireball",
+    "name": "Fireball",
+    "isSupport": false
+  },
+  {
+    "id": "Firebolt",
+    "name": "Firebolt",
+    "isSupport": false
+  },
+  {
+    "id": "Firestorm",
+    "name": "Firestorm",
+    "isSupport": false
+  },
+  {
+    "id": "WyvernFlameBreath",
+    "name": "Flame Breath",
+    "isSupport": false
+  },
+  {
+    "id": "FlameWall",
+    "name": "Flame Wall",
+    "isSupport": false
+  },
+  {
+    "id": "Flameblast",
+    "name": "Flameblast",
+    "isSupport": false
+  },
+  {
+    "id": "FlashGrenade",
+    "name": "Flash Grenade",
+    "isSupport": false
+  },
+  {
+    "id": "FlickerStrike",
+    "name": "Flicker Strike",
+    "isSupport": false
+  },
+  {
+    "id": "ForgeHammer",
+    "name": "Forge Hammer",
+    "isSupport": false
+  },
+  {
+    "id": "FortifyingCry",
+    "name": "Fortifying Cry",
+    "isSupport": false
+  },
+  {
+    "id": "FragmentationRounds",
+    "name": "Fragmentation Rounds",
+    "isSupport": false
+  },
+  {
+    "id": "FragmentsOfThePast",
+    "name": "Fragments Of The Past",
+    "isSupport": false
+  },
+  {
+    "id": "FreezingMark",
+    "name": "Freezing Mark",
+    "isSupport": false
+  },
+  {
+    "id": "FreezingSalvo",
+    "name": "Freezing Salvo",
+    "isSupport": false
+  },
+  {
+    "id": "FreezingShards",
+    "name": "Freezing Shards",
+    "isSupport": false
+  },
+  {
+    "id": "FrostBomb",
+    "name": "Frost Bomb",
+    "isSupport": false
+  },
+  {
+    "id": "FrostDarts",
+    "name": "Frost Darts",
+    "isSupport": false
+  },
+  {
+    "id": "FrostWall",
+    "name": "Frost Wall",
+    "isSupport": false
+  },
+  {
+    "id": "FrostBolt",
+    "name": "Frostbolt",
+    "isSupport": false
+  },
+  {
+    "id": "FrostflameNova",
+    "name": "Frostflame Nova",
+    "isSupport": false
+  },
+  {
+    "id": "FrozenLocus",
+    "name": "Frozen Locus",
+    "isSupport": false
+  },
+  {
+    "id": "AscendancyFulminatingConcoction",
+    "name": "Fulminating Concoction",
+    "isSupport": false
+  },
+  {
+    "id": "Fulmination",
+    "name": "Fulmination",
+    "isSupport": false
+  },
+  {
+    "id": "FuriousSlam",
+    "name": "Furious Slam",
+    "isSupport": false
+  },
+  {
+    "id": "BearFuryOfTheMountain",
+    "name": "Fury of the Mountain",
+    "isSupport": false
+  },
+  {
+    "id": "FuturePast",
+    "name": "Future-Past",
+    "isSupport": false
+  },
+  {
+    "id": "GalvanicField",
+    "name": "Galvanic Field",
+    "isSupport": false
+  },
+  {
+    "id": "GalvanicShards",
+    "name": "Galvanic Shards",
+    "isSupport": false
+  },
+  {
+    "id": "GasArrow",
+    "name": "Gas Arrow",
+    "isSupport": false
+  },
+  {
+    "id": "ToxicGrenade",
+    "name": "Gas Grenade",
+    "isSupport": false
+  },
+  {
+    "id": "GatheringStorm",
+    "name": "Gathering Storm",
+    "isSupport": false
+  },
+  {
+    "id": "GeminiSurge",
+    "name": "Gemini Surge",
+    "isSupport": false
+  },
+  {
+    "id": "GhostDance",
+    "name": "Ghost Dance",
+    "isSupport": false
+  },
+  {
+    "id": "GlacialBolt",
+    "name": "Glacial Bolt",
+    "isSupport": false
+  },
+  {
+    "id": "GlacialCascade",
+    "name": "Glacial Cascade",
+    "isSupport": false
+  },
+  {
+    "id": "GlacialLance",
+    "name": "Glacial Lance",
+    "isSupport": false
+  },
+  {
+    "id": "PlayerDefaultGrenadeLauncher",
+    "name": "Grenade",
+    "isSupport": false
+  },
+  {
+    "id": "GrimFeast",
+    "name": "Grim Feast",
+    "isSupport": false
+  },
+  {
+    "id": "GrimPillars",
+    "name": "Grim Pillars",
+    "isSupport": false
+  },
+  {
+    "id": "HailstormRounds",
+    "name": "Hailstorm Rounds",
+    "isSupport": false
+  },
+  {
+    "id": "HammerOfTheGods",
+    "name": "Hammer of the Gods",
+    "isSupport": false
+  },
+  {
+    "id": "HandOfChayula",
+    "name": "Hand of Chayula",
+    "isSupport": false
+  },
+  {
+    "id": "HeartOfIce",
+    "name": "Heart of Ice",
+    "isSupport": false
+  },
+  {
+    "id": "HeraldOfAsh",
+    "name": "Herald of Ash",
+    "isSupport": false
+  },
+  {
+    "id": "HeraldOfBlood",
+    "name": "Herald of Blood",
+    "isSupport": false
+  },
+  {
+    "id": "HeraldOfIce",
+    "name": "Herald of Ice",
+    "isSupport": false
+  },
+  {
+    "id": "HeraldOfPlague",
+    "name": "Herald of Plague",
+    "isSupport": false
+  },
+  {
+    "id": "HeraldOfThunder",
+    "name": "Herald of Thunder",
+    "isSupport": false
+  },
+  {
+    "id": "Hexblast",
+    "name": "Hexblast",
+    "isSupport": false
+  },
+  {
+    "id": "HighVelocityRounds",
+    "name": "High Velocity Rounds",
+    "isSupport": false
+  },
+  {
+    "id": "HisFoulEmergence",
+    "name": "His Foul Emergence",
+    "isSupport": false
+  },
+  {
+    "id": "ScatteringCalamity",
+    "name": "His Scattering Calamity",
+    "isSupport": false
+  },
+  {
+    "id": "VileDisruption",
+    "name": "His Vile Intrusion",
+    "isSupport": false
+  },
+  {
+    "id": "HisWinnowingFlame",
+    "name": "His Winnowing Flame",
+    "isSupport": false
+  },
+  {
+    "id": "HollowFocus",
+    "name": "Hollow Focus",
+    "isSupport": false
+  },
+  {
+    "id": "HollowForm",
+    "name": "Hollow Form",
+    "isSupport": false
+  },
+  {
+    "id": "HollowResonance",
+    "name": "Hollow Resonance",
+    "isSupport": false
+  },
+  {
+    "id": "HollowShell",
+    "name": "Hollow Shell",
+    "isSupport": false
+  },
+  {
+    "id": "IceFragments",
+    "name": "Ice Fragments",
+    "isSupport": false
+  },
+  {
+    "id": "IceNova",
+    "name": "Ice Nova",
+    "isSupport": false
+  },
+  {
+    "id": "IceShards",
+    "name": "Ice Shards",
+    "isSupport": false
+  },
+  {
+    "id": "IceShot",
+    "name": "Ice Shot",
+    "isSupport": false
+  },
+  {
+    "id": "IceStrike",
+    "name": "Ice Strike",
+    "isSupport": false
+  },
+  {
+    "id": "IceTippedArrows",
+    "name": "Ice-Tipped Arrows",
+    "isSupport": false
+  },
+  {
+    "id": "Icestorm",
+    "name": "Icestorm",
+    "isSupport": false
+  },
+  {
+    "id": "Impurity",
+    "name": "Impurity",
+    "isSupport": false
+  },
+  {
+    "id": "IncendiaryShot",
+    "name": "Incendiary Shot",
+    "isSupport": false
+  },
+  {
+    "id": "Incinerate",
+    "name": "Incinerate",
+    "isSupport": false
+  },
+  {
+    "id": "InevitableAgony",
+    "name": "Inevitable Agony",
+    "isSupport": false
+  },
+  {
+    "id": "InfernallCry",
+    "name": "Infernal Cry",
+    "isSupport": false
+  },
+  {
+    "id": "IntoTheBreach",
+    "name": "Into the Breach",
+    "isSupport": false
+  },
+  {
+    "id": "IronWard",
+    "name": "Iron Ward",
+    "isSupport": false
+  },
+  {
+    "id": "AscendancyCorpseBeetles",
+    "name": "Kelari's Malediction",
+    "isSupport": false
+  },
+  {
+    "id": "AscendancySummonSandDjinn",
+    "name": "Kelari, the Tainted Sands",
+    "isSupport": false
+  },
+  {
+    "id": "KillingPalm",
+    "name": "Killing Palm",
+    "isSupport": false
+  },
+  {
+    "id": "LeapSlam",
+    "name": "Leap Slam",
+    "isSupport": false
+  },
+  {
+    "id": "Leylines",
+    "name": "Leylines",
+    "isSupport": false
+  },
+  {
+    "id": "AscendancyLifeRemnants",
+    "name": "Life Remnants",
+    "isSupport": false
+  },
+  {
+    "id": "LightningArrow",
+    "name": "Lightning Arrow",
+    "isSupport": false
+  },
+  {
+    "id": "LightningBolt",
+    "name": "Lightning Bolt",
+    "isSupport": false
+  },
+  {
+    "id": "UniqueBreachLightningBolt",
+    "name": "Lightning Bolt",
+    "isSupport": false
+  },
+  {
+    "id": "LightningConduit",
+    "name": "Lightning Conduit",
+    "isSupport": false
+  },
+  {
+    "id": "LightningRod",
+    "name": "Lightning Rod",
+    "isSupport": false
+  },
+  {
+    "id": "LightningSpear",
+    "name": "Lightning Spear",
+    "isSupport": false
+  },
+  {
+    "id": "LightningWarp",
+    "name": "Lightning Warp",
+    "isSupport": false
+  },
+  {
+    "id": "LingeringIllusion",
+    "name": "Lingering Illusion",
+    "isSupport": false
+  },
+  {
+    "id": "LivingBombPlayer",
+    "name": "Living Bomb",
+    "isSupport": false
+  },
+  {
+    "id": "LunarAssault",
+    "name": "Lunar Assault",
+    "isSupport": false
+  },
+  {
+    "id": "WolfLunarBlessing",
+    "name": "Lunar Blessing",
+    "isSupport": false
+  },
+  {
+    "id": "PlayerDefault1HMace",
+    "name": "Mace Strike",
+    "isSupport": false
+  },
+  {
+    "id": "PlayerDefaultMaceMace",
+    "name": "Mace Strike",
+    "isSupport": false
+  },
+  {
+    "id": "PlayerDefault2HMace",
+    "name": "Mace Strike",
+    "isSupport": false
+  },
+  {
+    "id": "MagmaBarrier",
+    "name": "Magma Barrier",
+    "isSupport": false
+  },
+  {
+    "id": "MagneticSalvo",
+    "name": "Magnetic Salvo",
+    "isSupport": false
+  },
+  {
+    "id": "Malice",
+    "name": "Malice",
+    "isSupport": false
+  },
+  {
+    "id": "ManaDrain",
+    "name": "Mana Drain",
+    "isSupport": false
+  },
+  {
+    "id": "ManaRemnants",
+    "name": "Mana Remnants",
+    "isSupport": false
+  },
+  {
+    "id": "ManaTempest",
+    "name": "Mana Tempest",
+    "isSupport": false
+  },
+  {
+    "id": "ManifestWeapon",
+    "name": "Manifest Weapon",
+    "isSupport": false
+  },
+  {
+    "id": "MantraOfDestruction",
+    "name": "Mantra of Destruction",
+    "isSupport": false
+  },
+  {
+    "id": "BearMaul",
+    "name": "Maul",
+    "isSupport": false
+  },
+  {
+    "id": "AscendancyMeditate",
+    "name": "Meditate",
+    "isSupport": false
+  },
+  {
+    "id": "MidnightStar",
+    "name": "Midnight Zenith",
+    "isSupport": false
+  },
+  {
+    "id": "MirageArcher",
+    "name": "Mirage Archer",
+    "isSupport": false
+  },
+  {
+    "id": "MirageDeadeye",
+    "name": "Mirage Deadeye",
+    "isSupport": false
+  },
+  {
+    "id": "MirrorOfRefraction",
+    "name": "Mirror of Refraction",
+    "isSupport": false
+  },
+  {
+    "id": "MistRaven",
+    "name": "Mist Raven",
+    "isSupport": false
+  },
+  {
+    "id": "MoltenBlast",
+    "name": "Molten Blast",
+    "isSupport": false
+  },
+  {
+    "id": "MoltenCrash",
+    "name": "Molten Crash",
+    "isSupport": false
+  },
+  {
+    "id": "MoltenShower",
+    "name": "Molten Shower",
+    "isSupport": false
+  },
+  {
+    "id": "AscendancyMomentOfVulnerability",
+    "name": "Moment of Vulnerability",
+    "isSupport": false
+  },
+  {
+    "id": "MortarCannon",
+    "name": "Mortar Cannon",
+    "isSupport": false
+  },
+  {
+    "id": "AscendancySummonWaterDjinn",
+    "name": "Navira, the Last Mirage",
+    "isSupport": false
+  },
+  {
+    "id": "OilBarrage",
+    "name": "Oil Barrage",
+    "isSupport": false
+  },
+  {
+    "id": "OilGrenade",
+    "name": "Oil Grenade",
+    "isSupport": false
+  },
+  {
+    "id": "OrbOfStorms",
+    "name": "Orb of Storms",
+    "isSupport": false
+  },
+  {
+    "id": "OverwhelmingPresence",
+    "name": "Overwhelming Presence",
+    "isSupport": false
+  },
+  {
+    "id": "PainOffering",
+    "name": "Pain Offering",
+    "isSupport": false
+  },
+  {
+    "id": "Parry",
+    "name": "Parry",
+    "isSupport": false
+  },
+  {
+    "id": "PerfectStrike",
+    "name": "Perfect Strike",
+    "isSupport": false
+  },
+  {
+    "id": "PermafrostBolts",
+    "name": "Permafrost Bolts",
+    "isSupport": false
+  },
+  {
+    "id": "PhantasmalArrowPlayer",
+    "name": "Phantasmal Arrow",
+    "isSupport": false
+  },
+  {
+    "id": "PinnacleOfPower",
+    "name": "Pinnacle of Power",
+    "isSupport": false
+  },
+  {
+    "id": "PlagueBearer",
+    "name": "Plague Bearer",
+    "isSupport": false
+  },
+  {
+    "id": "PlasmaBlast",
+    "name": "Plasma Blast",
+    "isSupport": false
+  },
+  {
+    "id": "PoisonBurstArrow",
+    "name": "Poisonburst Arrow",
+    "isSupport": false
+  },
+  {
+    "id": "WolfPounce",
+    "name": "Pounce",
+    "isSupport": false
+  },
+  {
+    "id": "PowerSiphon",
+    "name": "Power Siphon",
+    "isSupport": false
+  },
+  {
+    "id": "PoweredByVerisium",
+    "name": "Powered by Verisium",
+    "isSupport": false
+  },
+  {
+    "id": "PrimalBounty",
+    "name": "Primal Bounty",
+    "isSupport": false
+  },
+  {
+    "id": "PrimalStrikes",
+    "name": "Primal Strikes",
+    "isSupport": false
+  },
+  {
+    "id": "ProfaneRitual",
+    "name": "Profane Ritual",
+    "isSupport": false
+  },
+  {
+    "id": "PurityOfFire",
+    "name": "Purity of Fire",
+    "isSupport": false
+  },
+  {
+    "id": "PurityOfIce",
+    "name": "Purity of Ice",
+    "isSupport": false
+  },
+  {
+    "id": "PurityOfLightning",
+    "name": "Purity of Lightning",
+    "isSupport": false
+  },
+  {
+    "id": "PlayerDefaultQuarterstaff",
+    "name": "Quarterstaff Strike",
+    "isSupport": false
+  },
+  {
+    "id": "RagingSpirits",
+    "name": "Raging Spirits",
+    "isSupport": false
+  },
+  {
+    "id": "RainOfArrows",
+    "name": "Rain of Arrows",
+    "isSupport": false
+  },
+  {
+    "id": "RainOfBlades",
+    "name": "Rain of Blades",
+    "isSupport": false
+  },
+  {
+    "id": "ShieldBlock",
+    "name": "Raise Shield",
+    "isSupport": false
+  },
+  {
+    "id": "RaiseZombie",
+    "name": "Raise Zombie",
+    "isSupport": false
+  },
+  {
+    "id": "Rake",
+    "name": "Rake",
+    "isSupport": false
+  },
+  {
+    "id": "BearRampage",
+    "name": "Rampage",
+    "isSupport": false
+  },
+  {
+    "id": "RapidAssault",
+    "name": "Rapid Assault",
+    "isSupport": false
+  },
+  {
+    "id": "RapidShot",
+    "name": "Rapid Shot",
+    "isSupport": false
+  },
+  {
+    "id": "RavenousSwarm",
+    "name": "Ravenous Swarm",
+    "isSupport": false
+  },
+  {
+    "id": "Reap",
+    "name": "Reap",
+    "isSupport": false
+  },
+  {
+    "id": "ReapersInvocation",
+    "name": "Reaper's Invocation",
+    "isSupport": false
+  },
+  {
+    "id": "Refutation",
+    "name": "Refutation",
+    "isSupport": false
+  },
+  {
+    "id": "RemnantsOfKalguur",
+    "name": "Remnants of Kalguur",
+    "isSupport": false
+  },
+  {
+    "id": "WyvernRend",
+    "name": "Rend",
+    "isSupport": false
+  },
+  {
+    "id": "Repulsion",
+    "name": "Repulsion",
+    "isSupport": false
+  },
+  {
+    "id": "CrossbowRequiem",
+    "name": "Requiem",
+    "isSupport": false
+  },
+  {
+    "id": "ResonatingShield",
+    "name": "Resonating Shield",
+    "isSupport": false
+  },
+  {
+    "id": "RhoaMount",
+    "name": "Rhoa Mount",
+    "isSupport": false
+  },
+  {
+    "id": "RighteousDescent",
+    "name": "Righteous Descent",
+    "isSupport": false
+  },
+  {
+    "id": "SigilOfLife",
+    "name": "Rite of Restoration",
+    "isSupport": false
+  },
+  {
+    "id": "RitualSacrifice",
+    "name": "Ritual Sacrifice",
+    "isSupport": false
+  },
+  {
+    "id": "RollingMagma",
+    "name": "Rolling Magma",
+    "isSupport": false
+  },
+  {
+    "id": "RollingSlam",
+    "name": "Rolling Slam",
+    "isSupport": false
+  },
+  {
+    "id": "RunicReprieve",
+    "name": "Runic Reprieve",
+    "isSupport": false
+  },
+  {
+    "id": "AscendancySummonFireDjinn",
+    "name": "Ruzhan, the Blazing Sword",
+    "isSupport": false
+  },
+  {
+    "id": "Sacrifice",
+    "name": "Sacrifice",
+    "isSupport": false
+  },
+  {
+    "id": "ScavengedPlating",
+    "name": "Scavenged Plating",
+    "isSupport": false
+  },
+  {
+    "id": "SeismicCry",
+    "name": "Seismic Cry",
+    "isSupport": false
+  },
+  {
+    "id": "ShardScavenger",
+    "name": "Shard Scavenger",
+    "isSupport": false
+  },
+  {
+    "id": "AscendancyShatteringConcoction",
+    "name": "Shattering Concoction",
+    "isSupport": false
+  },
+  {
+    "id": "ShatteringPalm",
+    "name": "Shattering Palm",
+    "isSupport": false
+  },
+  {
+    "id": "ShatteringSpite",
+    "name": "Shattering Spite",
+    "isSupport": false
+  },
+  {
+    "id": "ShieldCharge",
+    "name": "Shield Charge",
+    "isSupport": false
+  },
+  {
+    "id": "ShieldWall",
+    "name": "Shield Wall",
+    "isSupport": false
+  },
+  {
+    "id": "ShockburstRounds",
+    "name": "Shockburst Rounds",
+    "isSupport": false
+  },
+  {
+    "id": "ShockchainArrow",
+    "name": "Shockchain Arrow",
+    "isSupport": false
+  },
+  {
+    "id": "ShockwaveTotem",
+    "name": "Shockwave Totem",
+    "isSupport": false
+  },
+  {
+    "id": "WolfShred",
+    "name": "Shred",
+    "isSupport": false
+  },
+  {
+    "id": "SiegeBallista",
+    "name": "Siege Ballista",
+    "isSupport": false
+  },
+  {
+    "id": "SiegeCascade",
+    "name": "Siege Cascade",
+    "isSupport": false
+  },
+  {
+    "id": "SigilOfPower",
+    "name": "Sigil of Power",
+    "isSupport": false
+  },
+  {
+    "id": "SiphonElements",
+    "name": "Siphon Elements",
+    "isSupport": false
+  },
+  {
+    "id": "SiphoningStrike",
+    "name": "Siphoning Strike",
+    "isSupport": false
+  },
+  {
+    "id": "SkeletalArsonist",
+    "name": "Skeletal Arsonist",
+    "isSupport": false
+  },
+  {
+    "id": "SkeletalBrute",
+    "name": "Skeletal Brute",
+    "isSupport": false
+  },
+  {
+    "id": "SkeletalCleric",
+    "name": "Skeletal Cleric",
+    "isSupport": false
+  },
+  {
+    "id": "SkeletalFrostMage",
+    "name": "Skeletal Frost Mage",
+    "isSupport": false
+  },
+  {
+    "id": "SkeletalReaver",
+    "name": "Skeletal Reaver",
+    "isSupport": false
+  },
+  {
+    "id": "SkeletalSniper",
+    "name": "Skeletal Sniper",
+    "isSupport": false
+  },
+  {
+    "id": "SkeletalSniper",
+    "name": "Skeletal Sniper",
+    "isSupport": false
+  },
+  {
+    "id": "SkeletalStormMage",
+    "name": "Skeletal Storm Mage",
+    "isSupport": false
+  },
+  {
+    "id": "SkeletalWarrior",
+    "name": "Skeletal Warrior",
+    "isSupport": false
+  },
+  {
+    "id": "Skyfall",
+    "name": "Skyfall",
+    "isSupport": false
+  },
+  {
+    "id": "Snap",
+    "name": "Snap",
+    "isSupport": false
+  },
+  {
+    "id": "Snipe",
+    "name": "Snipe",
+    "isSupport": false
+  },
+  {
+    "id": "SnipersMark",
+    "name": "Sniper's Mark",
+    "isSupport": false
+  },
+  {
+    "id": "NightfallShieldThrow",
+    "name": "Soaring Midnight",
+    "isSupport": false
+  },
+  {
+    "id": "SolarOrb",
+    "name": "Solar Orb",
+    "isSupport": false
+  },
+  {
+    "id": "SorceryWard",
+    "name": "Sorcery Ward",
+    "isSupport": false
+  },
+  {
+    "id": "SoulOffering",
+    "name": "Soul Offering",
+    "isSupport": false
+  },
+  {
+    "id": "Soulrend",
+    "name": "Soulrend",
+    "isSupport": false
+  },
+  {
+    "id": "Spark",
+    "name": "Spark",
+    "isSupport": false
+  },
+  {
+    "id": "PlayerDefaultSpear",
+    "name": "Spear Stab",
+    "isSupport": false
+  },
+  {
+    "id": "PlayerDefaultSpearOffHand",
+    "name": "Spear Stab",
+    "isSupport": false
+  },
+  {
+    "id": "PlayerDefaultSpearThrow",
+    "name": "Spear Throw",
+    "isSupport": false
+  },
+  {
+    "id": "SpearOfSolaris",
+    "name": "Spear of Solaris",
+    "isSupport": false
+  },
+  {
+    "id": "Spearfield",
+    "name": "Spearfield",
+    "isSupport": false
+  },
+  {
+    "id": "SummonSpectre",
+    "name": "Spectre: {0}",
+    "isSupport": false
+  },
+  {
+    "id": "MetaSpellTotem",
+    "name": "Spell Totem",
+    "isSupport": false
+  },
+  {
+    "id": "Spellslinger",
+    "name": "Spellslinger",
+    "isSupport": false
+  },
+  {
+    "id": "SpiralVolley",
+    "name": "Spiral Volley",
+    "isSupport": false
+  },
+  {
+    "id": "SpiralingConspiracy",
+    "name": "Spiraling Conspiracy",
+    "isSupport": false
+  },
+  {
+    "id": "SpiritVessel",
+    "name": "Spirit Vessel",
+    "isSupport": false
+  },
+  {
+    "id": "StaggeringPalm",
+    "name": "Staggering Palm",
+    "isSupport": false
+  },
+  {
+    "id": "Stampede",
+    "name": "Stampede",
+    "isSupport": false
+  },
+  {
+    "id": "StarbornOnslaught",
+    "name": "Starborn Onslaught",
+    "isSupport": false
+  },
+  {
+    "id": "StormLance",
+    "name": "Storm Lance",
+    "isSupport": false
+  },
+  {
+    "id": "StormWave",
+    "name": "Storm Wave",
+    "isSupport": false
+  },
+  {
+    "id": "StormblastBolts",
+    "name": "Stormblast Bolts",
+    "isSupport": false
+  },
+  {
+    "id": "StormcallerArrow",
+    "name": "Stormcaller Arrow",
+    "isSupport": false
+  },
+  {
+    "id": "AscendancySummonInfernalHound",
+    "name": "Summon Infernal Hound",
+    "isSupport": false
+  },
+  {
+    "id": "Sunder",
+    "name": "Sunder",
+    "isSupport": false
+  },
+  {
+    "id": "SuperchargedSlam",
+    "name": "Supercharged Slam",
+    "isSupport": false
+  },
+  {
+    "id": "SupportingFire",
+    "name": "Supporting Fire",
+    "isSupport": false
+  },
+  {
+    "id": "TameBeast",
+    "name": "Tame Beast",
+    "isSupport": false
+  },
+  {
+    "id": "TemperWeapon",
+    "name": "Temper Weapon",
+    "isSupport": false
+  },
+  {
+    "id": "TempestBell",
+    "name": "Tempest Bell",
+    "isSupport": false
+  },
+  {
+    "id": "TempestFlurry",
+    "name": "Tempest Flurry",
+    "isSupport": false
+  },
+  {
+    "id": "TemporalChains",
+    "name": "Temporal Chains",
+    "isSupport": false
+  },
+  {
+    "id": "TemporalRift",
+    "name": "Temporal Rift",
+    "isSupport": false
+  },
+  {
+    "id": "TheStarsAnswer",
+    "name": "The Stars Answer",
+    "isSupport": false
+  },
+  {
+    "id": "ThrashingVines",
+    "name": "Thrashing Vines",
+    "isSupport": false
+  },
+  {
+    "id": "CastLightningSpellOnHit",
+    "name": "Thundergod's Wrath",
+    "isSupport": false
+  },
+  {
+    "id": "ThunderousLeap",
+    "name": "Thunderous Leap",
+    "isSupport": false
+  },
+  {
+    "id": "Thunderstorm",
+    "name": "Thunderstorm",
+    "isSupport": false
+  },
+  {
+    "id": "TimeFreeze",
+    "name": "Time Freeze",
+    "isSupport": false
+  },
+  {
+    "id": "TimeSnap",
+    "name": "Time Snap",
+    "isSupport": false
+  },
+  {
+    "id": "TimeOfNeed",
+    "name": "Time of Need",
+    "isSupport": false
+  },
+  {
+    "id": "Tornado",
+    "name": "Tornado",
+    "isSupport": false
+  },
+  {
+    "id": "TornadoShot",
+    "name": "Tornado Shot",
+    "isSupport": false
+  },
+  {
+    "id": "ToxicDomain",
+    "name": "Toxic Domain",
+    "isSupport": false
+  },
+  {
+    "id": "ToxicGrowth",
+    "name": "Toxic Growth",
+    "isSupport": false
+  },
+  {
+    "id": "TrailOfCaltrops",
+    "name": "Trail of Caltrops",
+    "isSupport": false
+  },
+  {
+    "id": "Trinity",
+    "name": "Trinity",
+    "isSupport": false
+  },
+  {
+    "id": "TriskelionCascade",
+    "name": "Triskelion Cascade",
+    "isSupport": false
+  },
+  {
+    "id": "Twister",
+    "name": "Twister",
+    "isSupport": false
+  },
+  {
+    "id": "AscendancyUnboundAvatar",
+    "name": "Unbound Avatar",
+    "isSupport": false
+  },
+  {
+    "id": "Unearth",
+    "name": "Unearth",
+    "isSupport": false
+  },
+  {
+    "id": "Unleash",
+    "name": "Unleash",
+    "isSupport": false
+  },
+  {
+    "id": "ValakosCharge",
+    "name": "Valako's Charge",
+    "isSupport": false
+  },
+  {
+    "id": "VaultingImpact",
+    "name": "Vaulting Impact",
+    "isSupport": false
+  },
+  {
+    "id": "VerisiumManifestation",
+    "name": "Verisium Manifestations",
+    "isSupport": false
+  },
+  {
+    "id": "VineArrow",
+    "name": "Vine Arrow",
+    "isSupport": false
+  },
+  {
+    "id": "VividStampede",
+    "name": "Vivid Stampede",
+    "isSupport": false
+  },
+  {
+    "id": "VoidIllusion",
+    "name": "Void Illusion",
+    "isSupport": false
+  },
+  {
+    "id": "VolatileDead",
+    "name": "Volatile Dead",
+    "isSupport": false
+  },
+  {
+    "id": "VolcanicFissure",
+    "name": "Volcanic Fissure",
+    "isSupport": false
+  },
+  {
+    "id": "Volcano",
+    "name": "Volcano",
+    "isSupport": false
+  },
+  {
+    "id": "VoltaicBarrier",
+    "name": "Voltaic Barrier",
+    "isSupport": false
+  },
+  {
+    "id": "ShockGrenade",
+    "name": "Voltaic Grenade",
+    "isSupport": false
+  },
+  {
+    "id": "VoltaicMark",
+    "name": "Voltaic Mark",
+    "isSupport": false
+  },
+  {
+    "id": "Vulnerability",
+    "name": "Vulnerability",
+    "isSupport": false
+  },
+  {
+    "id": "WalkingCalamity",
+    "name": "Walking Calamity",
+    "isSupport": false
+  },
+  {
+    "id": "WarBanner",
+    "name": "War Banner",
+    "isSupport": false
+  },
+  {
+    "id": "WardboundMinions",
+    "name": "Wardbound Minions",
+    "isSupport": false
+  },
+  {
+    "id": "WaveOfFrost",
+    "name": "Wave of Frost",
+    "isSupport": false
+  },
+  {
+    "id": "WhirlingAssault",
+    "name": "Whirling Assault",
+    "isSupport": false
+  },
+  {
+    "id": "WhirlingSlash",
+    "name": "Whirling Slash",
+    "isSupport": false
+  },
+  {
+    "id": "WhirlwindLance",
+    "name": "Whirlwind Lance",
+    "isSupport": false
+  },
+  {
+    "id": "WildProtector",
+    "name": "Wild Protector",
+    "isSupport": false
+  },
+  {
+    "id": "AncientGifts",
+    "name": "Wildwood's Gifts",
+    "isSupport": false
+  },
+  {
+    "id": "WindBlast",
+    "name": "Wind Blast",
+    "isSupport": false
+  },
+  {
+    "id": "WindDancer",
+    "name": "Wind Dancer",
+    "isSupport": false
+  },
+  {
+    "id": "WindSerpentsFury",
+    "name": "Wind Serpent's Fury",
+    "isSupport": false
+  },
+  {
+    "id": "WingBlast",
+    "name": "Wing Blast",
+    "isSupport": false
+  },
+  {
+    "id": "Wither",
+    "name": "Wither",
+    "isSupport": false
+  },
+  {
+    "id": "WitheringPresence",
+    "name": "Withering Presence",
+    "isSupport": false
+  },
+  {
+    "id": "WolfPack",
+    "name": "Wolf Pack",
+    "isSupport": false
+  },
+  {
+    "id": "AbidingHexSupport",
+    "name": "Abiding Hex",
+    "isSupport": true
+  },
+  {
+    "id": "ExplosiveGrowthSupport",
+    "name": "Accelerated Growth",
+    "isSupport": true
+  },
+  {
+    "id": "ExplosiveGrowthSupportTwo",
+    "name": "Accelerated Growth II",
+    "isSupport": true
+  },
+  {
+    "id": "AcrimonySupport",
+    "name": "Acrimony",
+    "isSupport": true
+  },
+  {
+    "id": "AdhesiveGrenadesSupport",
+    "name": "Adhesive Grenades I",
+    "isSupport": true
+  },
+  {
+    "id": "AdhesiveGrenadesSupportTwo",
+    "name": "Adhesive Grenades II",
+    "isSupport": true
+  },
+  {
+    "id": "AdmixtureSupport",
+    "name": "Admixture",
+    "isSupport": true
+  },
+  {
+    "id": "AdvancingStormSupport",
+    "name": "Advancing Storm",
+    "isSupport": true
+  },
+  {
+    "id": "AftershockChanceSupport",
+    "name": "Aftershock I",
+    "isSupport": true
+  },
+  {
+    "id": "AftershockChanceSupportTwo",
+    "name": "Aftershock II",
+    "isSupport": true
+  },
+  {
+    "id": "AhnsCitadelSupport",
+    "name": "Ahn's Citadel",
+    "isSupport": true
+  },
+  {
+    "id": "AilithLineageSupport",
+    "name": "Ailith's Chimes",
+    "isSupport": true
+  },
+  {
+    "id": "AlignmentSupport",
+    "name": "Alignment I",
+    "isSupport": true
+  },
+  {
+    "id": "AlignmentSupportTwo",
+    "name": "Alignment II",
+    "isSupport": true
+  },
+  {
+    "id": "AlignmentSupportThree",
+    "name": "Alignment III",
+    "isSupport": true
+  },
+  {
+    "id": "AmanamusTitheSupport",
+    "name": "Amanamu's Tithe",
+    "isSupport": true
+  },
+  {
+    "id": "AmbrosiaSupport",
+    "name": "Ambrosia",
+    "isSupport": true
+  },
+  {
+    "id": "AmbrosiaSupportTwo",
+    "name": "Ambrosia II",
+    "isSupport": true
+  },
+  {
+    "id": "AmbushSupport",
+    "name": "Ambush",
+    "isSupport": true
+  },
+  {
+    "id": "AmmoConservationSupport",
+    "name": "Ammo Conservation I",
+    "isSupport": true
+  },
+  {
+    "id": "AmmoConservationSupportTwo",
+    "name": "Ammo Conservation II",
+    "isSupport": true
+  },
+  {
+    "id": "AmmoConservationSupportThree",
+    "name": "Ammo Conservation III",
+    "isSupport": true
+  },
+  {
+    "id": "AncestralAidSupport",
+    "name": "Ancestral Aid",
+    "isSupport": true
+  },
+  {
+    "id": "AncestralCallSupport",
+    "name": "Ancestral Call I",
+    "isSupport": true
+  },
+  {
+    "id": "AncestralCallSupportTwo",
+    "name": "Ancestral Call II",
+    "isSupport": true
+  },
+  {
+    "id": "ArakaalisLustSupport",
+    "name": "Arakaali's Lust",
+    "isSupport": true
+  },
+  {
+    "id": "ArbitersIngitionSupport",
+    "name": "Arbiter's Ignition",
+    "isSupport": true
+  },
+  {
+    "id": "ArbitersReachSupport",
+    "name": "Arbiter's Reach",
+    "isSupport": true
+  },
+  {
+    "id": "ArcaneSurgeSupport",
+    "name": "Arcane Surge",
+    "isSupport": true
+  },
+  {
+    "id": "AmmoConservationSupportFour",
+    "name": "Arjun's Medal",
+    "isSupport": true
+  },
+  {
+    "id": "ArmourBreakSupport",
+    "name": "Armour Break I",
+    "isSupport": true
+  },
+  {
+    "id": "ArmourBreakSupportTwo",
+    "name": "Armour Break II",
+    "isSupport": true
+  },
+  {
+    "id": "ArmourBreakSupportThree",
+    "name": "Armour Break III",
+    "isSupport": true
+  },
+  {
+    "id": "ArmourDemolisherSupport",
+    "name": "Armour Demolisher I",
+    "isSupport": true
+  },
+  {
+    "id": "ArmourDemolisherSupportTwo",
+    "name": "Armour Demolisher II",
+    "isSupport": true
+  },
+  {
+    "id": "ArmourExplosionSupport",
+    "name": "Armour Explosion",
+    "isSupport": true
+  },
+  {
+    "id": "ArmsLengthSupport",
+    "name": "Arms Length",
+    "isSupport": true
+  },
+  {
+    "id": "AstralProjectionSupport",
+    "name": "Astral Projection",
+    "isSupport": true
+  },
+  {
+    "id": "AtaluiBloodlettingSupport",
+    "name": "Atalui's Bloodletting",
+    "isSupport": true
+  },
+  {
+    "id": "AtzirisAllureSupport",
+    "name": "Atziri's Allure",
+    "isSupport": true
+  },
+  {
+    "id": "AtzirisImpatienceSupport",
+    "name": "Atziri's Impatience",
+    "isSupport": true
+  },
+  {
+    "id": "AutoReloadSupport",
+    "name": "Auto Reload",
+    "isSupport": true
+  },
+  {
+    "id": "BarbsSupport",
+    "name": "Barbs I",
+    "isSupport": true
+  },
+  {
+    "id": "BarbsSupportTwo",
+    "name": "Barbs II",
+    "isSupport": true
+  },
+  {
+    "id": "BarbsSupportThree",
+    "name": "Barbs III",
+    "isSupport": true
+  },
+  {
+    "id": "BattershoutSupport",
+    "name": "Battershout",
+    "isSupport": true
+  },
+  {
+    "id": "BeheadSupport",
+    "name": "Behead I",
+    "isSupport": true
+  },
+  {
+    "id": "BeheadSupportTwo",
+    "name": "Behead II",
+    "isSupport": true
+  },
+  {
+    "id": "BhatairsVengeanceSupport",
+    "name": "Bhatair's Vengeance",
+    "isSupport": true
+  },
+  {
+    "id": "BiddingSupport",
+    "name": "Bidding I",
+    "isSupport": true
+  },
+  {
+    "id": "BiddingSupportTwo",
+    "name": "Bidding II",
+    "isSupport": true
+  },
+  {
+    "id": "BiddingSupportThree",
+    "name": "Bidding III",
+    "isSupport": true
+  },
+  {
+    "id": "BitingFrostSupport",
+    "name": "Biting Frost I",
+    "isSupport": true
+  },
+  {
+    "id": "BitingFrostSupportTwo",
+    "name": "Biting Frost II",
+    "isSupport": true
+  },
+  {
+    "id": "BlazingCriticalSupport",
+    "name": "Blazing Critical",
+    "isSupport": true
+  },
+  {
+    "id": "BleedSupport",
+    "name": "Bleed I",
+    "isSupport": true
+  },
+  {
+    "id": "BleedSupportTwo",
+    "name": "Bleed II",
+    "isSupport": true
+  },
+  {
+    "id": "BleedSupportThree",
+    "name": "Bleed III",
+    "isSupport": true
+  },
+  {
+    "id": "BleedSupportFour",
+    "name": "Bleed IV",
+    "isSupport": true
+  },
+  {
+    "id": "BlindSupport",
+    "name": "Blind I",
+    "isSupport": true
+  },
+  {
+    "id": "BlindSupportTwo",
+    "name": "Blind II",
+    "isSupport": true
+  },
+  {
+    "id": "BlindsideSupport",
+    "name": "Blindside",
+    "isSupport": true
+  },
+  {
+    "id": "BloodlustSupport",
+    "name": "Bloodlust",
+    "isSupport": true
+  },
+  {
+    "id": "BoneShrapnelSupport",
+    "name": "Bone Shrapnel",
+    "isSupport": true
+  },
+  {
+    "id": "BoundlessEnergySupport",
+    "name": "Boundless Energy I",
+    "isSupport": true
+  },
+  {
+    "id": "BoundlessEnergySupportTwo",
+    "name": "Boundless Energy II",
+    "isSupport": true
+  },
+  {
+    "id": "BountySupport",
+    "name": "Bounty I",
+    "isSupport": true
+  },
+  {
+    "id": "BountySupportTwo",
+    "name": "Bounty II",
+    "isSupport": true
+  },
+  {
+    "id": "BrambleslamSupport",
+    "name": "Brambleslam",
+    "isSupport": true
+  },
+  {
+    "id": "BranchingFissuresSupport",
+    "name": "Branching Fissures I",
+    "isSupport": true
+  },
+  {
+    "id": "BranchingFissuresSupportTwo",
+    "name": "Branching Fissures II",
+    "isSupport": true
+  },
+  {
+    "id": "BreachlordsAmalgamSupport",
+    "name": "Breachlord's Amalgam",
+    "isSupport": true
+  },
+  {
+    "id": "BrinkSupport",
+    "name": "Brink I",
+    "isSupport": true
+  },
+  {
+    "id": "BrinkSupportTwo",
+    "name": "Brink II",
+    "isSupport": true
+  },
+  {
+    "id": "BrittleArmourSupport",
+    "name": "Brittle Armour",
+    "isSupport": true
+  },
+  {
+    "id": "BrutalitySupport",
+    "name": "Brutality I",
+    "isSupport": true
+  },
+  {
+    "id": "BrutalitySupportTwo",
+    "name": "Brutality II",
+    "isSupport": true
+  },
+  {
+    "id": "BrutalitySupportThree",
+    "name": "Brutality III",
+    "isSupport": true
+  },
+  {
+    "id": "BrutusBrainSupport",
+    "name": "Brutus' Brain",
+    "isSupport": true
+  },
+  {
+    "id": "BurgeonSupport",
+    "name": "Burgeon I",
+    "isSupport": true
+  },
+  {
+    "id": "BurgeonSupportTwo",
+    "name": "Burgeon II",
+    "isSupport": true
+  },
+  {
+    "id": "BurningRunesSupport",
+    "name": "Burning Inscription",
+    "isSupport": true
+  },
+  {
+    "id": "SupportBurstingPlague",
+    "name": "Bursting Plague",
+    "isSupport": true
+  },
+  {
+    "id": "CadenceSupport",
+    "name": "Cadence",
+    "isSupport": true
+  },
+  {
+    "id": "CaltropsSupport",
+    "name": "Caltrops",
+    "isSupport": true
+  },
+  {
+    "id": "CannibalismSupport",
+    "name": "Cannibalism I",
+    "isSupport": true
+  },
+  {
+    "id": "CannibalismSupportTwo",
+    "name": "Cannibalism II",
+    "isSupport": true
+  },
+  {
+    "id": "CatalysingElementsSupport",
+    "name": "Catalysing Elements",
+    "isSupport": true
+  },
+  {
+    "id": "CathasBrillianceSupport",
+    "name": "Catha's Brilliance",
+    "isSupport": true
+  },
+  {
+    "id": "CatharsisSupport",
+    "name": "Catharsis",
+    "isSupport": true
+  },
+  {
+    "id": "ChainSupport",
+    "name": "Chain I",
+    "isSupport": true
+  },
+  {
+    "id": "ChainSupportTwo",
+    "name": "Chain II",
+    "isSupport": true
+  },
+  {
+    "id": "ChainSupportThree",
+    "name": "Chain III",
+    "isSupport": true
+  },
+  {
+    "id": "AddedChaosDamageSupport",
+    "name": "Chaos Attunement",
+    "isSupport": true
+  },
+  {
+    "id": "ChaosMasterySupport",
+    "name": "Chaos Mastery",
+    "isSupport": true
+  },
+  {
+    "id": "ChaoticFreezeSupport",
+    "name": "Chaotic Freeze",
+    "isSupport": true
+  },
+  {
+    "id": "ChargeProfusionSupport",
+    "name": "Charge Profusion I",
+    "isSupport": true
+  },
+  {
+    "id": "ChargeProfusionSupportTwo",
+    "name": "Charge Profusion II",
+    "isSupport": true
+  },
+  {
+    "id": "ChargedMarkSupport",
+    "name": "Charged Mark",
+    "isSupport": true
+  },
+  {
+    "id": "ChargedShotsSupport",
+    "name": "Charged Shots I",
+    "isSupport": true
+  },
+  {
+    "id": "ChargedShotsSupportTwo",
+    "name": "Charged Shots II",
+    "isSupport": true
+  },
+  {
+    "id": "CharmBountySupport",
+    "name": "Charm Bounty",
+    "isSupport": true
+  },
+  {
+    "id": "CirelsCultivationSupport",
+    "name": "Cirel's Cultivation",
+    "isSupport": true
+  },
+  {
+    "id": "ClaritySupport",
+    "name": "Clarity I",
+    "isSupport": true
+  },
+  {
+    "id": "ClaritySupportTwo",
+    "name": "Clarity II",
+    "isSupport": true
+  },
+  {
+    "id": "ClashSupport",
+    "name": "Clash",
+    "isSupport": true
+  },
+  {
+    "id": "CloseCombatSupport",
+    "name": "Close Combat I",
+    "isSupport": true
+  },
+  {
+    "id": "CloseCombatSupportTwo",
+    "name": "Close Combat II",
+    "isSupport": true
+  },
+  {
+    "id": "AddedColdDamageSupport",
+    "name": "Cold Attunement",
+    "isSupport": true
+  },
+  {
+    "id": "ColdExposureSupport",
+    "name": "Cold Exposure",
+    "isSupport": true
+  },
+  {
+    "id": "ColdMasterySupport",
+    "name": "Cold Mastery",
+    "isSupport": true
+  },
+  {
+    "id": "ColdPenetrationSupport",
+    "name": "Cold Penetration",
+    "isSupport": true
+  },
+  {
+    "id": "ComboFinisherSupport",
+    "name": "Combo Finisher I",
+    "isSupport": true
+  },
+  {
+    "id": "ComboFinisherSupportTwo",
+    "name": "Combo Finisher II",
+    "isSupport": true
+  },
+  {
+    "id": "CommandmentSupport",
+    "name": "Commandment",
+    "isSupport": true
+  },
+  {
+    "id": "CommiserateSupport",
+    "name": "Commiserate",
+    "isSupport": true
+  },
+  {
+    "id": "CompressedDurationSupport",
+    "name": "Compressed Duration I",
+    "isSupport": true
+  },
+  {
+    "id": "CompressedDurationSupportTwo",
+    "name": "Compressed Duration II",
+    "isSupport": true
+  },
+  {
+    "id": "ConcentratedAreaSupport",
+    "name": "Concentrated Area",
+    "isSupport": true
+  },
+  {
+    "id": "ConcoctSupport",
+    "name": "Concoct I",
+    "isSupport": true
+  },
+  {
+    "id": "ConcoctSupportTwo",
+    "name": "Concoct II",
+    "isSupport": true
+  },
+  {
+    "id": "ConcussiveRunesSupport",
+    "name": "Concussive Runes",
+    "isSupport": true
+  },
+  {
+    "id": "ConcussiveSpellsSupport",
+    "name": "Concussive Spells",
+    "isSupport": true
+  },
+  {
+    "id": "ConsideredCastingSupport",
+    "name": "Considered Casting",
+    "isSupport": true
+  },
+  {
+    "id": "ControlledDestructionSupport",
+    "name": "Controlled Destruction",
+    "isSupport": true
+  },
+  {
+    "id": "ControlledHazardSupport",
+    "name": "Controlled Hazard",
+    "isSupport": true
+  },
+  {
+    "id": "CoolHeadedSupport",
+    "name": "Cool Headed",
+    "isSupport": true
+  },
+  {
+    "id": "CooldownRecoverySupport",
+    "name": "Cooldown Recovery I",
+    "isSupport": true
+  },
+  {
+    "id": "CooldownRecoverySupportTwo",
+    "name": "Cooldown Recovery II",
+    "isSupport": true
+  },
+  {
+    "id": "CorpseConservationSupport",
+    "name": "Corpse Conservation",
+    "isSupport": true
+  },
+  {
+    "id": "Corrosion",
+    "name": "Corrosion",
+    "isSupport": true
+  },
+  {
+    "id": "CorruptingCrySupport",
+    "name": "Corrupting Cry I",
+    "isSupport": true
+  },
+  {
+    "id": "CorruptingCrySupportTwo",
+    "name": "Corrupting Cry II",
+    "isSupport": true
+  },
+  {
+    "id": "DeadlyCurrentSupport",
+    "name": "Coursing Current",
+    "isSupport": true
+  },
+  {
+    "id": "CracklingBarrierSupport",
+    "name": "Crackling Barrier",
+    "isSupport": true
+  },
+  {
+    "id": "CraterSupport",
+    "name": "Crater",
+    "isSupport": true
+  },
+  {
+    "id": "CrazedMinionsSupport",
+    "name": "Crazed Minions",
+    "isSupport": true
+  },
+  {
+    "id": "CreepingChillSupport",
+    "name": "Creeping Chill",
+    "isSupport": true
+  },
+  {
+    "id": "CrescendoSupport",
+    "name": "Crescendo I",
+    "isSupport": true
+  },
+  {
+    "id": "CrescendoSupportTwo",
+    "name": "Crescendo II",
+    "isSupport": true
+  },
+  {
+    "id": "CrescendoSupportThree",
+    "name": "Crescendo III",
+    "isSupport": true
+  },
+  {
+    "id": "CrystallineShardsSupport",
+    "name": "Crystalline Shards",
+    "isSupport": true
+  },
+  {
+    "id": "CullingStrikeSupport",
+    "name": "Culling Strike I",
+    "isSupport": true
+  },
+  {
+    "id": "CullingStrikeSupportTwo",
+    "name": "Culling Strike II",
+    "isSupport": true
+  },
+  {
+    "id": "CulminationSupport",
+    "name": "Culmination I",
+    "isSupport": true
+  },
+  {
+    "id": "CulminationSupportTwo",
+    "name": "Culmination II",
+    "isSupport": true
+  },
+  {
+    "id": "CursedGroundSupport",
+    "name": "Cursed Ground",
+    "isSupport": true
+  },
+  {
+    "id": "DanseMacabreSupport",
+    "name": "Danse Macabre",
+    "isSupport": true
+  },
+  {
+    "id": "DaressosPassionSupport",
+    "name": "Daresso's Passion",
+    "isSupport": true
+  },
+  {
+    "id": "DauntlessSupport",
+    "name": "Dauntless",
+    "isSupport": true
+  },
+  {
+    "id": "DazeSupport",
+    "name": "Daze",
+    "isSupport": true
+  },
+  {
+    "id": "DeadlyHeraldsSupport",
+    "name": "Deadly Herald",
+    "isSupport": true
+  },
+  {
+    "id": "DeadlyPoisonSupport",
+    "name": "Deadly Poison I",
+    "isSupport": true
+  },
+  {
+    "id": "DeadlyPoisonSupportTwo",
+    "name": "Deadly Poison II",
+    "isSupport": true
+  },
+  {
+    "id": "DeathmarchSupport",
+    "name": "Deathmarch",
+    "isSupport": true
+  },
+  {
+    "id": "DecayingHexSupport",
+    "name": "Decaying Hex",
+    "isSupport": true
+  },
+  {
+    "id": "DeepCutsSupport",
+    "name": "Deep Cuts I",
+    "isSupport": true
+  },
+  {
+    "id": "DeepCutsSupportTwo",
+    "name": "Deep Cuts II",
+    "isSupport": true
+  },
+  {
+    "id": "LastingFrostSupport",
+    "name": "Deep Freeze",
+    "isSupport": true
+  },
+  {
+    "id": "DefySupport",
+    "name": "Defy I",
+    "isSupport": true
+  },
+  {
+    "id": "DefySupportTwo",
+    "name": "Defy II",
+    "isSupport": true
+  },
+  {
+    "id": "DelayedGratificationSupport",
+    "name": "Delayed Gratification",
+    "isSupport": true
+  },
+  {
+    "id": "DelayedReactionSupport",
+    "name": "Delayed Reaction",
+    "isSupport": true
+  },
+  {
+    "id": "DeliberationSupport",
+    "name": "Deliberation",
+    "isSupport": true
+  },
+  {
+    "id": "DerangeSupport",
+    "name": "Derange",
+    "isSupport": true
+  },
+  {
+    "id": "DiallasDesireSupport",
+    "name": "Dialla's Desire",
+    "isSupport": true
+  },
+  {
+    "id": "DirestrikeSupport",
+    "name": "Direstrike I",
+    "isSupport": true
+  },
+  {
+    "id": "DirestrikeSupportTwo",
+    "name": "Direstrike II",
+    "isSupport": true
+  },
+  {
+    "id": "PietysMercySupport",
+    "name": "Dominus' Grasp",
+    "isSupport": true
+  },
+  {
+    "id": "DoubleBarrelSupport",
+    "name": "Double Barrel I",
+    "isSupport": true
+  },
+  {
+    "id": "DoubleBarrelSupportTwo",
+    "name": "Double Barrel II",
+    "isSupport": true
+  },
+  {
+    "id": "DoubleBarrelSupportThree",
+    "name": "Double Barrel III",
+    "isSupport": true
+  },
+  {
+    "id": "DrainedAilmentSupport",
+    "name": "Drain Ailments",
+    "isSupport": true
+  },
+  {
+    "id": "DurabilitySupport",
+    "name": "Durability",
+    "isSupport": true
+  },
+  {
+    "id": "EchoingCrySupport",
+    "name": "Echoing Cry",
+    "isSupport": true
+  },
+  {
+    "id": "EfficiencySupport",
+    "name": "Efficiency I",
+    "isSupport": true
+  },
+  {
+    "id": "EfficiencySupportTwo",
+    "name": "Efficiency II",
+    "isSupport": true
+  },
+  {
+    "id": "EinharsBeastriteSupport",
+    "name": "Einhar's Beastrite",
+    "isSupport": true
+  },
+  {
+    "id": "ElectrocuteSupport",
+    "name": "Electrocute",
+    "isSupport": true
+  },
+  {
+    "id": "ShockingRiftSupport",
+    "name": "Electromagnetism",
+    "isSupport": true
+  },
+  {
+    "id": "ElementalArmamentSupport",
+    "name": "Elemental Armament I",
+    "isSupport": true
+  },
+  {
+    "id": "ElementalArmamentSupportTwo",
+    "name": "Elemental Armament II",
+    "isSupport": true
+  },
+  {
+    "id": "ElementalArmamentSupportThree",
+    "name": "Elemental Armament III",
+    "isSupport": true
+  },
+  {
+    "id": "ElementalArmySupport",
+    "name": "Elemental Army",
+    "isSupport": true
+  },
+  {
+    "id": "ElementalDischarge",
+    "name": "Elemental Discharge",
+    "isSupport": true
+  },
+  {
+    "id": "ElementalFocusSupport",
+    "name": "Elemental Focus",
+    "isSupport": true
+  },
+  {
+    "id": "EmbitterSupport",
+    "name": "Embitter",
+    "isSupport": true
+  },
+  {
+    "id": "EncroachingGroundSupport",
+    "name": "Encroaching Ground",
+    "isSupport": true
+  },
+  {
+    "id": "HeavyStunEnduranceSupportOne",
+    "name": "Enduring Impact I",
+    "isSupport": true
+  },
+  {
+    "id": "HeavyStunEnduranceSupportTwo",
+    "name": "Enduring Impact II",
+    "isSupport": true
+  },
+  {
+    "id": "EnergyCapacitorSupport",
+    "name": "Energy Capacitor",
+    "isSupport": true
+  },
+  {
+    "id": "EnergyRetentionSupport",
+    "name": "Energy Retention",
+    "isSupport": true
+  },
+  {
+    "id": "EnragedWarcrySupport",
+    "name": "Enraged Warcry I",
+    "isSupport": true
+  },
+  {
+    "id": "EnragedWarcrySupportTwo",
+    "name": "Enraged Warcry II",
+    "isSupport": true
+  },
+  {
+    "id": "EonyrsThunderSupport",
+    "name": "Eonyr's Thunder",
+    "isSupport": true
+  },
+  {
+    "id": "EscalatingPoisonSupport",
+    "name": "Escalating Poison",
+    "isSupport": true
+  },
+  {
+    "id": "EshsProwessSupport",
+    "name": "Esh's Prowess",
+    "isSupport": true
+  },
+  {
+    "id": "EshsRadianceSupport",
+    "name": "Esh's Radiance",
+    "isSupport": true
+  },
+  {
+    "id": "EssenceHarvestSupport",
+    "name": "Essence Harvest",
+    "isSupport": true
+  },
+  {
+    "id": "IgniteDurationSupport",
+    "name": "Eternal Flame I",
+    "isSupport": true
+  },
+  {
+    "id": "IgniteDurationSupportTwo",
+    "name": "Eternal Flame II",
+    "isSupport": true
+  },
+  {
+    "id": "IgniteDurationSupportThree",
+    "name": "Eternal Flame III",
+    "isSupport": true
+  },
+  {
+    "id": "EternalMarkSupport",
+    "name": "Eternal Mark",
+    "isSupport": true
+  },
+  {
+    "id": "ExciseSupport",
+    "name": "Excise",
+    "isSupport": true
+  },
+  {
+    "id": "ExecrateSupport",
+    "name": "Execrate",
+    "isSupport": true
+  },
+  {
+    "id": "ExecuteSupport",
+    "name": "Execute I",
+    "isSupport": true
+  },
+  {
+    "id": "ExecuteSupportTwo",
+    "name": "Execute II",
+    "isSupport": true
+  },
+  {
+    "id": "ExecuteSupportThree",
+    "name": "Execute III",
+    "isSupport": true
+  },
+  {
+    "id": "ExpandSupport",
+    "name": "Expand",
+    "isSupport": true
+  },
+  {
+    "id": "ExpanseSupport",
+    "name": "Expanse",
+    "isSupport": true
+  },
+  {
+    "id": "ExploitWeaknessSupport",
+    "name": "Exploit Weakness",
+    "isSupport": true
+  },
+  {
+    "id": "ExposingCrySupport",
+    "name": "Exposing Cry",
+    "isSupport": true
+  },
+  {
+    "id": "ExtractionSupport",
+    "name": "Extraction",
+    "isSupport": true
+  },
+  {
+    "id": "FanTheFlamesSupport",
+    "name": "Fan The Flames",
+    "isSupport": true
+  },
+  {
+    "id": "FanTheFlamesSupportTwo",
+    "name": "Fan The Flames II",
+    "isSupport": true
+  },
+  {
+    "id": "FeedingFrenzySupport",
+    "name": "Feeding Frenzy I",
+    "isSupport": true
+  },
+  {
+    "id": "FeedingFrenzySupportTwo",
+    "name": "Feeding Frenzy II",
+    "isSupport": true
+  },
+  {
+    "id": "FerocitySupport",
+    "name": "Ferocity",
+    "isSupport": true
+  },
+  {
+    "id": "FieryDeathSupport",
+    "name": "Fiery Death",
+    "isSupport": true
+  },
+  {
+    "id": "AddedFireDamageSupport",
+    "name": "Fire Attunement",
+    "isSupport": true
+  },
+  {
+    "id": "FireExposureSupport",
+    "name": "Fire Exposure",
+    "isSupport": true
+  },
+  {
+    "id": "FireMasterySupport",
+    "name": "Fire Mastery",
+    "isSupport": true
+  },
+  {
+    "id": "FirePenetrationSupport",
+    "name": "Fire Penetration I",
+    "isSupport": true
+  },
+  {
+    "id": "FirePenetrationSupportTwo",
+    "name": "Fire Penetration II",
+    "isSupport": true
+  },
+  {
+    "id": "FistOfKalguurSupport",
+    "name": "Fist Of Kalguur",
+    "isSupport": true
+  },
+  {
+    "id": "FistOfWarSupport",
+    "name": "Fist of War I",
+    "isSupport": true
+  },
+  {
+    "id": "FistOfWarSupportTwo",
+    "name": "Fist of War II",
+    "isSupport": true
+  },
+  {
+    "id": "FistOfWarSupportThree",
+    "name": "Fist of War III",
+    "isSupport": true
+  },
+  {
+    "id": "FlamePillarSupport",
+    "name": "Flame Pillar",
+    "isSupport": true
+  },
+  {
+    "id": "FlamepierceSupport",
+    "name": "Flamepierce",
+    "isSupport": true
+  },
+  {
+    "id": "FlukeSupport",
+    "name": "Fluke",
+    "isSupport": true
+  },
+  {
+    "id": "FocusedCurseSupport",
+    "name": "Focused Curse",
+    "isSupport": true
+  },
+  {
+    "id": "BloodFountainSupport",
+    "name": "Font of Blood",
+    "isSupport": true
+  },
+  {
+    "id": "ManaFountainSupport",
+    "name": "Font of Mana",
+    "isSupport": true
+  },
+  {
+    "id": "ForkSupport",
+    "name": "Fork",
+    "isSupport": true
+  },
+  {
+    "id": "WallFortress",
+    "name": "Fortress I",
+    "isSupport": true
+  },
+  {
+    "id": "WallFortressTwo",
+    "name": "Fortress II",
+    "isSupport": true
+  },
+  {
+    "id": "FreezeSupport",
+    "name": "Freeze",
+    "isSupport": true
+  },
+  {
+    "id": "FreezeForkSupport",
+    "name": "Freezefork",
+    "isSupport": true
+  },
+  {
+    "id": "FrenziedRiposteSupport",
+    "name": "Frenzied Riposte",
+    "isSupport": true
+  },
+  {
+    "id": "FreshClipSupport",
+    "name": "Fresh Clip I",
+    "isSupport": true
+  },
+  {
+    "id": "FreshClipSupportTwo",
+    "name": "Fresh Clip II",
+    "isSupport": true
+  },
+  {
+    "id": "ChillingIceSupport",
+    "name": "Frost Nexus",
+    "isSupport": true
+  },
+  {
+    "id": "FrostfireSupport",
+    "name": "Frostfire",
+    "isSupport": true
+  },
+  {
+    "id": "FrozenSpiteSupport",
+    "name": "Frozen Spite",
+    "isSupport": true
+  },
+  {
+    "id": "GambleshotSupport",
+    "name": "Gambleshot",
+    "isSupport": true
+  },
+  {
+    "id": "GarukhansResolveSupport",
+    "name": "Garukhan's Resolve",
+    "isSupport": true
+  },
+  {
+    "id": "GlacierSupport",
+    "name": "Glacier",
+    "isSupport": true
+  },
+  {
+    "id": "GuatelitzisAblationSupport",
+    "name": "Guatelitzi's Ablation",
+    "isSupport": true
+  },
+  {
+    "id": "HaemocrystalsSupport",
+    "name": "Haemocrystals",
+    "isSupport": true
+  },
+  {
+    "id": "HardyTotemsSupport",
+    "name": "Hardy Totems I",
+    "isSupport": true
+  },
+  {
+    "id": "HardyTotemsSupportTwo",
+    "name": "Hardy Totems II",
+    "isSupport": true
+  },
+  {
+    "id": "FleetingRemnantsSupport",
+    "name": "Harmonic Remnants I",
+    "isSupport": true
+  },
+  {
+    "id": "FleetingRemnantsSupportTwo",
+    "name": "Harmonic Remnants II",
+    "isSupport": true
+  },
+  {
+    "id": "HayoxisFulminationSupport",
+    "name": "Hayoxi's Fulmination",
+    "isSupport": true
+  },
+  {
+    "id": "HealingRunesSupport",
+    "name": "Healing Runes",
+    "isSupport": true
+  },
+  {
+    "id": "MeleePhysicalDamageSupport",
+    "name": "Heavy Swing",
+    "isSupport": true
+  },
+  {
+    "id": "HeftSupport",
+    "name": "Heft",
+    "isSupport": true
+  },
+  {
+    "id": "HeightenedAccuracySupport",
+    "name": "Heightened Accuracy I",
+    "isSupport": true
+  },
+  {
+    "id": "HeightenedAccuracySupportTwo",
+    "name": "Heightened Accuracy II",
+    "isSupport": true
+  },
+  {
+    "id": "HeightenedChargesSupport",
+    "name": "Heightened Charges",
+    "isSupport": true
+  },
+  {
+    "id": "CurseEffectSupport",
+    "name": "Heightened Curse",
+    "isSupport": true
+  },
+  {
+    "id": "HelbrymsHideSupport",
+    "name": "Helbrym's Hide",
+    "isSupport": true
+  },
+  {
+    "id": "HerDeclarationSupport",
+    "name": "Her Declaration",
+    "isSupport": true
+  },
+  {
+    "id": "HerbalismSupport",
+    "name": "Herbalism I",
+    "isSupport": true
+  },
+  {
+    "id": "HerbalismSupportTwo",
+    "name": "Herbalism II",
+    "isSupport": true
+  },
+  {
+    "id": "HexBloomSupport",
+    "name": "Hex Bloom",
+    "isSupport": true
+  },
+  {
+    "id": "HitAndRunSupport",
+    "name": "Hit and Run",
+    "isSupport": true
+  },
+  {
+    "id": "HolyDescentSupport",
+    "name": "Holy Descent",
+    "isSupport": true
+  },
+  {
+    "id": "HourglassSupport",
+    "name": "Hourglass",
+    "isSupport": true
+  },
+  {
+    "id": "HulkingMinionsSupport",
+    "name": "Hulking Minions",
+    "isSupport": true
+  },
+  {
+    "id": "IceBiteSupport",
+    "name": "Ice Bite I",
+    "isSupport": true
+  },
+  {
+    "id": "IceBiteSupportTwo",
+    "name": "Ice Bite II",
+    "isSupport": true
+  },
+  {
+    "id": "IcicleSupport",
+    "name": "Icicle",
+    "isSupport": true
+  },
+  {
+    "id": "IgniteSupport",
+    "name": "Ignite I",
+    "isSupport": true
+  },
+  {
+    "id": "IgniteSupportTwo",
+    "name": "Ignite II",
+    "isSupport": true
+  },
+  {
+    "id": "IgniteSupportThree",
+    "name": "Ignite III",
+    "isSupport": true
+  },
+  {
+    "id": "ImmolateSupport",
+    "name": "Immolate",
+    "isSupport": true
+  },
+  {
+    "id": "ImpactShockwaveSupport",
+    "name": "Impact Shockwave",
+    "isSupport": true
+  },
+  {
+    "id": "ImpaleSupport",
+    "name": "Impale",
+    "isSupport": true
+  },
+  {
+    "id": "ImpendingDoomSupport",
+    "name": "Impending Doom",
+    "isSupport": true
+  },
+  {
+    "id": "IncisionSupport",
+    "name": "Incision",
+    "isSupport": true
+  },
+  {
+    "id": "InevitableCriticalsSupport",
+    "name": "Inexorable Critical I",
+    "isSupport": true
+  },
+  {
+    "id": "InevitableCriticalsSupportTwo",
+    "name": "Inexorable Critical II",
+    "isSupport": true
+  },
+  {
+    "id": "InfernalLegionSupport",
+    "name": "Infernal Legion I",
+    "isSupport": true
+  },
+  {
+    "id": "InfernalLegionSupportTwo",
+    "name": "Infernal Legion II",
+    "isSupport": true
+  },
+  {
+    "id": "InfernalLegionSupportThree",
+    "name": "Infernal Legion III",
+    "isSupport": true
+  },
+  {
+    "id": "ChargeInhibitionSupport",
+    "name": "Inhibitor",
+    "isSupport": true
+  },
+  {
+    "id": "InnervateSupport",
+    "name": "Innervate",
+    "isSupport": true
+  },
+  {
+    "id": "IntenseAgonySupport",
+    "name": "Intense Agony",
+    "isSupport": true
+  },
+  {
+    "id": "FlukeSupportTwo",
+    "name": "Ixchel's Torment",
+    "isSupport": true
+  },
+  {
+    "id": "JaggedGroundSupport",
+    "name": "Jagged Ground I",
+    "isSupport": true
+  },
+  {
+    "id": "JaggedGroundSupportTwo",
+    "name": "Jagged Ground II",
+    "isSupport": true
+  },
+  {
+    "id": "KalisasCrescendoSupport",
+    "name": "Kalisa's Crescendo",
+    "isSupport": true
+  },
+  {
+    "id": "KaomsMadnessSupport",
+    "name": "Kaom's Madness",
+    "isSupport": true
+  },
+  {
+    "id": "KhatalsRejuvenationSupport",
+    "name": "Khatal's Rejuvenation",
+    "isSupport": true
+  },
+  {
+    "id": "KnockbackSupport",
+    "name": "Knockback",
+    "isSupport": true
+  },
+  {
+    "id": "KulemaksDominionSupport",
+    "name": "Kulemak's Dominion",
+    "isSupport": true
+  },
+  {
+    "id": "KurgalsLeashSupport",
+    "name": "Kurgal's Leash",
+    "isSupport": true
+  },
+  {
+    "id": "LastGaspSupport",
+    "name": "Last Gasp",
+    "isSupport": true
+  },
+  {
+    "id": "LastingGroundSupport",
+    "name": "Lasting Ground",
+    "isSupport": true
+  },
+  {
+    "id": "LastingShockSupport",
+    "name": "Lasting Shock",
+    "isSupport": true
+  },
+  {
+    "id": "LifeFlaskSupport",
+    "name": "Life Bounty",
+    "isSupport": true
+  },
+  {
+    "id": "LifeOnCullSupport",
+    "name": "Life Drain",
+    "isSupport": true
+  },
+  {
+    "id": "LifeLeechSupport",
+    "name": "Life Leech I",
+    "isSupport": true
+  },
+  {
+    "id": "LifeLeechSupportTwo",
+    "name": "Life Leech II",
+    "isSupport": true
+  },
+  {
+    "id": "LifeLeechSupportThree",
+    "name": "Life Leech III",
+    "isSupport": true
+  },
+  {
+    "id": "BloodMagicSupport",
+    "name": "Lifetap",
+    "isSupport": true
+  },
+  {
+    "id": "AddedLightningDamageSupport",
+    "name": "Lightning Attunement",
+    "isSupport": true
+  },
+  {
+    "id": "LightningExposureSupport",
+    "name": "Lightning Exposure",
+    "isSupport": true
+  },
+  {
+    "id": "LightningMasterySupport",
+    "name": "Lightning Mastery",
+    "isSupport": true
+  },
+  {
+    "id": "LightningPenetrationSupport",
+    "name": "Lightning Penetration",
+    "isSupport": true
+  },
+  {
+    "id": "LivingLightningSupport",
+    "name": "Living Lightning",
+    "isSupport": true
+  },
+  {
+    "id": "LivingLightningSupportTwo",
+    "name": "Living Lightning II",
+    "isSupport": true
+  },
+  {
+    "id": "LockdownSupport",
+    "name": "Lockdown",
+    "isSupport": true
+  },
+  {
+    "id": "LongFuseSupport",
+    "name": "Long Fuse I",
+    "isSupport": true
+  },
+  {
+    "id": "LongFuseSupportTwo",
+    "name": "Long Fuse II",
+    "isSupport": true
+  },
+  {
+    "id": "FarCombatSupport",
+    "name": "Longshot I",
+    "isSupport": true
+  },
+  {
+    "id": "FarCombatSupportTwo",
+    "name": "Longshot II",
+    "isSupport": true
+  },
+  {
+    "id": "LoyaltySupport",
+    "name": "Loyalty",
+    "isSupport": true
+  },
+  {
+    "id": "MagneticRemnantsSupport",
+    "name": "Magnetic Remnants",
+    "isSupport": true
+  },
+  {
+    "id": "MagnifiedAreaSupport",
+    "name": "Magnified Area I",
+    "isSupport": true
+  },
+  {
+    "id": "MagnifiedAreaSupportTwo",
+    "name": "Magnified Area II",
+    "isSupport": true
+  },
+  {
+    "id": "MaimSupport",
+    "name": "Maim",
+    "isSupport": true
+  },
+  {
+    "id": "MaladySupport",
+    "name": "Malady",
+    "isSupport": true
+  },
+  {
+    "id": "ManaFlaskSupport",
+    "name": "Mana Bounty",
+    "isSupport": true
+  },
+  {
+    "id": "ManaFlareSupport",
+    "name": "Mana Flare",
+    "isSupport": true
+  },
+  {
+    "id": "ManaLeechSupport",
+    "name": "Mana Leech",
+    "isSupport": true
+  },
+  {
+    "id": "MarkForDeathSupport",
+    "name": "Mark for Death",
+    "isSupport": true
+  },
+  {
+    "id": "MarkForDeathSupportTwo",
+    "name": "Mark for Death II",
+    "isSupport": true
+  },
+  {
+    "id": "MarkOfSiphoningSupport",
+    "name": "Mark of Siphoning",
+    "isSupport": true
+  },
+  {
+    "id": "MarkOfSiphoningSupportTwo",
+    "name": "Mark of Siphoning II",
+    "isSupport": true
+  },
+  {
+    "id": "MeatShieldSupport",
+    "name": "Meat Shield I",
+    "isSupport": true
+  },
+  {
+    "id": "MeatShieldSupportTwo",
+    "name": "Meat Shield II",
+    "isSupport": true
+  },
+  {
+    "id": "MedvedsFellingSupport",
+    "name": "Medved's Felling",
+    "isSupport": true
+  },
+  {
+    "id": "MinionInstabilitySupport",
+    "name": "Minion Instability",
+    "isSupport": true
+  },
+  {
+    "id": "MinionMasterySupport",
+    "name": "Minion Mastery",
+    "isSupport": true
+  },
+  {
+    "id": "MinionPactSupport",
+    "name": "Minion Pact I",
+    "isSupport": true
+  },
+  {
+    "id": "MinionPactSupportTwo",
+    "name": "Minion Pact II",
+    "isSupport": true
+  },
+  {
+    "id": "MinionMeleeSplashSupport",
+    "name": "Minion Splash I",
+    "isSupport": true
+  },
+  {
+    "id": "MinionMeleeSplashSupportTwo",
+    "name": "Minion Splash II",
+    "isSupport": true
+  },
+  {
+    "id": "MobilitySupport",
+    "name": "Mobility",
+    "isSupport": true
+  },
+  {
+    "id": "MomentumSupport",
+    "name": "Momentum",
+    "isSupport": true
+  },
+  {
+    "id": "MorganasTempestSupport",
+    "name": "Morgana's Tempest",
+    "isSupport": true
+  },
+  {
+    "id": "MorrigansInsightSupport",
+    "name": "Morrigan's Insight",
+    "isSupport": true
+  },
+  {
+    "id": "MultishotSupport",
+    "name": "Multishot I",
+    "isSupport": true
+  },
+  {
+    "id": "MultishotSupportTwo",
+    "name": "Multishot II",
+    "isSupport": true
+  },
+  {
+    "id": "EmpoweredCullSupport",
+    "name": "Murderous Intent",
+    "isSupport": true
+  },
+  {
+    "id": "MusterSupport",
+    "name": "Muster",
+    "isSupport": true
+  },
+  {
+    "id": "MysticismSupport",
+    "name": "Mysticism I",
+    "isSupport": true
+  },
+  {
+    "id": "MysticismSupportTwo",
+    "name": "Mysticism II",
+    "isSupport": true
+  },
+  {
+    "id": "NeuralOverload",
+    "name": "Neural Overload",
+    "isSupport": true
+  },
+  {
+    "id": "NimbleReloadSupport",
+    "name": "Nimble Reload",
+    "isSupport": true
+  },
+  {
+    "id": "NovaProjectilesSupport",
+    "name": "Nova Projectiles I",
+    "isSupport": true
+  },
+  {
+    "id": "NovaProjectilesTwoSupport",
+    "name": "Nova Projectiles II",
+    "isSupport": true
+  },
+  {
+    "id": "OisinsOathSupport",
+    "name": "Oisin's Oath",
+    "isSupport": true
+  },
+  {
+    "id": "OlrothsConvictionSupport",
+    "name": "Olroth's Conviction",
+    "isSupport": true
+  },
+  {
+    "id": "OlrothsHubrisSupport",
+    "name": "Olroth's Hubris",
+    "isSupport": true
+  },
+  {
+    "id": "OpeningMoveSupport",
+    "name": "Opening Move",
+    "isSupport": true
+  },
+  {
+    "id": "IncreaseLimitSupport",
+    "name": "Overabundance I",
+    "isSupport": true
+  },
+  {
+    "id": "IncreaseLimitSupportTwo",
+    "name": "Overabundance II",
+    "isSupport": true
+  },
+  {
+    "id": "OverchargeSupport",
+    "name": "Overcharge",
+    "isSupport": true
+  },
+  {
+    "id": "OverextendSupport",
+    "name": "Overextend",
+    "isSupport": true
+  },
+  {
+    "id": "OverreachSupport",
+    "name": "Overreach",
+    "isSupport": true
+  },
+  {
+    "id": "CorruptingCrySupportThree",
+    "name": "Paquate's Pact",
+    "isSupport": true
+  },
+  {
+    "id": "PayloadSupport",
+    "name": "Payload",
+    "isSupport": true
+  },
+  {
+    "id": "PerfectEnduranceSupport",
+    "name": "Perfected Endurance",
+    "isSupport": true
+  },
+  {
+    "id": "PerfectionSupport",
+    "name": "Perfection",
+    "isSupport": true
+  },
+  {
+    "id": "PerpetualCharge",
+    "name": "Perpetual Charge",
+    "isSupport": true
+  },
+  {
+    "id": "PersistentGroundSupport",
+    "name": "Persistent Ground I",
+    "isSupport": true
+  },
+  {
+    "id": "PersistentGroundSupportTwo",
+    "name": "Persistent Ground II",
+    "isSupport": true
+  },
+  {
+    "id": "PersistentGroundSupportThree",
+    "name": "Persistent Ground III",
+    "isSupport": true
+  },
+  {
+    "id": "PhysicalMasterySupport",
+    "name": "Physical Mastery",
+    "isSupport": true
+  },
+  {
+    "id": "PierceSupport",
+    "name": "Pierce I",
+    "isSupport": true
+  },
+  {
+    "id": "PierceSupportTwo",
+    "name": "Pierce II",
+    "isSupport": true
+  },
+  {
+    "id": "PierceSupportThree",
+    "name": "Pierce III",
+    "isSupport": true
+  },
+  {
+    "id": "PinSupport",
+    "name": "Pin I",
+    "isSupport": true
+  },
+  {
+    "id": "PinSupportTwo",
+    "name": "Pin II",
+    "isSupport": true
+  },
+  {
+    "id": "PinSupportThree",
+    "name": "Pin III",
+    "isSupport": true
+  },
+  {
+    "id": "PinpointCritical",
+    "name": "Pinpoint Critical",
+    "isSupport": true
+  },
+  {
+    "id": "PoisonSupport",
+    "name": "Poison I",
+    "isSupport": true
+  },
+  {
+    "id": "PoisonSupportTwo",
+    "name": "Poison II",
+    "isSupport": true
+  },
+  {
+    "id": "PoisonSupportThree",
+    "name": "Poison III",
+    "isSupport": true
+  },
+  {
+    "id": "PoisonSporesSupport",
+    "name": "Poison Spores",
+    "isSupport": true
+  },
+  {
+    "id": "PotentExposureSupport",
+    "name": "Potent Exposure",
+    "isSupport": true
+  },
+  {
+    "id": "PracticalMagicSupport",
+    "name": "Practical Magic I",
+    "isSupport": true
+  },
+  {
+    "id": "PracticalMagicSupportTwo",
+    "name": "Practical Magic II",
+    "isSupport": true
+  },
+  {
+    "id": "PracticedComboSupport",
+    "name": "Practiced Combo",
+    "isSupport": true
+  },
+  {
+    "id": "PrecisionSupport",
+    "name": "Precision I",
+    "isSupport": true
+  },
+  {
+    "id": "PrecisionSupportTwo",
+    "name": "Precision II",
+    "isSupport": true
+  },
+  {
+    "id": "ProfanitySupport",
+    "name": "Profanity I",
+    "isSupport": true
+  },
+  {
+    "id": "ProfanitySupportTwo",
+    "name": "Profanity II",
+    "isSupport": true
+  },
+  {
+    "id": "ProjectileAccelerationSupport",
+    "name": "Projectile Acceleration I",
+    "isSupport": true
+  },
+  {
+    "id": "ProjectileAccelerationSupportTwo",
+    "name": "Projectile Acceleration II",
+    "isSupport": true
+  },
+  {
+    "id": "ProjectileAccelerationSupportThree",
+    "name": "Projectile Acceleration III",
+    "isSupport": true
+  },
+  {
+    "id": "ProjectileDecelerationSupport",
+    "name": "Projectile Deceleration I",
+    "isSupport": true
+  },
+  {
+    "id": "ProjectileDecelerationSupportTwo",
+    "name": "Projectile Deceleration II",
+    "isSupport": true
+  },
+  {
+    "id": "ProlongedDurationSupport",
+    "name": "Prolonged Duration I",
+    "isSupport": true
+  },
+  {
+    "id": "ProlongedDurationSupportTwo",
+    "name": "Prolonged Duration II",
+    "isSupport": true
+  },
+  {
+    "id": "PrototypeSeventeenSupport",
+    "name": "Prototype Seventeen",
+    "isSupport": true
+  },
+  {
+    "id": "PunchThroughSupport",
+    "name": "Punch Through",
+    "isSupport": true
+  },
+  {
+    "id": "PursuitSupport",
+    "name": "Pursuit I",
+    "isSupport": true
+  },
+  {
+    "id": "PursuitSupportTwo",
+    "name": "Pursuit II",
+    "isSupport": true
+  },
+  {
+    "id": "PursuitSupportThree",
+    "name": "Pursuit III",
+    "isSupport": true
+  },
+  {
+    "id": "QuillburstSupport",
+    "name": "Quill Burst",
+    "isSupport": true
+  },
+  {
+    "id": "RageSupport",
+    "name": "Rage I",
+    "isSupport": true
+  },
+  {
+    "id": "RageSupportTwo",
+    "name": "Rage II",
+    "isSupport": true
+  },
+  {
+    "id": "RageSupportThree",
+    "name": "Rage III",
+    "isSupport": true
+  },
+  {
+    "id": "RageforgedSupport",
+    "name": "Rageforged I",
+    "isSupport": true
+  },
+  {
+    "id": "RageforgedSupportTwo",
+    "name": "Rageforged II",
+    "isSupport": true
+  },
+  {
+    "id": "RagingCrySupport",
+    "name": "Raging Cry",
+    "isSupport": true
+  },
+  {
+    "id": "RakiatasFlowSupport",
+    "name": "Rakiata's Flow",
+    "isSupport": true
+  },
+  {
+    "id": "RapidAttacksSupport",
+    "name": "Rapid Attacks I",
+    "isSupport": true
+  },
+  {
+    "id": "RapidAttacksSupportTwo",
+    "name": "Rapid Attacks II",
+    "isSupport": true
+  },
+  {
+    "id": "RapidAttacksSupportThree",
+    "name": "Rapid Attacks III",
+    "isSupport": true
+  },
+  {
+    "id": "RapidCastingSupport",
+    "name": "Rapid Casting I",
+    "isSupport": true
+  },
+  {
+    "id": "RapidCastingSupportTwo",
+    "name": "Rapid Casting II",
+    "isSupport": true
+  },
+  {
+    "id": "RapidCastingSupportThree",
+    "name": "Rapid Casting III",
+    "isSupport": true
+  },
+  {
+    "id": "CombatReloadSupport",
+    "name": "Ratha's Assault",
+    "isSupport": true
+  },
+  {
+    "id": "RearmSupport",
+    "name": "Rearm I",
+    "isSupport": true
+  },
+  {
+    "id": "RearmSupportTwo",
+    "name": "Rearm II",
+    "isSupport": true
+  },
+  {
+    "id": "RefractionSupport",
+    "name": "Refraction I",
+    "isSupport": true
+  },
+  {
+    "id": "RefractionSupportTwo",
+    "name": "Refraction II",
+    "isSupport": true
+  },
+  {
+    "id": "RefractionSupportThree",
+    "name": "Refraction III",
+    "isSupport": true
+  },
+  {
+    "id": "ReinforcedTotemsSupport",
+    "name": "Reinforced Totems I",
+    "isSupport": true
+  },
+  {
+    "id": "ReinforcedTotemsSupportTwo",
+    "name": "Reinforced Totems II",
+    "isSupport": true
+  },
+  {
+    "id": "RelentlessRageSupport",
+    "name": "Relentless Rage",
+    "isSupport": true
+  },
+  {
+    "id": "RemnantPotencySupport",
+    "name": "Remnant Potency I",
+    "isSupport": true
+  },
+  {
+    "id": "RemnantPotencySupportTwo",
+    "name": "Remnant Potency II",
+    "isSupport": true
+  },
+  {
+    "id": "RemnantPotencySupportThree",
+    "name": "Remnant Potency III",
+    "isSupport": true
+  },
+  {
+    "id": "RendingApexSupport",
+    "name": "Rending Apex",
+    "isSupport": true
+  },
+  {
+    "id": "RetaliateSupport",
+    "name": "Retaliate I",
+    "isSupport": true
+  },
+  {
+    "id": "RetaliateSupportTwo",
+    "name": "Retaliate II",
+    "isSupport": true
+  },
+  {
+    "id": "RetreatSupport",
+    "name": "Retreat I",
+    "isSupport": true
+  },
+  {
+    "id": "RetreatSupportTwo",
+    "name": "Retreat II",
+    "isSupport": true
+  },
+  {
+    "id": "RetreatSupportThree",
+    "name": "Retreat III",
+    "isSupport": true
+  },
+  {
+    "id": "ReverberateSupport",
+    "name": "Reverberate",
+    "isSupport": true
+  },
+  {
+    "id": "TerrainChainSupport",
+    "name": "Ricochet I",
+    "isSupport": true
+  },
+  {
+    "id": "TerrainChainSupportTwo",
+    "name": "Ricochet II",
+    "isSupport": true
+  },
+  {
+    "id": "RigwaldsFerocitySupport",
+    "name": "Rigwald's Ferocity",
+    "isSupport": true
+  },
+  {
+    "id": "RipSupport",
+    "name": "Rip",
+    "isSupport": true
+  },
+  {
+    "id": "TempestuousTempoSupport",
+    "name": "Rising Tempest",
+    "isSupport": true
+  },
+  {
+    "id": "RitualisticCurseSupport",
+    "name": "Ritualistic Curse",
+    "isSupport": true
+  },
+  {
+    "id": "RuneforgedBladesSupport",
+    "name": "Runeforged Blades",
+    "isSupport": true
+  },
+  {
+    "id": "RunicExtractionSupport",
+    "name": "Runic Extraction",
+    "isSupport": true
+  },
+  {
+    "id": "RunicInfusionSupport",
+    "name": "Runic Infusion",
+    "isSupport": true
+  },
+  {
+    "id": "RuptureSupport",
+    "name": "Rupture",
+    "isSupport": true
+  },
+  {
+    "id": "RustedSpikesSupport",
+    "name": "Rusted Spikes",
+    "isSupport": true
+  },
+  {
+    "id": "RuthlessSupport",
+    "name": "Ruthless",
+    "isSupport": true
+  },
+  {
+    "id": "SacrificialLambSupport",
+    "name": "Sacrificial Lamb I",
+    "isSupport": true
+  },
+  {
+    "id": "SacrificialLambSupportTwo",
+    "name": "Sacrificial Lamb II",
+    "isSupport": true
+  },
+  {
+    "id": "SacrificialOfferingSupport",
+    "name": "Sacrificial Offering",
+    "isSupport": true
+  },
+  {
+    "id": "SalvoSupport",
+    "name": "Salvo",
+    "isSupport": true
+  },
+  {
+    "id": "ScouringFlame",
+    "name": "Scouring Flame",
+    "isSupport": true
+  },
+  {
+    "id": "DeadlyIgnitesSupport",
+    "name": "Searing Flame I",
+    "isSupport": true
+  },
+  {
+    "id": "DeadlyIgnitesSupportTwo",
+    "name": "Searing Flame II",
+    "isSupport": true
+  },
+  {
+    "id": "SecondWindSupport",
+    "name": "Second Wind I",
+    "isSupport": true
+  },
+  {
+    "id": "SecondWindSupportTwo",
+    "name": "Second Wind II",
+    "isSupport": true
+  },
+  {
+    "id": "SecondWindSupportThree",
+    "name": "Second Wind III",
+    "isSupport": true
+  },
+  {
+    "id": "SelflessRemnantsSupport",
+    "name": "Selfless Remnants",
+    "isSupport": true
+  },
+  {
+    "id": "SeraphsHeartSupport",
+    "name": "Seraph's Heart",
+    "isSupport": true
+  },
+  {
+    "id": "ShockSupport",
+    "name": "Shock",
+    "isSupport": true
+  },
+  {
+    "id": "ShockConductionSupport",
+    "name": "Shock Conduction",
+    "isSupport": true
+  },
+  {
+    "id": "ShockConductionSupportTwo",
+    "name": "Shock Conduction II",
+    "isSupport": true
+  },
+  {
+    "id": "EnergyShieldOnShockKillSupport",
+    "name": "Shock Siphon",
+    "isSupport": true
+  },
+  {
+    "id": "ShockingLeapSupport",
+    "name": "Shocking Leap",
+    "isSupport": true
+  },
+  {
+    "id": "ShortFuseSupport",
+    "name": "Short Fuse I",
+    "isSupport": true
+  },
+  {
+    "id": "ShortFuseSupportTwo",
+    "name": "Short Fuse II",
+    "isSupport": true
+  },
+  {
+    "id": "WildshardsSupportThree",
+    "name": "Sione's Temper",
+    "isSupport": true
+  },
+  {
+    "id": "SkitteringStoneSupport",
+    "name": "Skittering Stone I",
+    "isSupport": true
+  },
+  {
+    "id": "SkitteringStoneSupportTwo",
+    "name": "Skittering Stone II",
+    "isSupport": true
+  },
+  {
+    "id": "SlowPotencySupport",
+    "name": "Slow Potency",
+    "isSupport": true
+  },
+  {
+    "id": "ManaOnCullSupport",
+    "name": "Soul Drain",
+    "isSupport": true
+  },
+  {
+    "id": "SparSupport",
+    "name": "Spar",
+    "isSupport": true
+  },
+  {
+    "id": "SpectralVolleySupport",
+    "name": "Spectral Volley",
+    "isSupport": true
+  },
+  {
+    "id": "SpellCascadeSupport",
+    "name": "Spell Cascade",
+    "isSupport": true
+  },
+  {
+    "id": "SpellEchoSupport",
+    "name": "Spell Echo",
+    "isSupport": true
+  },
+  {
+    "id": "SplinteringTotemSupport",
+    "name": "Splinter Totem I",
+    "isSupport": true
+  },
+  {
+    "id": "SplinteringTotemSupportTwo",
+    "name": "Splinter Totem II",
+    "isSupport": true
+  },
+  {
+    "id": "StaticShocksSupport",
+    "name": "Static Shocks",
+    "isSupport": true
+  },
+  {
+    "id": "SteadfastSupport",
+    "name": "Steadfast I",
+    "isSupport": true
+  },
+  {
+    "id": "SteadfastSupportTwo",
+    "name": "Steadfast II",
+    "isSupport": true
+  },
+  {
+    "id": "StoicismSupport",
+    "name": "Stoicism I",
+    "isSupport": true
+  },
+  {
+    "id": "StoicismSupportTwo",
+    "name": "Stoicism II",
+    "isSupport": true
+  },
+  {
+    "id": "StompingGroundSupport",
+    "name": "Stomping Ground",
+    "isSupport": true
+  },
+  {
+    "id": "StormchainSupport",
+    "name": "Stormchain",
+    "isSupport": true
+  },
+  {
+    "id": "StormfireSupport",
+    "name": "Stormfire",
+    "isSupport": true
+  },
+  {
+    "id": "StreamlinedRoundsSupport",
+    "name": "Streamlined Rounds",
+    "isSupport": true
+  },
+  {
+    "id": "StrongHeartedSupport",
+    "name": "Strong Hearted",
+    "isSupport": true
+  },
+  {
+    "id": "StunSupport",
+    "name": "Stun I",
+    "isSupport": true
+  },
+  {
+    "id": "StunSupportTwo",
+    "name": "Stun II",
+    "isSupport": true
+  },
+  {
+    "id": "StunSupportThree",
+    "name": "Stun III",
+    "isSupport": true
+  },
+  {
+    "id": "StyrnsFerocitySupport",
+    "name": "Styrn's Ferocity",
+    "isSupport": true
+  },
+  {
+    "id": "StyrnsMountainSupport",
+    "name": "Styrn's Mountain",
+    "isSupport": true
+  },
+  {
+    "id": "IncreasedCriticalDamageSupport",
+    "name": "Supercritical",
+    "isSupport": true
+  },
+  {
+    "id": "SwiftAfflictionSupport",
+    "name": "Swift Affliction I",
+    "isSupport": true
+  },
+  {
+    "id": "SwiftAfflictionSupportTwo",
+    "name": "Swift Affliction II",
+    "isSupport": true
+  },
+  {
+    "id": "SwiftAfflictionSupportThree",
+    "name": "Swift Affliction III",
+    "isSupport": true
+  },
+  {
+    "id": "SyzygySupport",
+    "name": "Syzygy",
+    "isSupport": true
+  },
+  {
+    "id": "TacatisIreSupport",
+    "name": "Tacati's Ire",
+    "isSupport": true
+  },
+  {
+    "id": "TangmazusThuribleSupport",
+    "name": "Tangmazu's Thurible",
+    "isSupport": true
+  },
+  {
+    "id": "TasaliosRhythmSupport",
+    "name": "Tasalio's Rhythm",
+    "isSupport": true
+  },
+  {
+    "id": "HardyTotemsSupportThree",
+    "name": "Tawhoa's Tending",
+    "isSupport": true
+  },
+  {
+    "id": "TearSupport",
+    "name": "Tear",
+    "isSupport": true
+  },
+  {
+    "id": "TecrodsRevengeSupport",
+    "name": "Tecrod's Revenge",
+    "isSupport": true
+  },
+  {
+    "id": "SlamAftershocksSupport",
+    "name": "Tectonic Slams",
+    "isSupport": true
+  },
+  {
+    "id": "ThornskinSupport",
+    "name": "Thornskin I",
+    "isSupport": true
+  },
+  {
+    "id": "ThornskinSupportTwo",
+    "name": "Thornskin II",
+    "isSupport": true
+  },
+  {
+    "id": "ThrillOfTheKillSupport",
+    "name": "Thrill of the Kill",
+    "isSupport": true
+  },
+  {
+    "id": "ThrillOfTheKillSupportTwo",
+    "name": "Thrill of the Kill II",
+    "isSupport": true
+  },
+  {
+    "id": "TirelessSupport",
+    "name": "Tireless",
+    "isSupport": true
+  },
+  {
+    "id": "TrickstersShardSupport",
+    "name": "Trickster's Shard",
+    "isSupport": true
+  },
+  {
+    "id": "TulsAvalancheSupport",
+    "name": "Tul's Avalanche",
+    "isSupport": true
+  },
+  {
+    "id": "TulsStillnessSupport",
+    "name": "Tul's Stillness",
+    "isSupport": true
+  },
+  {
+    "id": "UhtredAugurySupport",
+    "name": "Uhtred's Augury",
+    "isSupport": true
+  },
+  {
+    "id": "UhtredsConstellationSupport",
+    "name": "Uhtred's Constellation",
+    "isSupport": true
+  },
+  {
+    "id": "UhtredExodusSupport",
+    "name": "Uhtred's Exodus",
+    "isSupport": true
+  },
+  {
+    "id": "UhtredOmenSupport",
+    "name": "Uhtred's Omen",
+    "isSupport": true
+  },
+  {
+    "id": "UhtredsRiteSupport",
+    "name": "Uhtred's Rite",
+    "isSupport": true
+  },
+  {
+    "id": "UndermineSupport",
+    "name": "Undermine",
+    "isSupport": true
+  },
+  {
+    "id": "UnerringPowerSupport",
+    "name": "Unerring Power",
+    "isSupport": true
+  },
+  {
+    "id": "UnleashSupport",
+    "name": "Unleash",
+    "isSupport": true
+  },
+  {
+    "id": "UntouchableSupport",
+    "name": "Untouchable",
+    "isSupport": true
+  },
+  {
+    "id": "UpheavalSupport",
+    "name": "Upheaval I",
+    "isSupport": true
+  },
+  {
+    "id": "UpheavalSupportTwo",
+    "name": "Upheaval II",
+    "isSupport": true
+  },
+  {
+    "id": "UpwellingSupport",
+    "name": "Upwelling I",
+    "isSupport": true
+  },
+  {
+    "id": "UpwellingSupportTwo",
+    "name": "Upwelling II",
+    "isSupport": true
+  },
+  {
+    "id": "UrgentTotemsSupport",
+    "name": "Urgent Totems I",
+    "isSupport": true
+  },
+  {
+    "id": "UrgentTotemsSupportTwo",
+    "name": "Urgent Totems II",
+    "isSupport": true
+  },
+  {
+    "id": "UrgentTotemsSupportThree",
+    "name": "Urgent Totems III",
+    "isSupport": true
+  },
+  {
+    "id": "UruksSmeltingSupport",
+    "name": "Uruk's Smelting",
+    "isSupport": true
+  },
+  {
+    "id": "UulNetolsEmbraceSupport",
+    "name": "Uul-Netol's Embrace",
+    "isSupport": true
+  },
+  {
+    "id": "VanguardSupport",
+    "name": "Vanguard I",
+    "isSupport": true
+  },
+  {
+    "id": "VanguardSupportTwo",
+    "name": "Vanguard II",
+    "isSupport": true
+  },
+  {
+    "id": "VarashtasBlessingSupport",
+    "name": "Varashta's Blessing",
+    "isSupport": true
+  },
+  {
+    "id": "VerglasSupport",
+    "name": "Verglas",
+    "isSupport": true
+  },
+  {
+    "id": "VilentasPropulsionSupport",
+    "name": "Vilenta's Propulsion",
+    "isSupport": true
+  },
+  {
+    "id": "VitalitySupport",
+    "name": "Vitality I",
+    "isSupport": true
+  },
+  {
+    "id": "VitalitySupportTwo",
+    "name": "Vitality II",
+    "isSupport": true
+  },
+  {
+    "id": "VolatilitySupport",
+    "name": "Volatility",
+    "isSupport": true
+  },
+  {
+    "id": "VolcanicEruptionSupport",
+    "name": "Volcanic Eruption",
+    "isSupport": true
+  },
+  {
+    "id": "VoltSupport",
+    "name": "Volt",
+    "isSupport": true
+  },
+  {
+    "id": "VoranasSiegeSupport",
+    "name": "Vorana's Siege",
+    "isSupport": true
+  },
+  {
+    "id": "VruunsAftermathSupport",
+    "name": "Vruun's Aftermath",
+    "isSupport": true
+  },
+  {
+    "id": "VruunsInevitabilitySupport",
+    "name": "Vruun's Inevitability",
+    "isSupport": true
+  },
+  {
+    "id": "WarmBloodedSupport",
+    "name": "Warm Blooded",
+    "isSupport": true
+  },
+  {
+    "id": "WildfireSupport",
+    "name": "Wildfire",
+    "isSupport": true
+  },
+  {
+    "id": "WildshardsSupport",
+    "name": "Wildshards I",
+    "isSupport": true
+  },
+  {
+    "id": "WildshardsSupportTwo",
+    "name": "Wildshards II",
+    "isSupport": true
+  },
+  {
+    "id": "KnockbackWaveSupport",
+    "name": "Wind Wave",
+    "isSupport": true
+  },
+  {
+    "id": "WindowOfOpportunitySupport",
+    "name": "Window of Opportunity I",
+    "isSupport": true
+  },
+  {
+    "id": "WindowOfOpportunitySupportTwo",
+    "name": "Window of Opportunity II",
+    "isSupport": true
+  },
+  {
+    "id": "WitheringTouchSupport",
+    "name": "Withering Touch",
+    "isSupport": true
+  },
+  {
+    "id": "XibaquasRendingSupport",
+    "name": "Xibaqua's Rending",
+    "isSupport": true
+  },
+  {
+    "id": "XophsPyreSupport",
+    "name": "Xoph's Pyre",
+    "isSupport": true
+  },
+  {
+    "id": "ZarokhsRefrainSupport",
+    "name": "Zarokh's Refrain",
+    "isSupport": true
+  },
+  {
+    "id": "ZarokhsRevoltSupport",
+    "name": "Zarokh's Revolt",
+    "isSupport": true
+  },
+  {
+    "id": "ZenithSupport",
+    "name": "Zenith I",
+    "isSupport": true
+  },
+  {
+    "id": "ZenithSupportTwo",
+    "name": "Zenith II",
+    "isSupport": true
+  },
+  {
+    "id": "ZerphisLegacySupport",
+    "name": "Zerphi's Infamy",
+    "isSupport": true
+  }
+]

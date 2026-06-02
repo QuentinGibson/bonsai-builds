@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { buildStorage, BuildSet, Breakpoint } from "../../services/buildStorage";
+import { buildStorage, BuildSet, Breakpoint, type Skill } from "../../services/buildStorage";
 import { useEventBus } from "../../hooks/use-event-bus";
 import { kAppPopups, kAppScreens } from "../../config/enums";
 import { classNames } from "../../utils";
 import { BuildTree } from "../BuildTree/BuildTree";
+import { SkillsEditor } from "../SkillsEditor/SkillsEditor";
 import { parseBuildFile, serializeBuildFile, parseFilename, type BuildFileData } from "../../../convex/build_file";
 import { resolveAscendancy } from "../../services/class-ascendancy-map";
 
@@ -291,6 +292,14 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
   const [editStepName, setEditStepName] = useState("");
   const [editStepOrder, setEditStepOrder] = useState<number>(0);
 
+  const [expandedSkillsStepId, setExpandedSkillsStepId] = useState<string | null>(null);
+
+  const handleSkillsChange = async (step: Breakpoint, skills: Skill[]) => {
+    if (!selectedBuild) return;
+    await buildStorage.updateBreakpoint(selectedBuild.id, step.id, { skills });
+    await refreshBuilds();
+  };
+
   const startEditStep = (step: Breakpoint) => {
     setEditingStepId(step.id);
     setEditStepName(step.name ?? "");
@@ -571,40 +580,63 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
                           </>
                         ) : (
                           <>
-                            <span className="step-name">{step.name || "Unnamed"}</span>
-                            <span className="step-nodes">
-                              {step.passives.length > 0
-                                ? `${step.passives.length} nodes`
-                                : "Empty"}
-                            </span>
-                            <button
-                              className="step-rename"
-                              title="Edit step name and level"
-                              onClick={() => startEditStep(step)}
-                            >
-                              Edit
-                            </button>
-                            <button
-                              className="step-edit-tree"
-                              title="Edit passive tree for this step"
-                              onClick={() => handleEditStepTree(step.id)}
-                            >
-                              Edit Tree
-                            </button>
-                            <button
-                              className="step-export"
-                              title="Export to .build file"
-                              onClick={() => handleExportStep(step)}
-                            >
-                              Export
-                            </button>
-                            <button
-                              className="step-delete"
-                              title="Delete step"
-                              onClick={() => handleDeleteStep(step.id)}
-                            >
-                              ×
-                            </button>
+                            <div className="step-main-row">
+                              <span className="step-name">{step.name || "Unnamed"}</span>
+                              <span className="step-nodes">
+                                {step.passives.length > 0
+                                  ? `${step.passives.length} nodes`
+                                  : "Empty"}
+                              </span>
+                              <button
+                                className={classNames("step-skills-toggle", {
+                                  active: expandedSkillsStepId === step.id,
+                                })}
+                                title="Edit skills for this step"
+                                onClick={() =>
+                                  setExpandedSkillsStepId(
+                                    expandedSkillsStepId === step.id ? null : step.id
+                                  )
+                                }
+                              >
+                                Skills {step.skills.length > 0 && `(${step.skills.length})`}
+                              </button>
+                              <button
+                                className="step-rename"
+                                title="Edit step name and level"
+                                onClick={() => startEditStep(step)}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                className="step-edit-tree"
+                                title="Edit passive tree for this step"
+                                onClick={() => handleEditStepTree(step.id)}
+                              >
+                                Edit Tree
+                              </button>
+                              <button
+                                className="step-export"
+                                title="Export to .build file"
+                                onClick={() => handleExportStep(step)}
+                              >
+                                Export
+                              </button>
+                              <button
+                                className="step-delete"
+                                title="Delete step"
+                                onClick={() => handleDeleteStep(step.id)}
+                              >
+                                ×
+                              </button>
+                            </div>
+                            {expandedSkillsStepId === step.id && (
+                              <div className="step-skills-panel">
+                                <SkillsEditor
+                                  skills={step.skills}
+                                  onChange={(skills) => handleSkillsChange(step, skills)}
+                                />
+                              </div>
+                            )}
                           </>
                         )}
                       </div>

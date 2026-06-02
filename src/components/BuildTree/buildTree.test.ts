@@ -14,6 +14,7 @@ function makeBuild(id: string, order: number, breakpoints: { id: string; order: 
       name: bp.id,
       order: bp.order,
       passives: [],
+      skills: [],
       selectedAscendancy: null,
       createdAt: 0,
     })),

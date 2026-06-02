@@ -1,6 +1,6 @@
 import { mutation } from "./_generated/server";
 import { v } from "convex/values";
-import { passiveNodeValidator } from "./schema";
+import { passiveNodeValidator, skillValidator } from "./schema";
 
 export const add = mutation({
   args: {
@@ -8,6 +8,7 @@ export const add = mutation({
     name: v.string(),
     order: v.optional(v.number()),
     passives: v.array(passiveNodeValidator),
+    skills: v.optional(v.array(skillValidator)),
     selectedAscendancy: v.optional(v.string()),
   },
   handler: async (ctx, { buildSetId, order, ...data }) => {
@@ -37,6 +38,7 @@ export const update = mutation({
     name: v.optional(v.string()),
     order: v.optional(v.number()),
     passives: v.optional(v.array(passiveNodeValidator)),
+    skills: v.optional(v.array(skillValidator)),
     selectedAscendancy: v.optional(v.string()),
   },
   handler: async (ctx, { id, buildSetId, ...updates }) => {

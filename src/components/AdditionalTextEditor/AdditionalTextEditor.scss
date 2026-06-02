@@ -1,0 +1,79 @@
+.AdditionalTextEditor {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .ate-toggle {
+    align-self: flex-start;
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    padding: 1px 0;
+    text-transform: uppercase;
+    transition: color 0.1s;
+
+    &:hover { color: #999; }
+    &.open { color: #aaa; }
+    &.has-content { color: #888; }
+  }
+
+  .ate-toolbar {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .ate-tag-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-size: 10px;
+    cursor: pointer;
+    transition: background 0.1s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+  }
+
+  .ate-textarea {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    color: #ccc;
+    font-family: inherit;
+    font-size: 11px;
+    padding: 6px 8px;
+    resize: vertical;
+    width: 100%;
+    box-sizing: border-box;
+
+    &::placeholder { color: #666; }
+    &:focus {
+      border-color: rgba(255, 255, 255, 0.3);
+      outline: none;
+    }
+  }
+
+  .ate-preview {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    color: #ccc;
+    font-size: 11px;
+    line-height: 1.5;
+    min-height: 24px;
+    padding: 6px 8px;
+
+    .mu-fire      { color: #af6025 !important; }
+    .mu-cold      { color: #3d9dce !important; }
+    .mu-lightning { color: #ffe566 !important; }
+    .mu-physical  { color: #c8c8c8 !important; }
+    .mu-chaos     { color: #d02090 !important; }
+    .mu-magic     { color: #8888ff !important; }
+  }
+}

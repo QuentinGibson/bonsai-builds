@@ -200,6 +200,142 @@ test("breakpoints.add stores passives as objects with weapon_set and additional_
   ]);
 });
 
+test("marketplace.update snapshot includes skills", async () => {
+  const t = convexTest(schema, modules);
+
+  const listingId = await t.mutation(api.marketplace.publish, {
+    authorId: "user-mp-upd",
+    authorName: "Bob",
+    name: "Build",
+    description: "test",
+    className: "Witch",
+    breakpoints: [{ name: "Early", order: 0, passives: [], skills: [] }],
+  });
+
+  await t.mutation(api.marketplace.update, {
+    id: listingId as any,
+    userId: "user-mp-upd",
+    name: "Build",
+    description: "test",
+    className: "Witch",
+    breakpoints: [
+      {
+        name: "Early",
+        order: 0,
+        passives: [],
+        skills: [{ id: "IceNova", level_interval: [1, 20], support_skills: [] }],
+      },
+    ],
+  });
+
+  const listing = await t.query(api.marketplace.get, { id: listingId as any });
+  expect(listing!.breakpoints[0].skills).toEqual([
+    { id: "IceNova", level_interval: [1, 20], support_skills: [] },
+  ]);
+});
+
+test("marketplace.publish snapshot includes skills on each breakpoint", async () => {
+  const t = convexTest(schema, modules);
+
+  const listingId = await t.mutation(api.marketplace.publish, {
+    authorId: "user-mp-skills",
+    authorName: "Alice",
+    name: "Skill Build",
+    description: "test",
+    className: "Witch",
+    breakpoints: [
+      {
+        name: "Mid",
+        order: 0,
+        passives: [],
+        skills: [
+          {
+            id: "IceNova",
+            level_interval: [1, 20],
+            support_skills: [{ id: "AddedFireDamageSupport", level_interval: [1, 20] }],
+          },
+        ],
+      },
+    ],
+  });
+
+  const listing = await t.query(api.marketplace.get, { id: listingId });
+  expect(listing).not.toBeNull();
+  expect(listing!.breakpoints[0].skills).toEqual([
+    {
+      id: "IceNova",
+      level_interval: [1, 20],
+      support_skills: [{ id: "AddedFireDamageSupport", level_interval: [1, 20] }],
+    },
+  ]);
+});
+
+test("breakpoints.update replaces skills", async () => {
+  const t = convexTest(schema, modules);
+
+  const buildSetId = await t.mutation(api.buildSets.create, {
+    userId: "user-skills-update",
+    name: "Skills Build",
+  });
+
+  const bpId = await t.mutation(api.breakpoints.add, {
+    buildSetId,
+    name: "Step",
+    passives: [],
+    skills: [{ id: "IceNova", level_interval: [1, 10], support_skills: [] }],
+  });
+
+  await t.mutation(api.breakpoints.update, {
+    id: bpId as any,
+    buildSetId,
+    skills: [
+      { id: "LeapSlam", level_interval: [5, 20], support_skills: [] },
+    ],
+  });
+
+  const result = await t.query(api.buildSets.get, { id: buildSetId });
+  expect(result!.breakpoints[0].skills).toEqual([
+    { id: "LeapSlam", level_interval: [5, 20], support_skills: [] },
+  ]);
+});
+
+test("breakpoints.add accepts skills and buildSets.get returns them", async () => {
+  const t = convexTest(schema, modules);
+
+  const buildSetId = await t.mutation(api.buildSets.create, {
+    userId: "user-skills",
+    name: "Skills Build",
+  });
+
+  await t.mutation(api.breakpoints.add, {
+    buildSetId,
+    name: "Mid Game",
+    passives: [],
+    skills: [
+      {
+        id: "IceNova",
+        level_interval: [1, 20],
+        support_skills: [
+          { id: "AddedFireDamageSupport", level_interval: [1, 20] },
+        ],
+      },
+    ],
+  });
+
+  const result = await t.query(api.buildSets.get, { id: buildSetId });
+  expect(result).not.toBeNull();
+  const bp = result!.breakpoints[0];
+  expect(bp.skills).toEqual([
+    {
+      id: "IceNova",
+      level_interval: [1, 20],
+      support_skills: [
+        { id: "AddedFireDamageSupport", level_interval: [1, 20] },
+      ],
+    },
+  ]);
+});
+
 test("build file import: className set on BuildSet and selectedAscendancy set on Breakpoint", async () => {
   const key = Object.keys(rawBuildFiles).find((k) => k.includes("warrior-shield-build"))!;
   const raw = (await rawBuildFiles[key]()) as string;
