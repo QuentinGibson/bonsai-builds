@@ -14,12 +14,12 @@ Let build authors copy an entire section (passives, skills, or inventory) from o
 
 ## Acceptance criteria
 
-- [ ] Copying a section stores it in the in-app clipboard
-- [ ] Pasting replaces only the named section on the target Breakpoint; other sections are unchanged
-- [ ] Paste is disabled when source and target BuildSets have different `className`
-- [ ] Disabled paste shows a tooltip explaining the class mismatch
-- [ ] Paste works cross-BuildSet when classes match
-- [ ] `breakpoints.copySection` returns an error for cross-class paste attempts (server-side guard)
+- [x] Copying a section stores it in the in-app clipboard
+- [x] Pasting replaces only the named section on the target Breakpoint; other sections are unchanged
+- [x] Paste is disabled when source and target BuildSets have different `className`
+- [x] Disabled paste shows a tooltip explaining the class mismatch
+- [x] Paste works cross-BuildSet when classes match
+- [x] `breakpoints.copySection` returns an error for cross-class paste attempts (server-side guard)
 
 ## Blocked by
 

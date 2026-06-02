@@ -230,6 +230,18 @@ class BuildStorageService {
     });
   }
 
+  async copyBreakpointSection(
+    sourceId: string,
+    targetId: string,
+    section: "passives" | "skills" | "inventory"
+  ): Promise<void> {
+    await this.#client.mutation(api.breakpoints.copySection, {
+      sourceId: this.#bpId(sourceId),
+      targetId: this.#bpId(targetId),
+      section,
+    });
+  }
+
   async clearBreakpoints(buildSetId: string): Promise<boolean> {
     try {
       await this.#client.mutation(api.breakpoints.clearAll, {

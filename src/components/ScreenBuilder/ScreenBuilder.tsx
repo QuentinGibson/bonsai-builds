@@ -12,6 +12,21 @@ import { buildExportFilename, writeToGameFolder } from "../../services/overwolfF
 
 import "./ScreenBuilder.scss";
 
+// ── Clipboard ─────────────────────────────────────────────────────────────────
+
+type ClipboardEntry = {
+  section: "passives" | "skills" | "inventory";
+  sourceId: string;
+  sourceName: string;
+  sourceBuildSetId: string;
+};
+
+const SECTION_LABELS: Record<ClipboardEntry["section"], string> = {
+  passives: "Passives",
+  skills: "Skills",
+  inventory: "Inventory",
+};
+
 // ── Import dialog state ───────────────────────────────────────────────────────
 
 type ImportDialogState = {
@@ -321,6 +336,33 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
 
   const [expandedSkillsStepId, setExpandedSkillsStepId] = useState<string | null>(null);
   const [expandedInventoryStepId, setExpandedInventoryStepId] = useState<string | null>(null);
+
+  const [clipboard, setClipboard] = useState<ClipboardEntry | null>(null);
+  const [openMenuStepId, setOpenMenuStepId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!openMenuStepId) return;
+    const handler = () => setOpenMenuStepId(null);
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [openMenuStepId]);
+
+  const handleCopySection = (step: Breakpoint, section: ClipboardEntry["section"]) => {
+    if (!selectedBuild) return;
+    setClipboard({ section, sourceId: step.id, sourceName: step.name || "Unnamed", sourceBuildSetId: selectedBuild.id });
+    setOpenMenuStepId(null);
+  };
+
+  const handlePasteSection = async (targetStep: Breakpoint) => {
+    if (!clipboard || !selectedBuild) return;
+    try {
+      await buildStorage.copyBreakpointSection(clipboard.sourceId, targetStep.id, clipboard.section);
+      await refreshBuilds();
+    } catch (err) {
+      console.error("Paste failed:", err);
+    }
+    setOpenMenuStepId(null);
+  };
 
   const handleSkillsChange = async (step: Breakpoint, skills: Skill[]) => {
     if (!selectedBuild) return;
@@ -739,6 +781,47 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
                                   ? "Failed"
                                   : "Export to game"}
                               </button>
+                              <div
+                                className="step-menu-container"
+                                onMouseDown={(e) => e.stopPropagation()}
+                              >
+                                <button
+                                  className={`step-menu-btn${openMenuStepId === step.id ? " open" : ""}`}
+                                  title="Copy / Paste section"
+                                  onClick={() => setOpenMenuStepId(openMenuStepId === step.id ? null : step.id)}
+                                >
+                                  ⋮
+                                </button>
+                                {openMenuStepId === step.id && (() => {
+                                  const sourceBuildSet = clipboard ? builds.find((b) => b.id === clipboard.sourceBuildSetId) : null;
+                                  const pasteDisabled = !clipboard || !sourceBuildSet || sourceBuildSet.className !== (selectedBuild?.className ?? "");
+                                  const pasteTooltip = clipboard && pasteDisabled
+                                    ? `Cannot paste: source class "${sourceBuildSet?.className || "none"}" ≠ "${selectedBuild?.className || "none"}"`
+                                    : clipboard
+                                    ? `Paste ${SECTION_LABELS[clipboard.section]} from "${clipboard.sourceName}"`
+                                    : undefined;
+                                  return (
+                                    <div className="step-menu-dropdown">
+                                      <button className="step-menu-item" onClick={() => handleCopySection(step, "passives")}>Copy Passives</button>
+                                      <button className="step-menu-item" onClick={() => handleCopySection(step, "skills")}>Copy Skills</button>
+                                      <button className="step-menu-item" onClick={() => handleCopySection(step, "inventory")}>Copy Inventory</button>
+                                      {clipboard && (
+                                        <>
+                                          <div className="step-menu-separator" />
+                                          <button
+                                            className="step-menu-item"
+                                            disabled={pasteDisabled}
+                                            title={pasteTooltip}
+                                            onClick={() => !pasteDisabled && handlePasteSection(step)}
+                                          >
+                                            Paste {SECTION_LABELS[clipboard.section]} from &ldquo;{clipboard.sourceName}&rdquo;
+                                          </button>
+                                        </>
+                                      )}
+                                    </div>
+                                  );
+                                })()}
+                              </div>
                               <button
                                 className="step-delete"
                                 title="Delete step"

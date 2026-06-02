@@ -571,3 +571,236 @@ test("breakpoints.reorder does not touch unspecified breakpoints in the same Bui
   expect(byName["Stay"]).toBe(7);
   expect(byName["Move"]).toBe(3);
 });
+
+test("breakpoints.copySection pastes passives onto target; skills and inventory_slots unchanged", async () => {
+  const t = convexTest(schema, modules);
+
+  const buildSetId = await t.mutation(api.buildSets.create, {
+    userId: "user-cp-passives",
+    name: "Copy Passives Test",
+    className: "Warrior",
+  });
+
+  const sourceId = await t.mutation(api.breakpoints.add, {
+    buildSetId,
+    name: "Source",
+    passives: [{ id: "node-src" }],
+    skills: [{ id: "IceNova", level_interval: [1, 10], support_skills: [] }],
+    inventory_slots: [],
+  });
+
+  const targetId = await t.mutation(api.breakpoints.add, {
+    buildSetId,
+    name: "Target",
+    passives: [{ id: "node-tgt" }],
+    skills: [{ id: "LeapSlam", level_interval: [5, 20], support_skills: [] }],
+    inventory_slots: [
+      { inventory_id: "Helm1", level_interval: [1, 20], slot_x: 2, slot_y: 0, additional_text: "" },
+    ],
+  });
+
+  await t.mutation(api.breakpoints.copySection, {
+    sourceId: sourceId as any,
+    targetId: targetId as any,
+    section: "passives",
+  });
+
+  const result = await t.query(api.buildSets.get, { id: buildSetId });
+  const target = result!.breakpoints.find((bp) => bp.name === "Target")!;
+
+  expect(target.passives).toEqual([{ id: "node-src" }]);
+  expect(target.skills).toEqual([{ id: "LeapSlam", level_interval: [5, 20], support_skills: [] }]);
+  expect(target.inventory_slots).toEqual([
+    { inventory_id: "Helm1", level_interval: [1, 20], slot_x: 2, slot_y: 0, additional_text: "" },
+  ]);
+});
+
+test("breakpoints.copySection pastes skills onto target; passives and inventory_slots unchanged", async () => {
+  const t = convexTest(schema, modules);
+
+  const buildSetId = await t.mutation(api.buildSets.create, {
+    userId: "user-cp-skills",
+    name: "Copy Skills Test",
+    className: "Warrior",
+  });
+
+  const sourceId = await t.mutation(api.breakpoints.add, {
+    buildSetId,
+    name: "Source",
+    passives: [{ id: "src-passive" }],
+    skills: [{ id: "IceNova", level_interval: [1, 10], support_skills: [] }],
+    inventory_slots: [],
+  });
+
+  const targetId = await t.mutation(api.breakpoints.add, {
+    buildSetId,
+    name: "Target",
+    passives: [{ id: "tgt-passive" }],
+    skills: [{ id: "LeapSlam", level_interval: [5, 20], support_skills: [] }],
+    inventory_slots: [
+      { inventory_id: "Helm1", level_interval: [1, 20], slot_x: 2, slot_y: 0, additional_text: "" },
+    ],
+  });
+
+  await t.mutation(api.breakpoints.copySection, {
+    sourceId: sourceId as any,
+    targetId: targetId as any,
+    section: "skills",
+  });
+
+  const result = await t.query(api.buildSets.get, { id: buildSetId });
+  const target = result!.breakpoints.find((bp) => bp.name === "Target")!;
+
+  expect(target.skills).toEqual([{ id: "IceNova", level_interval: [1, 10], support_skills: [] }]);
+  expect(target.passives).toEqual([{ id: "tgt-passive" }]);
+  expect(target.inventory_slots).toEqual([
+    { inventory_id: "Helm1", level_interval: [1, 20], slot_x: 2, slot_y: 0, additional_text: "" },
+  ]);
+});
+
+test("breakpoints.copySection pastes inventory_slots onto target; passives and skills unchanged", async () => {
+  const t = convexTest(schema, modules);
+
+  const buildSetId = await t.mutation(api.buildSets.create, {
+    userId: "user-cp-inv",
+    name: "Copy Inventory Test",
+    className: "Warrior",
+  });
+
+  const sourceId = await t.mutation(api.breakpoints.add, {
+    buildSetId,
+    name: "Source",
+    passives: [{ id: "src-passive" }],
+    skills: [{ id: "IceNova", level_interval: [1, 10], support_skills: [] }],
+    inventory_slots: [
+      { inventory_id: "Weapon1", level_interval: [1, 40], slot_x: 0, slot_y: 0, additional_text: "Sword" },
+    ],
+  });
+
+  const targetId = await t.mutation(api.breakpoints.add, {
+    buildSetId,
+    name: "Target",
+    passives: [{ id: "tgt-passive" }],
+    skills: [{ id: "LeapSlam", level_interval: [5, 20], support_skills: [] }],
+    inventory_slots: [
+      { inventory_id: "Ring1", level_interval: [30, 70], slot_x: 1, slot_y: 3, additional_text: "" },
+    ],
+  });
+
+  await t.mutation(api.breakpoints.copySection, {
+    sourceId: sourceId as any,
+    targetId: targetId as any,
+    section: "inventory",
+  });
+
+  const result = await t.query(api.buildSets.get, { id: buildSetId });
+  const target = result!.breakpoints.find((bp) => bp.name === "Target")!;
+
+  expect(target.inventory_slots).toEqual([
+    { inventory_id: "Weapon1", level_interval: [1, 40], slot_x: 0, slot_y: 0, additional_text: "Sword" },
+  ]);
+  expect(target.passives).toEqual([{ id: "tgt-passive" }]);
+  expect(target.skills).toEqual([{ id: "LeapSlam", level_interval: [5, 20], support_skills: [] }]);
+});
+
+test("breakpoints.copySection throws when source and target BuildSets have different className", async () => {
+  const t = convexTest(schema, modules);
+
+  const setA = await t.mutation(api.buildSets.create, {
+    userId: "user-cp-mismatch",
+    name: "Warrior Build",
+    className: "Warrior",
+  });
+  const setB = await t.mutation(api.buildSets.create, {
+    userId: "user-cp-mismatch",
+    name: "Witch Build",
+    className: "Witch",
+  });
+
+  const sourceId = await t.mutation(api.breakpoints.add, {
+    buildSetId: setA,
+    name: "Source",
+    passives: [{ id: "node-src" }],
+  });
+  const targetId = await t.mutation(api.breakpoints.add, {
+    buildSetId: setB,
+    name: "Target",
+    passives: [],
+  });
+
+  await expect(
+    t.mutation(api.breakpoints.copySection, {
+      sourceId: sourceId as any,
+      targetId: targetId as any,
+      section: "passives",
+    })
+  ).rejects.toThrow();
+});
+
+test("breakpoints.copySection works cross-BuildSet when className matches", async () => {
+  const t = convexTest(schema, modules);
+
+  const setA = await t.mutation(api.buildSets.create, {
+    userId: "user-cp-cross",
+    name: "Build A",
+    className: "Warrior",
+  });
+  const setB = await t.mutation(api.buildSets.create, {
+    userId: "user-cp-cross",
+    name: "Build B",
+    className: "Warrior",
+  });
+
+  const sourceId = await t.mutation(api.breakpoints.add, {
+    buildSetId: setA,
+    name: "Source",
+    passives: [{ id: "cross-node" }],
+  });
+  const targetId = await t.mutation(api.breakpoints.add, {
+    buildSetId: setB,
+    name: "Target",
+    passives: [],
+  });
+
+  await t.mutation(api.breakpoints.copySection, {
+    sourceId: sourceId as any,
+    targetId: targetId as any,
+    section: "passives",
+  });
+
+  const result = await t.query(api.buildSets.get, { id: setB });
+  expect(result!.breakpoints[0].passives).toEqual([{ id: "cross-node" }]);
+});
+
+test("breakpoints.copySection bumps updatedAt on target BuildSet", async () => {
+  const t = convexTest(schema, modules);
+
+  const buildSetId = await t.mutation(api.buildSets.create, {
+    userId: "user-cp-ts",
+    name: "Timestamp Test",
+    className: "Warrior",
+  });
+
+  const before = await t.query(api.buildSets.get, { id: buildSetId });
+  const tsBefore = before!.updatedAt;
+
+  const sourceId = await t.mutation(api.breakpoints.add, {
+    buildSetId,
+    name: "Source",
+    passives: [{ id: "ts-node" }],
+  });
+  const targetId = await t.mutation(api.breakpoints.add, {
+    buildSetId,
+    name: "Target",
+    passives: [],
+  });
+
+  await t.mutation(api.breakpoints.copySection, {
+    sourceId: sourceId as any,
+    targetId: targetId as any,
+    section: "passives",
+  });
+
+  const after = await t.query(api.buildSets.get, { id: buildSetId });
+  expect(after!.updatedAt).toBeGreaterThanOrEqual(tsBefore);
+});

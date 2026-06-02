@@ -1,5 +1,6 @@
 import { mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { ConvexError } from "convex/values";
 import { passiveNodeValidator, skillValidator, inventorySlotValidator } from "./schema";
 
 export const add = mutation({
@@ -69,6 +70,35 @@ export const reorder = mutation({
   },
   handler: async (ctx, { updates }) => {
     await Promise.all(updates.map(({ id, order }) => ctx.db.patch(id, { order })));
+  },
+});
+
+export const copySection = mutation({
+  args: {
+    sourceId: v.id("breakpoints"),
+    targetId: v.id("breakpoints"),
+    section: v.union(v.literal("passives"), v.literal("skills"), v.literal("inventory")),
+  },
+  handler: async (ctx, { sourceId, targetId, section }) => {
+    const source = await ctx.db.get(sourceId);
+    const target = await ctx.db.get(targetId);
+    if (!source || !target) throw new ConvexError("Breakpoint not found");
+
+    const sourceBuildSet = await ctx.db.get(source.buildSetId);
+    const targetBuildSet = await ctx.db.get(target.buildSetId);
+    if (!sourceBuildSet || !targetBuildSet) throw new ConvexError("BuildSet not found");
+
+    if ((sourceBuildSet.className ?? "") !== (targetBuildSet.className ?? "")) {
+      throw new ConvexError("Cannot paste section between builds with different classes");
+    }
+
+    const patch: Record<string, unknown> = {};
+    if (section === "passives") patch.passives = source.passives;
+    else if (section === "skills") patch.skills = source.skills ?? [];
+    else patch.inventory_slots = source.inventory_slots ?? [];
+
+    await ctx.db.patch(targetId, patch);
+    await ctx.db.patch(target.buildSetId, { updatedAt: Date.now() });
   },
 });
 
