@@ -2,11 +2,17 @@ import { ConvexHttpClient } from "convex/browser";
 import type { Id } from "../../convex/_generated/dataModel";
 import { api } from "../../convex/_generated/api";
 
+export interface AllocatedNode {
+  id: string;
+  weapon_set?: number;
+  additional_text?: string;
+}
+
 export interface BuildSet {
   id: string;
   name: string;
   className: string;
-  ascendancy: string;
+  order: number;
   createdAt: number;
   updatedAt: number;
   breakpoints: Breakpoint[];
@@ -15,10 +21,9 @@ export interface BuildSet {
 export interface Breakpoint {
   id: string;
   name: string;
-  level: number;
-  allocatedNodes: string[];
+  order: number;
+  allocatedNodes: AllocatedNode[];
   allocatedAscendancyNodes: string[];
-  selectedClass: string | null;
   selectedAscendancy: string | null;
   createdAt: number;
 }
@@ -83,10 +88,11 @@ class BuildStorageService {
     }
   }
 
-  async createBuildSet(name: string): Promise<BuildSet> {
+  async createBuildSet(name: string, order?: number): Promise<BuildSet> {
     const id = await this.#client.mutation(api.buildSets.create, {
       userId: await this.#userId,
       name,
+      order,
     });
     return (await this.getBuildSet(id as string))!;
   }
@@ -97,7 +103,7 @@ class BuildStorageService {
 
   async updateBuildSet(
     id: string,
-    updates: Partial<Pick<BuildSet, "name" | "className" | "ascendancy">>
+    updates: Partial<Pick<BuildSet, "name" | "className" | "order">>
   ): Promise<BuildSet | null> {
     await this.#client.mutation(api.buildSets.update, {
       id: this.#id(id),
@@ -106,9 +112,7 @@ class BuildStorageService {
       ...(updates.className !== undefined
         ? { className: updates.className ?? "" }
         : {}),
-      ...(updates.ascendancy !== undefined
-        ? { ascendancy: updates.ascendancy ?? "" }
-        : {}),
+      ...(updates.order !== undefined ? { order: updates.order } : {}),
     });
     return this.getBuildSet(id);
   }
@@ -124,18 +128,15 @@ class BuildStorageService {
 
   async addBreakpoint(
     buildSetId: string,
-    breakpoint: Omit<Breakpoint, "id" | "createdAt">
+    breakpoint: Omit<Breakpoint, "id" | "createdAt" | "order"> & { order?: number }
   ): Promise<Breakpoint | null> {
     try {
       const id = await this.#client.mutation(api.breakpoints.add, {
         buildSetId: this.#id(buildSetId),
         name: breakpoint.name,
-        level: breakpoint.level,
+        ...(breakpoint.order !== undefined ? { order: breakpoint.order } : {}),
         allocatedNodes: breakpoint.allocatedNodes,
         allocatedAscendancyNodes: breakpoint.allocatedAscendancyNodes,
-        ...(breakpoint.selectedClass != null
-          ? { selectedClass: breakpoint.selectedClass }
-          : {}),
         ...(breakpoint.selectedAscendancy != null
           ? { selectedAscendancy: breakpoint.selectedAscendancy }
           : {}),
@@ -158,7 +159,7 @@ class BuildStorageService {
         id: this.#bpId(breakpointId),
         buildSetId: this.#id(buildSetId),
         ...(updates.name !== undefined ? { name: updates.name } : {}),
-        ...(updates.level !== undefined ? { level: updates.level } : {}),
+        ...(updates.order !== undefined ? { order: updates.order } : {}),
         ...(updates.allocatedNodes !== undefined
           ? { allocatedNodes: updates.allocatedNodes }
           : {}),
@@ -166,9 +167,6 @@ class BuildStorageService {
           ? { allocatedAscendancyNodes: updates.allocatedAscendancyNodes }
           : {}),
         // Empty string clears the field on the server
-        ...(updates.selectedClass !== undefined
-          ? { selectedClass: updates.selectedClass ?? "" }
-          : {}),
         ...(updates.selectedAscendancy !== undefined
           ? { selectedAscendancy: updates.selectedAscendancy ?? "" }
           : {}),
@@ -200,21 +198,6 @@ class BuildStorageService {
     try {
       await this.#client.mutation(api.breakpoints.clearAll, {
         buildSetId: this.#id(buildSetId),
-      });
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  async resetBreakpointsAscendancy(
-    buildSetId: string,
-    newAscendancy: string | null
-  ): Promise<boolean> {
-    try {
-      await this.#client.mutation(api.breakpoints.resetAscendancy, {
-        buildSetId: this.#id(buildSetId),
-        ascendancy: newAscendancy,
       });
       return true;
     } catch {

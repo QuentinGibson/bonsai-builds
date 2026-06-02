@@ -19,16 +19,15 @@ export const getAll = query({
           id: s._id as string,
           name: s.name,
           className: s.className ?? "",
-          ascendancy: s.ascendancy ?? "",
+          order: s.order,
           createdAt: s.createdAt,
           updatedAt: s.updatedAt,
           breakpoints: breakpoints.map((bp) => ({
             id: bp._id as string,
             name: bp.name,
-            level: bp.level,
+            order: bp.order,
             allocatedNodes: bp.allocatedNodes,
             allocatedAscendancyNodes: bp.allocatedAscendancyNodes,
-            selectedClass: bp.selectedClass ?? null,
             selectedAscendancy: bp.selectedAscendancy ?? null,
             createdAt: bp.createdAt,
           })),
@@ -51,16 +50,15 @@ export const get = query({
       id: s._id as string,
       name: s.name,
       className: s.className ?? "",
-      ascendancy: s.ascendancy ?? "",
+      order: s.order,
       createdAt: s.createdAt,
       updatedAt: s.updatedAt,
       breakpoints: breakpoints.map((bp) => ({
         id: bp._id as string,
         name: bp.name,
-        level: bp.level,
+        order: bp.order,
         allocatedNodes: bp.allocatedNodes,
         allocatedAscendancyNodes: bp.allocatedAscendancyNodes,
-        selectedClass: bp.selectedClass ?? null,
         selectedAscendancy: bp.selectedAscendancy ?? null,
         createdAt: bp.createdAt,
       })),
@@ -69,12 +67,13 @@ export const get = query({
 });
 
 export const create = mutation({
-  args: { userId: v.string(), name: v.string() },
-  handler: async (ctx, { userId, name }) => {
+  args: { userId: v.string(), name: v.string(), order: v.optional(v.number()) },
+  handler: async (ctx, { userId, name, order }) => {
     const now = Date.now();
     const id = await ctx.db.insert("buildSets", {
       userId,
       name,
+      order: order ?? 0,
       createdAt: now,
       updatedAt: now,
     });
@@ -82,19 +81,19 @@ export const create = mutation({
   },
 });
 
-// Pass empty string for className/ascendancy to clear the field.
+// Pass empty string for className to clear the field.
 export const update = mutation({
   args: {
     id: v.id("buildSets"),
     name: v.optional(v.string()),
     className: v.optional(v.string()),
-    ascendancy: v.optional(v.string()),
+    order: v.optional(v.number()),
   },
-  handler: async (ctx, { id, name, className, ascendancy }) => {
+  handler: async (ctx, { id, name, className, order }) => {
     const patch: Record<string, unknown> = { updatedAt: Date.now() };
     if (name !== undefined) patch.name = name;
     if (className !== undefined) patch.className = className || undefined;
-    if (ascendancy !== undefined) patch.ascendancy = ascendancy || undefined;
+    if (order !== undefined) patch.order = order;
     await ctx.db.patch(id, patch);
   },
 });

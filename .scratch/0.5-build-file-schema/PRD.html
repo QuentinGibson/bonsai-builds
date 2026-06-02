@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PRD: 0.5 Build File Schema — Full .build Alignment</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0f0f13;
+      color: #d4d0c8;
+      line-height: 1.7;
+      padding: 48px 24px 80px;
+    }
+
+    .container {
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    /* Status badge */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 36px;
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #1a2a1a;
+      border: 1px solid #2d5a2d;
+      color: #5dba5d;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 4px;
+    }
+    .status-badge::before {
+      content: "";
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: #5dba5d;
+      border-radius: 50%;
+    }
+
+    /* Title */
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #f0ece0;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+    .subtitle {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 48px;
+    }
+
+    /* Section headings */
+    h2 {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #8a7f6a;
+      margin: 44px 0 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #1e1e26;
+    }
+
+    /* Body text */
+    p {
+      color: #c4c0b0;
+      margin-bottom: 12px;
+      font-size: 14.5px;
+    }
+
+    /* Inline code */
+    code {
+      font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+      font-size: 12.5px;
+      background: #1a1a24;
+      color: #c8a86a;
+      padding: 1px 5px;
+      border-radius: 3px;
+      border: 1px solid #2a2a36;
+    }
+
+    /* User stories list */
+    ol.stories {
+      list-style: none;
+      counter-reset: story;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    ol.stories li {
+      counter-increment: story;
+      display: flex;
+      gap: 12px;
+      font-size: 14px;
+      color: #c4c0b0;
+      background: #13131a;
+      border: 1px solid #1e1e2a;
+      border-radius: 6px;
+      padding: 10px 14px;
+      line-height: 1.55;
+    }
+    ol.stories li::before {
+      content: counter(story);
+      min-width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #1e1e2c;
+      color: #6a6a8a;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 4px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    ol.stories li strong {
+      color: #a09060;
+    }
+
+    /* Decision items */
+    .decisions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .decision {
+      background: #13131a;
+      border: 1px solid #1e1e2a;
+      border-left: 3px solid #3a3a5a;
+      border-radius: 0 6px 6px 0;
+      padding: 14px 16px;
+    }
+    .decision-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #9090c0;
+      margin-bottom: 6px;
+    }
+    .decision p {
+      font-size: 13.5px;
+      color: #b0acA0;
+      margin: 0;
+    }
+
+    /* Testing blocks */
+    .test-group {
+      margin-bottom: 20px;
+    }
+    .test-group-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #6a6a8a;
+      margin-bottom: 8px;
+    }
+    ul.test-items {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    ul.test-items li {
+      font-size: 13.5px;
+      color: #b0acA0;
+      background: #13131a;
+      border: 1px solid #1e1e2a;
+      border-radius: 6px;
+      padding: 9px 13px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    ul.test-items li::before {
+      content: "→";
+      color: #4a4a6a;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* Out of scope */
+    ul.oos {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    ul.oos li {
+      font-size: 13.5px;
+      color: #888070;
+      display: flex;
+      gap: 10px;
+      padding: 8px 12px;
+      background: #111118;
+      border: 1px solid #1a1a22;
+      border-radius: 6px;
+    }
+    ul.oos li::before {
+      content: "✕";
+      color: #4a3a3a;
+      flex-shrink: 0;
+    }
+    ul.oos li strong {
+      color: #907060;
+    }
+
+    /* Further notes */
+    .notes {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .note {
+      font-size: 13.5px;
+      color: #b0acA0;
+      background: #13131a;
+      border: 1px solid #1e1e2a;
+      border-radius: 6px;
+      padding: 12px 14px;
+      line-height: 1.6;
+    }
+
+    /* Section intro paragraph */
+    .section-intro {
+      font-size: 14px;
+      color: #888070;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #1e1e26;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="status-bar">
+      <span class="status-badge">ready-for-agent</span>
+    </div>
+
+    <h1>PRD: 0.5 Build File Schema<br>Full <code>.build</code> Alignment</h1>
+    <p class="subtitle">Bonsai Builds &mdash; 0.5 pre-launch milestone</p>
+
+    <!-- PROBLEM -->
+    <h2>Problem Statement</h2>
+    <p>
+      Users want to create, edit, save, and share complete Path of Exile 2 build guides in Bonsai Builds.
+      The app currently only models the passive skill tree inside a Breakpoint &mdash; Skills (skill gems + supports + level ranges)
+      and Inventory Slots (gear items + mods + notes) are entirely absent. The passive node representation itself is also
+      misaligned: the <code>.build</code> format stores nodes as <code>{id, weapon_set?}</code> objects in a single array,
+      but the current schema splits them into two bare string arrays (<code>allocatedNodes</code> and <code>allocatedAscendancyNodes</code>).
+    </p>
+    <p>
+      There is no import or export path. A user cannot currently take a build they&rsquo;ve assembled and get a
+      <code>.build</code> file out of the app, nor can they load an existing community build to reference while playing.
+    </p>
+
+    <!-- SOLUTION -->
+    <h2>Solution</h2>
+    <p>
+      Rewrite the Convex schema to model the full <code>.build</code> file structure inside each Breakpoint &mdash;
+      passives, skills, and inventory slots &mdash; exactly as the format expects them. Implement <code>.build</code>
+      import (parsing a dropped or loaded file and creating a Breakpoint from it) and export (serializing a Breakpoint
+      to a downloadable <code>.build</code> file). Build the Skills editor UI (gem picker backed by a bundled
+      <code>gems.json</code>) and the Inventory Slots editor UI (item picker backed by <code>items.json</code>, mod
+      picker backed by <code>mods.json</code>, additional-text notes editor with live preview). Update the Marketplace
+      Listing schema to reflect the new richer Breakpoint shape.
+    </p>
+
+    <!-- USER STORIES -->
+    <h2>User Stories</h2>
+    <ol class="stories">
+      <li><span>As a <strong>build guide author</strong>, I want to import an existing <code>.build</code> file into the app, so that I can build on top of a community build without re-entering everything manually.</span></li>
+      <li><span>As a <strong>build guide author</strong>, I want to choose whether an imported <code>.build</code> becomes a new BuildSet or an additional Breakpoint on an existing BuildSet, so that I can organize related stages of the same build under one guide.</span></li>
+      <li><span>As a <strong>build guide author</strong>, I want to add skill gems to a Breakpoint and search for them by name, so that I don&rsquo;t have to remember or type raw gem metadata IDs.</span></li>
+      <li><span>As a <strong>build guide author</strong>, I want to add support gems to each skill gem, so that I can model the exact gem links a player should use at each stage.</span></li>
+      <li><span>As a <strong>build guide author</strong>, I want to set a level range on each skill and support gem, so that players know exactly when to start using that gem link.</span></li>
+      <li><span>As a <strong>build guide author</strong>, I want to remove a skill gem or support gem from a Breakpoint, so that I can correct mistakes without starting over.</span></li>
+      <li><span>As a <strong>build guide author</strong>, I want to add items to each inventory slot (weapon, offhand, body armour, gloves, boots, helm, rings, amulet, belt, flasks), so that players know what gear to target at each stage.</span></li>
+      <li><span>As a <strong>build guide author</strong>, I want to search for a base item by name when assigning an item to a slot, so that I can quickly find the right base without scrolling a long list.</span></li>
+      <li><span>As a <strong>build guide author</strong>, I want to add mods to an item slot and set their values manually, so that I can specify the exact stat thresholds that matter for the build.</span></li>
+      <li><span>As a <strong>build guide author</strong>, I want to add freeform notes to any inventory slot using POE2&rsquo;s markup syntax (colors, font sizes, newlines), so that I can annotate items with contextual guidance for players.</span></li>
+      <li><span>As a <strong>build guide author</strong>, I want a live preview of my markup notes that renders the colors and formatting, so that I can verify the notes look correct before publishing.</span></li>
+      <li><span>As a <strong>build guide author</strong>, I want a toolbar that inserts markup tags for me, so that I don&rsquo;t have to memorize the tag syntax.</span></li>
+      <li><span>As a <strong>build guide author</strong>, I want to add notes to individual skill gems and support gems, so that I can explain specific gem choices.</span></li>
+      <li><span>As a <strong>build guide author</strong>, I want to add notes to individual passive nodes, so that I can annotate key pathing decisions.</span></li>
+      <li><span>As a <strong>build guide author</strong>, I want passive nodes to carry a weapon-set tag when applicable, so that the exported build correctly separates weapon-set-1 and weapon-set-2 nodes.</span></li>
+      <li><span>As a <strong>build guide author</strong>, I want ascendancy nodes to be stored in the same passives array as regular nodes, so that export produces a valid <code>.build</code> file.</span></li>
+      <li><span>As a <strong>build guide author</strong>, I want to export any Breakpoint to a <code>.build</code> file that downloads to my computer, so that I can use it in-game via Path of Building or the game&rsquo;s own build planner.</span></li>
+      <li><span>As a <strong>build guide author</strong>, I want the class and ascendancy fields combined into the <code>.build</code> format&rsquo;s single <code>ascendancy</code> string (e.g. <code>"Warrior3"</code>) only at export time, so that the app can keep them as separate readable fields internally.</span></li>
+      <li><span>As a <strong>marketplace viewer</strong>, I want to download a community listing as a <code>.build</code> file, so that I can load it into my game.</span></li>
+      <li><span>As a <strong>marketplace viewer</strong>, I want to see the skills and inventory slots for each Breakpoint in a listing, so that I can evaluate a build without downloading it.</span></li>
+      <li><span>As a <strong>player using the Overwolf app</strong>, I want to reference skill gem assignments and gear targets for my current breakpoint, so that I know what to equip without alt-tabbing.</span></li>
+      <li><span>As a <strong>player</strong>, I want the second desktop window to show the same build data including skills and items, so that I can refer to my build on a second monitor.</span></li>
+    </ol>
+
+    <!-- IMPLEMENTATION DECISIONS -->
+    <h2>Implementation Decisions</h2>
+    <div class="decisions">
+
+      <div class="decision">
+        <div class="decision-title">Schema rewrite (no migration)</div>
+        <p>The app is pre-launch. The existing <code>breakpoints</code> table is dropped and recreated. The new Breakpoint schema stores the full <code>.build</code> body: <code>passives</code> as an array of <code>{id, weapon_set?: 0|1, additional_text?}</code>, <code>skills</code> as an array of <code>{id, level_interval, additional_text?, support_skills: [{id, level_interval, additional_text?}]}</code>, and <code>inventory_slots</code> as an array of <code>{inventory_id, level_interval, slot_x, slot_y, additional_text}</code>. The old top-level fields <code>level</code>, <code>allocatedNodes</code>, <code>allocatedAscendancyNodes</code>, <code>selectedClass</code>, and <code>selectedAscendancy</code> are removed.</p>
+      </div>
+
+      <div class="decision">
+        <div class="decision-title">Class / ascendancy encoding</div>
+        <p>BuildSet continues to store <code>className</code> and <code>ascendancy</code> as separate string fields. The combined <code>"Warrior3"</code>-style string is produced only at export time by a pure serialization function. Import parses the combined string back into the two separate fields.</p>
+      </div>
+
+      <div class="decision">
+        <div class="decision-title"><code>.build</code> import</div>
+        <p>A pure <code>parseBuildFile(json: string): BreakpointData</code> function reads the <code>.build</code> JSON and produces the internal Breakpoint shape. Called from a file input or drop target in the UI. After parsing, the user is prompted to create a new BuildSet or append the file as a new Breakpoint to an existing BuildSet.</p>
+      </div>
+
+      <div class="decision">
+        <div class="decision-title"><code>.build</code> export</div>
+        <p>A pure <code>serializeBuildFile(breakpoint: BreakpointData, buildSet: BuildSetMeta): string</code> function produces a valid <code>.build</code> JSON string. Triggered by an &ldquo;Export to computer&rdquo; button per Breakpoint, which fires a blob download. Output must round-trip cleanly through any POE2 build tool that reads the format.</p>
+      </div>
+
+      <div class="decision">
+        <div class="decision-title">Gem database</div>
+        <p>A <code>gems.json</code> file bundled in <code>public/</code> provides the searchable set of valid skill and support gem IDs and display names. The gem picker in the Skills editor searches this list. Gem entries in the schema store the raw metadata <code>id</code> (e.g. <code>"Metadata/Items/Gem/SkillGemShieldWall"</code>) &mdash; the gem database maps these to display names for the UI.</p>
+      </div>
+
+      <div class="decision">
+        <div class="decision-title">Item and mod databases</div>
+        <p><code>items.json</code> and <code>mods.json</code> bundled in <code>public/</code> back the item base picker and mod picker respectively. Items are indexed by slot (<code>inventory_id</code>). The mod picker lets a user select a mod then enter a value; the assembled <code>additional_text</code> string for the slot is the serialized form of base + mods in POE2 markup format.</p>
+      </div>
+
+      <div class="decision">
+        <div class="decision-title">Additional Text editor</div>
+        <p>Shared across Inventory Slots, Skills, Support Gems, and Passive Nodes. Consists of a textarea for raw markup entry, a live preview panel that renders the markup using POE2&rsquo;s tag syntax, and a toolbar for inserting common tags (colors, font sizes, newline). The source of truth is always the raw markup string &mdash; no rich-text editing.</p>
+      </div>
+
+      <div class="decision">
+        <div class="decision-title">Marketplace Listing update</div>
+        <p>The embedded <code>breakpoints</code> array in <code>marketplaceListings</code> mirrors the new Breakpoint shape (passives, skills, inventory_slots). The old fields are removed from the snapshot. The listing schema is rewritten in lockstep with the breakpoints table &mdash; no migration needed.</p>
+      </div>
+
+      <div class="decision">
+        <div class="decision-title">Ad Container constraint</div>
+        <p>All new UI panels (Skills editor, Inventory editor, Additional Text editor, Import modal) must be laid out to avoid covering the bottom-right Ad Container. The Ad Container renders at high z-index and must remain visible at all times.</p>
+      </div>
+
+    </div>
+
+    <!-- TESTING DECISIONS -->
+    <h2>Testing Decisions</h2>
+    <p class="section-intro">Good tests assert on observable outputs (the serialized JSON, the parsed object, what the user sees) &mdash; not on internal state or intermediate representations.</p>
+
+    <div class="test-group">
+      <div class="test-group-title">Highest-seam tests &mdash; pure functions</div>
+      <ul class="test-items">
+        <li><span><code>parseBuildFile</code> &mdash; given the raw JSON of <code>warrior-shield-build.build</code>, assert expected passives count, correct weapon-set tags, correct skill IDs, correct inventory slot <code>additional_text</code>. Round-trip: <code>parseBuildFile(serializeBuildFile(bp))</code> must equal the original Breakpoint.</span></li>
+        <li><span><code>serializeBuildFile</code> &mdash; given a hand-constructed Breakpoint, assert the output JSON is valid and matches the expected structure. Assert that ascendancy nodes are interleaved in <code>passives</code>, the combined <code>ascendancy</code> string is correctly formed, and the output is accepted by a JSON schema derived from the official POE2 build planner docs.</span></li>
+      </ul>
+    </div>
+
+    <div class="test-group">
+      <div class="test-group-title">Convex mutation tests</div>
+      <ul class="test-items">
+        <li><span><code>breakpoints.add</code> with the new schema shape &mdash; assert the returned document matches the input, including nested arrays.</span></li>
+        <li><span><code>breakpoints.update</code> for partial updates to <code>skills</code> and <code>inventory_slots</code> &mdash; assert only the updated field changes.</span></li>
+      </ul>
+    </div>
+
+    <div class="test-group">
+      <div class="test-group-title">Prior art</div>
+      <ul class="test-items">
+        <li><span>Look at any existing Convex mutation tests in the codebase for the shape of test setup. The pure-function tests have no prior art yet; they are plain unit tests and do not need a Convex test harness.</span></li>
+      </ul>
+    </div>
+
+    <!-- OUT OF SCOPE -->
+    <h2>Out of Scope</h2>
+    <ul class="oos">
+      <li><span><strong>Export to game (Overwolf file system API)</strong> &mdash; &ldquo;Export to computer&rdquo; blob download is in scope; writing directly to <code>Preferences/BuildPlanner</code> is not.</span></li>
+      <li><span><strong>Gem level fields on individual gems</strong> &mdash; The <code>.build</code> format stores <code>level_interval</code> (active range) but not the gem&rsquo;s actual level. Gem leveling is out of scope.</span></li>
+      <li><span><strong>Jewel sockets</strong> &mdash; Jewel slot passive nodes are stored as regular passive nodes by ID. Configuring jewels themselves is out of scope.</span></li>
+      <li><span><strong>Flask slot configuration</strong> &mdash; Flask items have their own <code>inventory_id</code>s but finer flask mod configuration is out of scope.</span></li>
+      <li><span><strong>Premium features</strong> &mdash; Marketplace publishing gating behind <code>isPremium</code> is not changed by this work.</span></li>
+      <li><span><strong>Second desktop window layout</strong> &mdash; No separate layout work; verify existing components work with the new data shape.</span></li>
+      <li><span><strong>Additional Text editing UI on Passive Nodes</strong> &mdash; The schema stores <code>additional_text</code> on nodes for format compatibility, but no editing UI for per-node notes is committed to in this PRD.</span></li>
+    </ul>
+
+    <!-- FURTHER NOTES -->
+    <h2>Further Notes</h2>
+    <div class="notes">
+      <div class="note">
+        The reference file at <code>build-examples/warrior-shield-build.build</code> should be used as the primary test fixture for both import and export correctness. It covers weapon-set nodes, ascendancy nodes, multiple skill links with support gems, and inventory slots with multi-line <code>additional_text</code>.
+      </div>
+      <div class="note">
+        The POE2 official build planner documentation (linked in <code>objectives/0.5-update.md</code>) is the authoritative spec for the <code>.build</code> JSON structure. Any field not modeled by the app must pass through losslessly on import/export &mdash; the app must not silently drop unknown fields from a loaded <code>.build</code> file.
+      </div>
+      <div class="note">
+        Class/ascendancy string mapping (e.g. <code>"Warrior3"</code> &rarr; <code>{className: "Warrior", ascendancy: "Titan"}</code>) needs a lookup table derived from Path of Building or the official docs. This table should live as a static constant, not be computed dynamically.
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

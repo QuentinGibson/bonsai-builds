@@ -56,9 +56,9 @@ export function BreakpointTimeline({
 									key={bp.id}
 									className={`timeline-dot ${isActive ? "active" : isPast ? "past" : "future"}`}
 									onClick={() => onSelect(bp.id)}
-									title={`${bp.name} — Level ${bp.level}`}
+									title={bp.name}
 								>
-									<span className="dot-label">L{bp.level}</span>
+									<span className="dot-label">{bp.order + 1}</span>
 									{bp.name && <span className="dot-name">{bp.name}</span>}
 								</button>
 							);

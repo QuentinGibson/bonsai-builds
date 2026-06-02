@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PRD: Build Management Overhaul</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0f0f13;
+      color: #d4d0c8;
+      line-height: 1.7;
+      padding: 48px 24px 80px;
+    }
+
+    .container {
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    /* Status badge */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 36px;
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #1a2a1a;
+      border: 1px solid #2d5a2d;
+      color: #5dba5d;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 4px;
+    }
+    .status-badge::before {
+      content: "";
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: #5dba5d;
+      border-radius: 50%;
+    }
+
+    /* Title */
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #f0ece0;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+    .subtitle {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 48px;
+    }
+
+    /* Section headings */
+    h2 {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #8a7f6a;
+      margin: 44px 0 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #1e1e26;
+    }
+
+    /* Body text */
+    p {
+      color: #c4c0b0;
+      margin-bottom: 12px;
+      font-size: 14.5px;
+    }
+
+    /* Inline code */
+    code {
+      font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+      font-size: 12.5px;
+      background: #1a1a24;
+      color: #c8a86a;
+      padding: 1px 5px;
+      border-radius: 3px;
+      border: 1px solid #2a2a36;
+    }
+
+    /* User stories list */
+    ol.stories {
+      list-style: none;
+      counter-reset: story;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    ol.stories li {
+      counter-increment: story;
+      display: flex;
+      gap: 12px;
+      font-size: 14px;
+      color: #c4c0b0;
+      background: #13131a;
+      border: 1px solid #1e1e2a;
+      border-radius: 6px;
+      padding: 10px 14px;
+      line-height: 1.55;
+    }
+    ol.stories li::before {
+      content: counter(story);
+      min-width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #1e1e2c;
+      color: #6a6a8a;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 4px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    ol.stories li strong {
+      color: #a09060;
+    }
+
+    /* Decision items */
+    .decisions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .decision {
+      background: #13131a;
+      border: 1px solid #1e1e2a;
+      border-left: 3px solid #3a3a5a;
+      border-radius: 0 6px 6px 0;
+      padding: 14px 16px;
+    }
+    .decision-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #9090c0;
+      margin-bottom: 6px;
+    }
+    .decision p {
+      font-size: 13.5px;
+      color: #b0aca0;
+      margin: 0;
+    }
+
+    /* Schema cleanup decisions get a distinct left border colour */
+    .decision.schema {
+      border-left-color: #5a3a3a;
+    }
+    .decision.schema .decision-title {
+      color: #c08080;
+    }
+
+    /* Testing blocks */
+    .test-group {
+      margin-bottom: 20px;
+    }
+    .test-group-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #6a6a8a;
+      margin-bottom: 8px;
+    }
+    ul.test-items {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    ul.test-items li {
+      font-size: 13.5px;
+      color: #b0aca0;
+      background: #13131a;
+      border: 1px solid #1e1e2a;
+      border-radius: 6px;
+      padding: 9px 13px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    ul.test-items li::before {
+      content: "→";
+      color: #4a4a6a;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* Out of scope */
+    ul.oos {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    ul.oos li {
+      font-size: 13.5px;
+      color: #888070;
+      display: flex;
+      gap: 10px;
+      padding: 8px 12px;
+      background: #111118;
+      border: 1px solid #1a1a22;
+      border-radius: 6px;
+    }
+    ul.oos li::before {
+      content: "✕";
+      color: #4a3a3a;
+      flex-shrink: 0;
+    }
+    ul.oos li strong {
+      color: #907060;
+    }
+
+    /* Further notes */
+    .notes {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .note {
+      font-size: 13.5px;
+      color: #b0aca0;
+      background: #13131a;
+      border: 1px solid #1e1e2a;
+      border-radius: 6px;
+      padding: 12px 14px;
+      line-height: 1.6;
+    }
+
+    /* Section intro paragraph */
+    .section-intro {
+      font-size: 14px;
+      color: #888070;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    /* ADR tag */
+    .adr-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: #1a1a2a;
+      border: 1px solid #2a2a40;
+      color: #6a6a9a;
+      padding: 2px 7px;
+      border-radius: 3px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="status-bar">
+      <span class="status-badge">ready-for-agent</span>
+    </div>
+
+    <h1>PRD: Build Management Overhaul</h1>
+    <p class="subtitle">Bonsai Builds &mdash; 0.5 pre-launch milestone &mdash; ADR 0001 &amp; ADR 0002</p>
+
+    <!-- PROBLEM -->
+    <h2>Problem Statement</h2>
+    <p>
+      Build authors have no way to manage their builds as a structured collection. BuildSets and Breakpoints live in a flat
+      list with no visual hierarchy and no way to reorder them. There is no way to reuse a passive setup, skill layout,
+      or gear configuration across related Breakpoints without rebuilding it by hand.
+    </p>
+    <p>
+      Passive nodes cannot have notes added in the UI even though the <code>.build</code> format natively supports it.
+      Exporting a Breakpoint requires leaving the app to manually move the file into the game folder, and importing from
+      the game folder requires navigating a file picker for each file.
+    </p>
+    <p>
+      The schema has stale and incorrect fields (<code>level</code>, <code>selectedClass</code> per Breakpoint, bare-string
+      <code>allocatedNodes</code>) that contradict the domain model and create consistency hazards. Marketplace publishing
+      is blocked behind a premium gate even though no premium tier exists at launch.
+    </p>
+
+    <!-- SOLUTION -->
+    <h2>Solution</h2>
+    <p>
+      Render BuildSets as folders and Breakpoints as files in a drag-reorderable UI. Add section-level copy-paste between
+      Breakpoints so authors can reuse passives, skills, or inventory across stages. Add per-node note editing for passive
+      nodes. Introduce a persistent Game Folder Panel that connects directly to the game&rsquo;s build directory for
+      one-click export and multi-file import. Clean up the schema to match the actual domain model. Remove the premium
+      gate from Marketplace publishing.
+    </p>
+
+    <!-- USER STORIES -->
+    <h2>User Stories</h2>
+    <ol class="stories">
+      <li><span>As a <strong>build author</strong>, I want my builds displayed as folders and my breakpoints displayed as files inside them, so that I can understand the structure of my guide at a glance.</span></li>
+      <li><span>As a <strong>build author</strong>, I want to drag-reorder my builds in the list, so that I can keep my most active guides at the top.</span></li>
+      <li><span>As a <strong>build author</strong>, I want to drag-reorder breakpoints within a build, so that I can arrange them in progression order (e.g. Acts 1&ndash;5 before Endgame).</span></li>
+      <li><span>As a <strong>build author</strong>, I want to copy the passives section from one breakpoint and paste it into another, so that I can reuse a passive tree layout across multiple stages without re-selecting every node.</span></li>
+      <li><span>As a <strong>build author</strong>, I want to copy the skills section from one breakpoint and paste it into another, so that I can propagate a gem setup across breakpoints.</span></li>
+      <li><span>As a <strong>build author</strong>, I want to copy the inventory section from one breakpoint and paste it into another, so that I can reuse a gear configuration across stages.</span></li>
+      <li><span>As a <strong>build author</strong>, I want cross-build section paste to only work between builds of the same class, so that I never accidentally paste Warrior passives into a Sorceress build.</span></li>
+      <li><span>As a <strong>build author</strong>, I want the paste action to be visually disabled when classes don&rsquo;t match, so that I understand immediately why I can&rsquo;t paste.</span></li>
+      <li><span>As a <strong>build author</strong>, I want to add a note to a specific passive node from the UI, so that I can explain why that node is taken at that stage of the build.</span></li>
+      <li><span>As a <strong>build author</strong>, I want passive node notes to support the full POE2 markup syntax with a live preview, so that my notes render consistently with item and skill notes.</span></li>
+      <li><span>As a <strong>build author</strong>, I want a tag toolbar when editing passive node notes, so that I don&rsquo;t have to memorize the markup syntax.</span></li>
+      <li><span>As a <strong>build author</strong>, I want to publish my build to the Marketplace without needing a premium account, so that I can share guides with the community from day one.</span></li>
+      <li><span>As a <strong>player</strong>, I want to export a breakpoint directly to my game&rsquo;s build folder in one click, so that I can load it in-game without manually moving files.</span></li>
+      <li><span>As a <strong>player</strong>, I want the exported filename to follow the <code>{build}~{breakpoint}.build</code> convention, so that reimporting it into Bonsai reconstructs the correct folder and file structure automatically.</span></li>
+      <li><span>As a <strong>player</strong>, I want to open a Game Folder Panel that lists all <code>.build</code> files currently in my game directory, so that I can see available builds without switching windows.</span></li>
+      <li><span>As a <strong>player</strong>, I want the Game Folder Panel to remain open after I import a file, so that I can import multiple builds in a single session.</span></li>
+      <li><span>As a <strong>player</strong>, I want to import a build directly from the Game Folder Panel, so that I don&rsquo;t have to use a file picker for each file.</span></li>
+      <li><span>As a <strong>player</strong>, I want a Bonsai-exported file to automatically map to the correct build and breakpoint on reimport, so that my folder structure is preserved across export and import cycles.</span></li>
+      <li><span>As a <strong>player</strong>, I want a third-party <code>.build</code> file with no <code>~</code> in the name to import as a new build with a single breakpoint named &ldquo;Default&rdquo;, so that the import works even when the file didn&rsquo;t come from Bonsai.</span></li>
+      <li><span>As a <strong>build author</strong>, I want the ascendancy to be settable independently per breakpoint, so that I can document a build that transitions from one ascendancy to another across stages.</span></li>
+      <li><span>As a <strong>build author</strong>, I want the base class to be fixed at the build level and not editable per breakpoint, so that I can never create a breakpoint with an inconsistent class.</span></li>
+    </ol>
+
+    <!-- IMPLEMENTATION DECISIONS -->
+    <h2>Implementation Decisions</h2>
+
+    <p class="section-intro">Schema cleanup decisions are marked <span class="adr-tag">ADR 0002</span>. All others follow from the domain decisions in <span class="adr-tag">ADR 0001</span>.</p>
+
+    <div class="decisions">
+
+      <div class="decision schema">
+        <div class="decision-title">Remove <code>level</code> from Breakpoints <span class="adr-tag">ADR 0002</span></div>
+        <p>The field has no defined purpose &mdash; the glossary states name is the only Breakpoint identifier. Removed from the <code>breakpoints</code> table, the marketplace listing&rsquo;s embedded breakpoint snapshot, and all mutation arguments.</p>
+      </div>
+
+      <div class="decision schema">
+        <div class="decision-title"><code>className</code> belongs to BuildSet only <span class="adr-tag">ADR 0002</span></div>
+        <p>A character&rsquo;s base class cannot change between Breakpoints &mdash; a Warrior stays a Warrior. <code>selectedClass</code> is removed from the <code>breakpoints</code> table and marketplace snapshot. <code>className</code> lives on <code>buildSets</code> only. <code>selectedAscendancy</code> remains per-Breakpoint: ascendancy can legitimately change across stages (e.g. Smith of Kitava &rarr; Berserker). <code>resetAscendancy</code> is removed &mdash; it bulk-reset all Breakpoints simultaneously, which was only coherent when ascendancy was BuildSet-level.</p>
+      </div>
+
+      <div class="decision schema">
+        <div class="decision-title"><code>allocatedNodes</code> upgraded to objects <span class="adr-tag">ADR 0002</span></div>
+        <p>The POE2 <code>.build</code> format&rsquo;s <code>BuildPassive</code> object natively supports <code>{id, weapon_set?, additional_text?}</code>. The schema is corrected from bare strings to match both the glossary and the format spec. All three fields round-trip losslessly through import and export.</p>
+      </div>
+
+      <div class="decision schema">
+        <div class="decision-title">Add <code>order</code> to <code>buildSets</code> and <code>breakpoints</code> <span class="adr-tag">ADR 0002</span></div>
+        <p>Both tables get an <code>order: number</code> field to support drag-to-reorder. Reordering is within-container only &mdash; Breakpoints cannot be dragged between BuildSets. The reorder operation updates only the <code>order</code> fields of the rows involved.</p>
+      </div>
+
+      <div class="decision">
+        <div class="decision-title">Folder / file UI</div>
+        <p>BuildSets render as expandable folder rows. Breakpoints render as indented file rows inside their parent folder. Both support drag-to-reorder within their container. Cross-folder Breakpoint movement is not supported.</p>
+      </div>
+
+      <div class="decision">
+        <div class="decision-title">Section-level copy-paste</div>
+        <p>Three clipboard operations per Breakpoint: <strong>Copy Passives</strong>, <strong>Copy Skills</strong>, <strong>Copy Inventory</strong>. Each copies the full section into an in-memory clipboard. Paste replaces the corresponding section in the target Breakpoint entirely. Cross-build paste is gated on <code>className</code> equality between source and target BuildSet &mdash; the paste action is disabled (not hidden) when classes differ. The target Breakpoint&rsquo;s paste menu shows the source Breakpoint name for confirmation.</p>
+      </div>
+
+      <div class="decision">
+        <div class="decision-title">Passive node note editing</div>
+        <p>The <code>additional_text</code> field on node objects is exposed in the passive tree UI. Clicking a node opens an inline or panel editor using the same markup textarea, live preview, and tag toolbar already built for Inventory Slot and Skill notes. Nodes with no note have <code>additional_text</code> absent from the object &mdash; not stored as an empty string.</p>
+      </div>
+
+      <div class="decision">
+        <div class="decision-title">Export to game (Overwolf file system API)</div>
+        <p>An &ldquo;Export to game&rdquo; button per Breakpoint triggers a write via the Overwolf file system API to <code>Preferences/BuildPlanner</code>. Filename: <code>{BuildSet name}~{Breakpoint name}.build</code> with <code>~</code> stripped from both names at write time. This is distinct from &ldquo;Export to computer&rdquo; (blob download), which remains unchanged.</p>
+      </div>
+
+      <div class="decision">
+        <div class="decision-title">Game Folder Panel</div>
+        <p>A persistent side panel (not a modal) that enumerates all <code>.build</code> files in <code>Preferences/BuildPlanner</code> via the Overwolf file system API. The list is a snapshot taken when the panel opens. Each file shows its filename and an Import button. The panel stays open after import. It must not cover the Ad Container.</p>
+      </div>
+
+      <div class="decision">
+        <div class="decision-title">Filename convention</div>
+        <p>
+          <strong>Write:</strong> strip <code>~</code> from both names, then write <code>{BuildSet name}~{Breakpoint name}.build</code>.<br>
+          <strong>Read:</strong> split on the first <code>~</code>. If no <code>~</code> present, treat the full filename (minus <code>.build</code>) as the BuildSet name and use <code>"Default"</code> for the Breakpoint name.
+        </p>
+      </div>
+
+      <div class="decision">
+        <div class="decision-title">Marketplace publishing gate removed</div>
+        <p>Any UI gate checking <code>isPremium</code> before publishing is removed. The <code>isPremium</code> field stays in the <code>users</code> table for future use. The <code>publish</code> mutation in <code>convex/marketplace.ts</code> already only blocks anonymous users &mdash; no server-side change needed.</p>
+      </div>
+
+    </div>
+
+    <!-- TESTING DECISIONS -->
+    <h2>Testing Decisions</h2>
+    <p class="section-intro">Good tests check observable behavior at the highest stable seam. They do not assert on internal state or intermediate representations.</p>
+
+    <div class="test-group">
+      <div class="test-group-title">Filename parser &mdash; pure function</div>
+      <ul class="test-items">
+        <li><span><code>"ColdSnap~Endgame.build"</code> &rarr; <code>{buildSetName: "ColdSnap", breakpointName: "Endgame"}</code></span></li>
+        <li><span><code>"TornadoShot.build"</code> (no <code>~</code>) &rarr; <code>{buildSetName: "TornadoShot", breakpointName: "Default"}</code></span></li>
+        <li><span><code>"My~Build~Act1.build"</code> (multiple <code>~</code>) &rarr; split on first <code>~</code> only</span></li>
+        <li><span>Export of a BuildSet named <code>"My~Build"</code> &rarr; tilde stripped &rarr; filename <code>"MyBuild~Endgame.build"</code> &rarr; reimport resolves correctly</span></li>
+      </ul>
+    </div>
+
+    <div class="test-group">
+      <div class="test-group-title">Convex mutation tests &mdash; real Convex test environment</div>
+      <ul class="test-items">
+        <li><span><code>buildSets.reorder</code> &mdash; assert <code>order</code> fields update correctly for affected rows only; unrelated BuildSets unchanged</span></li>
+        <li><span><code>breakpoints.reorder</code> &mdash; same, within a single BuildSet</span></li>
+        <li><span><code>breakpoints.add</code> with new shape &mdash; assert <code>allocatedNodes</code> accepts objects; <code>level</code> and <code>selectedClass</code> are rejected</span></li>
+        <li><span>Section copy mutation &mdash; assert the target Breakpoint&rsquo;s section is fully replaced; other sections unchanged; cross-class paste returns an error</span></li>
+      </ul>
+    </div>
+
+    <div class="test-group">
+      <div class="test-group-title">Overwolf FS adapter &mdash; mock Overwolf global</div>
+      <ul class="test-items">
+        <li><span>Assert list / read / write calls pass the correct path and payload through to the Overwolf API</span></li>
+        <li><span>All tests above this layer mock the adapter &mdash; they never touch the real file system</span></li>
+      </ul>
+    </div>
+
+    <!-- OUT OF SCOPE -->
+    <h2>Out of Scope</h2>
+    <ul class="oos">
+      <li><span><strong>Moving a Breakpoint between BuildSets</strong> &mdash; cross-folder drag is not supported; Breakpoints can only be reordered within their own BuildSet.</span></li>
+      <li><span><strong>Item-level copy-paste</strong> &mdash; copying individual passive nodes, skills, or inventory slots rather than whole sections.</span></li>
+      <li><span><strong>Real-time Game Folder sync</strong> &mdash; the panel is a snapshot on open, not a live file watcher.</span></li>
+      <li><span><strong>Premium tier features</strong> &mdash; <code>isPremium</code> stays in schema; no feature is gated by it at launch.</span></li>
+      <li><span><strong>Any <code>.build</code> format version other than POE2 0.5.</strong></span></li>
+    </ul>
+
+    <!-- FURTHER NOTES -->
+    <h2>Further Notes</h2>
+    <div class="notes">
+      <div class="note">
+        See ADR 0001 (<code>.build</code> file as canonical format) and ADR 0002 (Breakpoint schema cleanup) for the rationale behind the schema decisions covered here.
+      </div>
+      <div class="note">
+        The <code>additional_text</code> field on passive nodes is part of the official POE2 <code>BuildPassive</code> spec &mdash; it is not a Bonsai extension. Notes on nodes round-trip through import and export with no special handling required.
+      </div>
+      <div class="note">
+        The app is pre-launch. No user data migration is required &mdash; the schema can be rewritten from scratch.
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

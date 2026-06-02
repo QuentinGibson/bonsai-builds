@@ -8,23 +8,23 @@ import './EditBreakpoint.scss'
 export type EditBreakpointProps = {
   className?: string
   currentName: string
-  currentLevel: number
+  currentOrder: number
   onClose: () => void
-  onSubmit: (name: string, level: number) => void
+  onSubmit: (name: string, order: number) => void
 }
 
-export function EditBreakpoint({ className, currentName, currentLevel, onClose, onSubmit }: EditBreakpointProps) {
+export function EditBreakpoint({ className, currentName, currentOrder, onClose, onSubmit }: EditBreakpointProps) {
   const [name, setName] = useState(currentName)
-  const [level, setLevel] = useState(currentLevel.toString())
+  const [order, setOrder] = useState(currentOrder.toString())
 
   useEffect(() => {
     setName(currentName)
-    setLevel(currentLevel.toString())
-  }, [currentName, currentLevel])
+    setOrder(currentOrder.toString())
+  }, [currentName, currentOrder])
 
   const submit = () => {
     if (isValid) {
-      onSubmit(name, parseInt(level))
+      onSubmit(name, parseInt(order))
       onClose()
     }
   }
@@ -33,14 +33,14 @@ export function EditBreakpoint({ className, currentName, currentLevel, onClose, 
     return name.trim().length > 0 && name.length <= 50
   }, [name])
 
-  const isLevelValid = useMemo(() => {
-    const levelNum = parseInt(level)
-    return !isNaN(levelNum) && levelNum >= 1 && levelNum <= 100
-  }, [level])
+  const isOrderValid = useMemo(() => {
+    const num = parseInt(order)
+    return !isNaN(num) && num >= 0
+  }, [order])
 
   const isValid = useMemo(() => {
-    return isNameValid && isLevelValid
-  }, [isNameValid, isLevelValid])
+    return isNameValid && isOrderValid
+  }, [isNameValid, isOrderValid])
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && isValid) {
@@ -50,16 +50,16 @@ export function EditBreakpoint({ className, currentName, currentLevel, onClose, 
 
   return (
     <div className={classNames('EditBreakpoint', className)}>
-      <h3>Edit Breakpoint</h3>
+      <h3>Edit Step</h3>
 
       <div className="content">
         <div className="form-group">
-          <label htmlFor="breakpoint-name">Breakpoint Name</label>
+          <label htmlFor="breakpoint-name">Step Name</label>
           <input
             id="breakpoint-name"
             className={classNames('text', { invalid: name.length > 0 && !isNameValid })}
             type="text"
-            placeholder="e.g., Level 30, Act 3, Early Game"
+            placeholder="e.g., Early Game, Act 3, Endgame"
             value={name}
             onChange={e => setName(e.target.value)}
             onKeyPress={handleKeyPress}
@@ -69,21 +69,17 @@ export function EditBreakpoint({ className, currentName, currentLevel, onClose, 
         </div>
 
         <div className="form-group">
-          <label htmlFor="breakpoint-level">Character Level</label>
+          <label htmlFor="breakpoint-order">Order</label>
           <input
-            id="breakpoint-level"
-            className={classNames('text', { invalid: level.length > 0 && !isLevelValid })}
+            id="breakpoint-order"
+            className={classNames('text', { invalid: order.length > 0 && !isOrderValid })}
             type="number"
-            placeholder="1-100"
-            min="1"
-            max="100"
-            value={level}
-            onChange={e => setLevel(e.target.value)}
+            placeholder="0, 1, 2, ..."
+            min="0"
+            value={order}
+            onChange={e => setOrder(e.target.value)}
             onKeyPress={handleKeyPress}
           />
-          {level.length > 0 && !isLevelValid && (
-            <div className="error-message">Level must be between 1 and 100</div>
-          )}
         </div>
       </div>
 

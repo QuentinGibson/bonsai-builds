@@ -23,13 +23,13 @@ export interface EventBusEvents {
   closeToast: string
   setFTUESeen: void
   createBuildSet: string
-  createBreakpoint: { name: string; level: number }
-  editBuildSet: { id: string; name: string; ascendancy: string | null }
-  editBreakpoint: { buildSetId: string; breakpointId: string; name: string; level: number }
+  createBreakpoint: { name: string }
+  editBuildSet: { id: string; name: string }
+  editBreakpoint: { buildSetId: string; breakpointId: string; name: string; order: number }
   deleteBuildSet: string
   deleteBreakpoint: { buildSetId: string; breakpointId: string }
-  openEditBuildSet: { id: string; name: string; ascendancy: string | null }
-  openEditBreakpoint: { buildSetId: string; breakpointId: string; name: string; level: number }
+  openEditBuildSet: { id: string; name: string }
+  openEditBreakpoint: { buildSetId: string; breakpointId: string; name: string; order: number }
 }
 
 export interface NoticeAction {

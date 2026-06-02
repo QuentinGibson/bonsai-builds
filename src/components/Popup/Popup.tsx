@@ -24,8 +24,8 @@ export function Popup() {
   const { popup } = useContext(CommonStoreContext)
 
   // State for edit popups
-  const [editBuildSetData, setEditBuildSetData] = useState<{ id: string; name: string; ascendancy: string | null } | null>(null)
-  const [editBreakpointData, setEditBreakpointData] = useState<{ buildSetId: string; breakpointId: string; name: string; level: number } | null>(null)
+  const [editBuildSetData, setEditBuildSetData] = useState<{ id: string; name: string } | null>(null)
+  const [editBreakpointData, setEditBreakpointData] = useState<{ buildSetId: string; breakpointId: string; name: string; order: number } | null>(null)
 
   const setPopup = useCallback((popup: kAppPopups | null) => {
     eventBus.emit('setPopup', popup)
@@ -57,19 +57,18 @@ export function Popup() {
         }} />
         break
       case kAppPopups.AddBreakpoint:
-        el = <AddBreakpoint onClose={() => setPopup(null)} onSubmit={(name, level) => {
+        el = <AddBreakpoint onClose={() => setPopup(null)} onSubmit={(name) => {
           // The onSubmit handler will be set via event bus
-          eventBus.emit('createBreakpoint', { name, level })
+          eventBus.emit('createBreakpoint', { name })
         }} />
         break
       case kAppPopups.EditBuildSet:
         if (editBuildSetData) {
           el = <EditBuildSet
             currentName={editBuildSetData.name}
-            currentAscendancy={editBuildSetData.ascendancy}
             onClose={() => setPopup(null)}
-            onSubmit={(name, ascendancy) => {
-              eventBus.emit('editBuildSet', { id: editBuildSetData.id, name, ascendancy })
+            onSubmit={(name) => {
+              eventBus.emit('editBuildSet', { id: editBuildSetData.id, name })
             }}
           />
         }
@@ -78,14 +77,14 @@ export function Popup() {
         if (editBreakpointData) {
           el = <EditBreakpoint
             currentName={editBreakpointData.name}
-            currentLevel={editBreakpointData.level}
+            currentOrder={editBreakpointData.order}
             onClose={() => setPopup(null)}
-            onSubmit={(name, level) => {
+            onSubmit={(name, order) => {
               eventBus.emit('editBreakpoint', {
                 buildSetId: editBreakpointData.buildSetId,
                 breakpointId: editBreakpointData.breakpointId,
                 name,
-                level
+                order
               })
             }}
           />
@@ -136,12 +135,12 @@ export function Popup() {
 
   // Listen for edit popup events
   useEffect(() => {
-    const handleOpenEditBuildSet = (data: { id: string; name: string; ascendancy: string | null }) => {
+    const handleOpenEditBuildSet = (data: { id: string; name: string }) => {
       setEditBuildSetData(data)
       setPopup(kAppPopups.EditBuildSet)
     }
 
-    const handleOpenEditBreakpoint = (data: { buildSetId: string; breakpointId: string; name: string; level: number }) => {
+    const handleOpenEditBreakpoint = (data: { buildSetId: string; breakpointId: string; name: string; order: number }) => {
       setEditBreakpointData(data)
       setPopup(kAppPopups.EditBreakpoint)
     }

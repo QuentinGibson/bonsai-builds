@@ -3,10 +3,13 @@ import { v } from "convex/values";
 
 const breakpointSnapshot = v.object({
   name: v.string(),
-  level: v.number(),
-  allocatedNodes: v.array(v.string()),
+  order: v.number(),
+  allocatedNodes: v.array(v.object({
+    id: v.string(),
+    weapon_set: v.optional(v.number()),
+    additional_text: v.optional(v.string()),
+  })),
   allocatedAscendancyNodes: v.array(v.string()),
-  selectedClass: v.optional(v.string()),
   selectedAscendancy: v.optional(v.string()),
 });
 
@@ -77,7 +80,7 @@ export const publish = mutation({
     authorName: v.string(),
     name: v.string(),
     description: v.string(),
-    className: v.optional(v.string()),
+    className: v.string(),
     ascendancy: v.optional(v.string()),
     breakpoints: v.array(breakpointSnapshot),
   },

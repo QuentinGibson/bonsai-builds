@@ -8,7 +8,7 @@ type Props = {
 	currentBuildSetId: string | null;
 	onSelect: (id: string) => void;
 	onNew: () => void;
-	onEdit: (id: string, name: string, ascendancy: string | null) => void;
+	onEdit: (id: string, name: string) => void;
 	onDelete: (id: string) => void;
 	onClose: () => void;
 };
@@ -16,24 +16,12 @@ type Props = {
 function getCardMeta(buildSet: BuildSet) {
 	const { breakpoints } = buildSet;
 
-	// Prefer the build-level ascendancy; fall back to the first breakpoint's
 	const ascendancy =
-		buildSet.ascendancy ??
 		(breakpoints.length > 0
-			? [...breakpoints].sort((a, b) => a.level - b.level)[0].selectedAscendancy
-			: null) ??
-		null;
+			? [...breakpoints].sort((a, b) => a.order - b.order)[0].selectedAscendancy
+			: null) ?? null;
 
-	if (breakpoints.length === 0) {
-		return { ascendancy, levelRange: null, stepCount: 0 };
-	}
-
-	const sorted = [...breakpoints].sort((a, b) => a.level - b.level);
-	const minLevel = sorted[0].level;
-	const maxLevel = sorted[sorted.length - 1].level;
-	const levelRange = minLevel === maxLevel ? `L${minLevel}` : `L${minLevel}–L${maxLevel}`;
-
-	return { ascendancy, levelRange, stepCount: breakpoints.length };
+	return { ascendancy, stepCount: breakpoints.length };
 }
 
 export function BuildSelectorModal({
@@ -59,7 +47,7 @@ export function BuildSelectorModal({
 		// Use the effective ascendancy (same logic as the card display) so the
 		// form pre-selects whatever the card is already showing.
 		const { ascendancy } = getCardMeta(buildSet);
-		onEdit(buildSet.id, buildSet.name, ascendancy);
+		onEdit(buildSet.id, buildSet.name);
 	};
 
 	return (
@@ -74,7 +62,7 @@ export function BuildSelectorModal({
 
 				<div className="modal-grid">
 					{buildSets.map((buildSet) => {
-						const { ascendancy, levelRange, stepCount } = getCardMeta(buildSet);
+						const { ascendancy, stepCount } = getCardMeta(buildSet);
 						const isActive = buildSet.id === currentBuildSetId;
 						const isHovered = hoveredId === buildSet.id;
 
@@ -119,7 +107,6 @@ export function BuildSelectorModal({
 								)}
 
 								<div className="card-meta">
-									{levelRange && <span className="card-levels">{levelRange}</span>}
 									<span className="card-steps">
 										{stepCount === 0 ? "No steps" : stepCount === 1 ? "1 step" : `${stepCount} steps`}
 									</span>

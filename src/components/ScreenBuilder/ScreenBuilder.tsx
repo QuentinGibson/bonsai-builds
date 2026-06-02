@@ -42,16 +42,22 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
 
   // Pending (unsaved) class / ascendancy values for the selected build
   const [pendingClass, setPendingClass] = useState(selectedBuild?.className ?? "");
-  const [pendingAscendancy, setPendingAscendancy] = useState(selectedBuild?.ascendancy ?? "");
+  const [pendingAscendancy, setPendingAscendancy] = useState(
+    selectedBuild?.breakpoints.slice().sort((a, b) => a.order - b.order)[0]?.selectedAscendancy ?? ""
+  );
 
   // Sync pending values whenever the selected build changes
   useEffect(() => {
     setPendingClass(selectedBuild?.className ?? "");
-    setPendingAscendancy(selectedBuild?.ascendancy ?? "");
+    setPendingAscendancy(
+      selectedBuild?.breakpoints.slice().sort((a, b) => a.order - b.order)[0]?.selectedAscendancy ?? ""
+    );
   }, [selectedBuild?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const classIsDirty = pendingClass !== (selectedBuild?.className ?? "");
-  const ascendancyIsDirty = pendingAscendancy !== (selectedBuild?.ascendancy ?? "");
+  const currentAscendancy =
+    selectedBuild?.breakpoints.slice().sort((a, b) => a.order - b.order)[0]?.selectedAscendancy ?? "";
+  const ascendancyIsDirty = pendingAscendancy !== currentAscendancy;
   const classAscendancyDirty = classIsDirty || ascendancyIsDirty;
 
   // ── Data loading ──────────────────────────────────────────────────────────
@@ -77,32 +83,27 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
   // ── Event bus listeners ───────────────────────────────────────────────────
 
   useEffect(() => {
-    const onCreateBreakpoint = async (data: { name: string; level: number }) => {
+    const onCreateBreakpoint = async (data: { name: string }) => {
       const currentId = selectedIdRef.current;
       const currentBuild = selectedBuildRef.current;
       if (!currentId) return;
 
-      // Copy nodes from the nearest step below the new level so the user builds on top of it
-      const sorted = [...(currentBuild?.breakpoints ?? [])].sort((a, b) => a.level - b.level);
-      const prevStep = sorted.filter((bp) => bp.level < data.level).at(-1) ?? null;
+      // Copy nodes from the last step so the user builds on top of it
+      const sorted = [...(currentBuild?.breakpoints ?? [])].sort((a, b) => a.order - b.order);
+      const lastStep = sorted.at(-1) ?? null;
 
       await buildStorage.addBreakpoint(currentId, {
         name: data.name,
-        level: data.level,
-        allocatedNodes: prevStep?.allocatedNodes ?? [],
-        allocatedAscendancyNodes: prevStep?.allocatedAscendancyNodes ?? [],
-        selectedClass: currentBuild?.className
-          ? (CLASSES.find((c) => c.name === currentBuild.className)?.nodeId ?? null)
-          : null,
-        selectedAscendancy: currentBuild?.ascendancy ?? null,
+        allocatedNodes: lastStep?.allocatedNodes ?? [],
+        allocatedAscendancyNodes: lastStep?.allocatedAscendancyNodes ?? [],
+        selectedAscendancy: lastStep?.selectedAscendancy ?? null,
       });
       await refreshBuilds();
     };
 
-    const onEditBuild = async (data: { id: string; name: string; ascendancy: string | null }) => {
+    const onEditBuild = async (data: { id: string; name: string }) => {
       await buildStorage.updateBuildSet(data.id, {
         name: data.name,
-        ascendancy: data.ascendancy ?? undefined,
       });
       await refreshBuilds();
     };
@@ -152,17 +153,14 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
     if (classIsDirty) {
       await buildStorage.updateBuildSet(selectedBuild.id, {
         className: pendingClass || undefined,
-        ascendancy: pendingAscendancy || undefined,
       });
     } else if (ascendancyIsDirty) {
-      await buildStorage.updateBuildSet(selectedBuild.id, {
-        ascendancy: pendingAscendancy || undefined,
-      });
-      // Reset ascendancy nodes on every step so the tree shows the new ascendancy
-      await buildStorage.resetBreakpointsAscendancy(
-        selectedBuild.id,
-        pendingAscendancy || null
-      );
+      // Update selectedAscendancy on every breakpoint
+      for (const bp of selectedBuild.breakpoints) {
+        await buildStorage.updateBreakpoint(selectedBuild.id, bp.id, {
+          selectedAscendancy: pendingAscendancy || null,
+        });
+      }
     }
 
     await refreshBuilds();
@@ -172,7 +170,7 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
 
   const sortedSteps = useMemo<Breakpoint[]>(() => {
     return (
-      selectedBuild?.breakpoints.slice().sort((a, b) => a.level - b.level) ?? []
+      selectedBuild?.breakpoints.slice().sort((a, b) => a.order - b.order) ?? []
     );
   }, [selectedBuild]);
 
@@ -192,12 +190,12 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
 
   const [editingStepId, setEditingStepId] = useState<string | null>(null);
   const [editStepName, setEditStepName] = useState("");
-  const [editStepLevel, setEditStepLevel] = useState<number>(1);
+  const [editStepOrder, setEditStepOrder] = useState<number>(0);
 
   const startEditStep = (step: Breakpoint) => {
     setEditingStepId(step.id);
     setEditStepName(step.name ?? "");
-    setEditStepLevel(step.level);
+    setEditStepOrder(step.order);
   };
 
   const cancelEditStep = () => setEditingStepId(null);
@@ -206,7 +204,7 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
     if (!selectedBuild || !editingStepId) return;
     await buildStorage.updateBreakpoint(selectedBuild.id, editingStepId, {
       name: editStepName,
-      level: editStepLevel,
+      order: editStepOrder,
     });
     setEditingStepId(null);
     await refreshBuilds();
@@ -297,8 +295,8 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
                 onClick={() => selectBuild(b.id)}
               >
                 <span className="item-name">{b.name}</span>
-                {(b.className || b.ascendancy) && (
-                  <span className="item-class">{b.ascendancy ?? b.className}</span>
+                {b.className && (
+                  <span className="item-class">{b.className}</span>
                 )}
                 <span className="item-steps">
                   {stepCount === 0 ? "No steps" : stepCount === 1 ? "1 step" : `${stepCount} steps`}
@@ -329,7 +327,6 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
                     eventBus.emit("openEditBuildSet", {
                       id: selectedBuild.id,
                       name: selectedBuild.name,
-                      ascendancy: selectedBuild.ascendancy ?? null,
                     })
                   }
                 >
@@ -437,10 +434,9 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
                             <input
                               className="step-edit-level"
                               type="number"
-                              min={1}
-                              max={100}
-                              value={editStepLevel}
-                              onChange={(e) => setEditStepLevel(Number(e.target.value))}
+                              min={0}
+                              value={editStepOrder}
+                              onChange={(e) => setEditStepOrder(Number(e.target.value))}
                               onKeyDown={(e) => {
                                 if (e.key === "Enter") saveEditStep();
                                 if (e.key === "Escape") cancelEditStep();
@@ -463,7 +459,6 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
                           </>
                         ) : (
                           <>
-                            <span className="step-level">L{step.level}</span>
                             <span className="step-name">{step.name || "Unnamed"}</span>
                             <span className="step-nodes">
                               {step.allocatedNodes.length > 0

@@ -24,6 +24,17 @@ export interface NodeData {
 }
 
 export class PassiveTreeManager {
+	private static readonly CLASS_START_NODES: Record<string, string> = {
+		"Warrior": "47175",
+		"Ranger": "50459",
+		"Huntress": "50459",
+		"Mercenary": "50986",
+		"Sorceress": "54447",
+		"Witch": "54447",
+		"Monk": "44683",
+		"Druid": "61525",
+	};
+
 	private svg: SVGSVGElement | null = null;
 	private treeData: TreeData | null = null;
 	private allocatedNodes = new Set<string>();
@@ -1027,9 +1038,8 @@ export class PassiveTreeManager {
 				this.currentBuildSetId,
 				this.currentBreakpointId,
 				{
-					allocatedNodes: Array.from(this.allocatedNodes),
+					allocatedNodes: Array.from(this.allocatedNodes).map((id) => ({ id })),
 					allocatedAscendancyNodes: Array.from(this.allocatedAscendancyNodes),
-					selectedClass: this.startingNodeId,
 					selectedAscendancy: this.currentSelectedAscendancy,
 				},
 			);
@@ -1728,9 +1738,8 @@ export class PassiveTreeManager {
 				this.currentBuildSetId,
 				this.currentBreakpointId,
 				{
-					allocatedNodes: Array.from(this.allocatedNodes),
+					allocatedNodes: Array.from(this.allocatedNodes).map((id) => ({ id })),
 					allocatedAscendancyNodes: Array.from(this.allocatedAscendancyNodes),
-					selectedClass: this.startingNodeId,
 					selectedAscendancy: this.currentSelectedAscendancy,
 				},
 			);
@@ -1784,18 +1793,15 @@ export class PassiveTreeManager {
 			this.updateBreakpointDropdown();
 
 			const sorted = [...buildSet.breakpoints].sort(
-				(a, b) => a.level - b.level,
+				(a, b) => a.order - b.order,
 			);
 			if (sorted.length > 0) {
 				// Load first breakpoint — it restores class/ascendancy via updateDropdownsFromState
 				this.currentBreakpointId = sorted[0].id;
 				await this.loadBreakpoint(this.currentBreakpointId);
 			} else if (buildSet.className) {
-				// No breakpoints yet — apply the build-level class/ascendancy directly
-				this.applyBuildClassAndAscendancy(
-					buildSet.className,
-					buildSet.ascendancy ?? null,
-				);
+				// No breakpoints yet — apply the build-level class
+				this.applyBuildClassAndAscendancy(buildSet.className, null);
 			}
 		}
 		this.notifyStateChange();
@@ -1831,7 +1837,7 @@ export class PassiveTreeManager {
 		}
 	}
 
-	async handleCreateBreakpoint(name: string, level: number) {
+	async handleCreateBreakpoint(name: string) {
 		if (!this.currentBuildSetId) {
 			console.error("No build set selected");
 			return;
@@ -1842,10 +1848,8 @@ export class PassiveTreeManager {
 				this.currentBuildSetId,
 				{
 					name,
-					level,
-					allocatedNodes: Array.from(this.allocatedNodes),
+					allocatedNodes: Array.from(this.allocatedNodes).map((id) => ({ id })),
 					allocatedAscendancyNodes: Array.from(this.allocatedAscendancyNodes),
-					selectedClass: this.startingNodeId,
 					selectedAscendancy: this.currentSelectedAscendancy,
 				},
 			);
@@ -1884,15 +1888,15 @@ export class PassiveTreeManager {
 		);
 		if (!buildSet) return;
 
-		// Add breakpoints sorted by level
+		// Add breakpoints sorted by order
 		const sortedBreakpoints = [...buildSet.breakpoints].sort(
-			(a, b) => a.level - b.level,
+			(a, b) => a.order - b.order,
 		);
 
 		sortedBreakpoints.forEach((breakpoint) => {
 			const option = document.createElement("option");
 			option.value = breakpoint.id;
-			option.textContent = `Level ${breakpoint.level}: ${breakpoint.name}`;
+			option.textContent = breakpoint.name || `Step ${breakpoint.order}`;
 			dropdown.appendChild(option);
 		});
 
@@ -1933,7 +1937,8 @@ export class PassiveTreeManager {
 		this.clearAllAllocations();
 
 		// Restore allocated nodes
-		breakpoint.allocatedNodes.forEach((nodeId) => {
+		breakpoint.allocatedNodes.forEach((allocNode) => {
+			const nodeId = allocNode.id;
 			const node = this.svg?.querySelector(`#n${nodeId}`);
 			if (node) {
 				node.classList.add("allocated");
@@ -1950,9 +1955,12 @@ export class PassiveTreeManager {
 			}
 		});
 
-		// Restore starting node
-		if (breakpoint.selectedClass) {
-			this.startingNodeId = breakpoint.selectedClass;
+		// Derive starting node from build class
+		const classStartNode = buildSet.className
+			? PassiveTreeManager.CLASS_START_NODES[buildSet.className]
+			: null;
+		if (classStartNode) {
+			this.startingNodeId = classStartNode;
 		}
 
 		// Ensure the starting class node is always physically allocated.
@@ -2095,7 +2103,6 @@ export class PassiveTreeManager {
 		this.eventBus.emit("openEditBuildSet", {
 			id: buildSet.id,
 			name: buildSet.name,
-			ascendancy: buildSet.ascendancy ?? null,
 		});
 	}
 
@@ -2145,7 +2152,7 @@ export class PassiveTreeManager {
 			buildSetId: this.currentBuildSetId,
 			breakpointId: breakpoint.id,
 			name: breakpoint.name,
-			level: breakpoint.level,
+			order: breakpoint.order,
 		});
 	}
 
@@ -2178,18 +2185,9 @@ export class PassiveTreeManager {
 		}
 	}
 
-	async handleEditBuildSet(
-		id: string,
-		name: string,
-		ascendancy?: string | null,
-	) {
+	async handleEditBuildSet(id: string, name: string) {
 		try {
-			const updates: { name: string; ascendancy?: string } = { name };
-			if (ascendancy !== undefined) {
-				// null means explicitly cleared; string means set; undefined means don't touch
-				updates.ascendancy = ascendancy ?? undefined;
-			}
-			const updatedBuildSet = await buildStorage.updateBuildSet(id, updates);
+			const updatedBuildSet = await buildStorage.updateBuildSet(id, { name });
 			if (updatedBuildSet) {
 				console.log("Updated build set:", updatedBuildSet);
 				await this.loadBuildSets();
@@ -2225,7 +2223,7 @@ export class PassiveTreeManager {
 		buildSetId: string,
 		breakpointId: string,
 		name: string,
-		level: number,
+		order: number,
 	) {
 		try {
 			const updatedBreakpoint = await buildStorage.updateBreakpoint(
@@ -2233,7 +2231,7 @@ export class PassiveTreeManager {
 				breakpointId,
 				{
 					name,
-					level,
+					order,
 				},
 			);
 			if (updatedBreakpoint) {

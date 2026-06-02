@@ -1,19 +1,33 @@
 import { mutation } from "./_generated/server";
 import { v } from "convex/values";
 
+const allocatedNodeValidator = v.object({
+  id: v.string(),
+  weapon_set: v.optional(v.number()),
+  additional_text: v.optional(v.string()),
+});
+
 export const add = mutation({
   args: {
     buildSetId: v.id("buildSets"),
     name: v.string(),
-    level: v.number(),
-    allocatedNodes: v.array(v.string()),
+    order: v.optional(v.number()),
+    allocatedNodes: v.array(allocatedNodeValidator),
     allocatedAscendancyNodes: v.array(v.string()),
-    selectedClass: v.optional(v.string()),
     selectedAscendancy: v.optional(v.string()),
   },
-  handler: async (ctx, { buildSetId, ...data }) => {
+  handler: async (ctx, { buildSetId, order, ...data }) => {
+    let resolvedOrder = order;
+    if (resolvedOrder === undefined) {
+      const existing = await ctx.db
+        .query("breakpoints")
+        .withIndex("by_build", (q) => q.eq("buildSetId", buildSetId))
+        .collect();
+      resolvedOrder = existing.length === 0 ? 0 : Math.max(...existing.map((bp) => bp.order)) + 1;
+    }
     const id = await ctx.db.insert("breakpoints", {
       buildSetId,
+      order: resolvedOrder,
       ...data,
       createdAt: Date.now(),
     });
@@ -22,16 +36,14 @@ export const add = mutation({
   },
 });
 
-// Pass empty string for selectedClass/selectedAscendancy to clear the field.
 export const update = mutation({
   args: {
     id: v.id("breakpoints"),
     buildSetId: v.id("buildSets"),
     name: v.optional(v.string()),
-    level: v.optional(v.number()),
-    allocatedNodes: v.optional(v.array(v.string())),
+    order: v.optional(v.number()),
+    allocatedNodes: v.optional(v.array(allocatedNodeValidator)),
     allocatedAscendancyNodes: v.optional(v.array(v.string())),
-    selectedClass: v.optional(v.string()),
     selectedAscendancy: v.optional(v.string()),
   },
   handler: async (ctx, { id, buildSetId, ...updates }) => {
@@ -62,28 +74,6 @@ export const clearAll = mutation({
       .withIndex("by_build", (q) => q.eq("buildSetId", buildSetId))
       .collect();
     await Promise.all(bps.map((bp) => ctx.db.delete(bp._id)));
-    await ctx.db.patch(buildSetId, { updatedAt: Date.now() });
-  },
-});
-
-export const resetAscendancy = mutation({
-  args: {
-    buildSetId: v.id("buildSets"),
-    ascendancy: v.union(v.string(), v.null()),
-  },
-  handler: async (ctx, { buildSetId, ascendancy }) => {
-    const bps = await ctx.db
-      .query("breakpoints")
-      .withIndex("by_build", (q) => q.eq("buildSetId", buildSetId))
-      .collect();
-    await Promise.all(
-      bps.map((bp) =>
-        ctx.db.patch(bp._id, {
-          selectedAscendancy: ascendancy ?? undefined,
-          allocatedAscendancyNodes: [],
-        })
-      )
-    );
     await ctx.db.patch(buildSetId, { updatedAt: Date.now() });
   },
 });

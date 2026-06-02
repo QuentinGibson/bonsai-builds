@@ -4,8 +4,9 @@ import {
   marketplaceService,
   type MarketplaceBuild,
   type MarketplaceComment,
+  type BreakpointSnapshot,
 } from "../../services/marketplaceService";
-import { buildStorage } from "../../services/buildStorage";
+import { buildStorage, type BuildSet } from "../../services/buildStorage";
 
 import "./ScreenMarketplace.scss";
 
@@ -233,15 +234,13 @@ function DetailView({
     const newBuild = await buildStorage.createBuildSet(listing.name);
     await buildStorage.updateBuildSet(newBuild.id, {
       className: listing.className || undefined,
-      ascendancy: listing.ascendancy || undefined,
     });
     for (const bp of listing.breakpoints ?? []) {
       await buildStorage.addBreakpoint(newBuild.id, {
         name: bp.name,
-        level: bp.level,
+        order: bp.order,
         allocatedNodes: bp.allocatedNodes,
         allocatedAscendancyNodes: bp.allocatedAscendancyNodes,
-        selectedClass: bp.selectedClass ?? null,
         selectedAscendancy: bp.selectedAscendancy ?? null,
       });
     }
@@ -526,10 +525,9 @@ function DetailView({
           <h3>Steps ({listing.breakpoints.length})</h3>
           <div className="steps-list">
             {[...listing.breakpoints]
-              .sort((a, b) => a.level - b.level)
+              .sort((a, b) => a.order - b.order)
               .map((bp, i) => (
                 <div key={i} className="step-row">
-                  <span className="step-level">L{bp.level}</span>
                   <span className="step-name">{bp.name || "Unnamed"}</span>
                   <span className="step-nodes">
                     {bp.allocatedNodes.length} nodes
@@ -583,9 +581,7 @@ function EditListingModal({
   onClose: () => void;
   onSaved: () => void;
 }) {
-  const [buildSets, setBuildSets] = useState<
-    { id: string; name: string; className: string; ascendancy: string; breakpoints: any[] }[]
-  >([]);
+  const [buildSets, setBuildSets] = useState<BuildSet[]>([]);
   const [name, setName] = useState(listing.name);
   const [description, setDescription] = useState(listing.description);
   const [syncBuildId, setSyncBuildId] = useState("");
@@ -608,23 +604,21 @@ function EditListingModal({
       name: name.trim(),
       description,
       className: syncBuild ? syncBuild.className : listing.className,
-      ascendancy: syncBuild ? syncBuild.ascendancy || undefined : listing.ascendancy || undefined,
+      ascendancy: listing.ascendancy || undefined,
       breakpoints: syncBuild
-        ? syncBuild.breakpoints.map((bp: any) => ({
+        ? syncBuild.breakpoints.map((bp) => ({
             name: bp.name,
-            level: bp.level,
+            order: bp.order,
             allocatedNodes: bp.allocatedNodes,
             allocatedAscendancyNodes: bp.allocatedAscendancyNodes,
-            selectedClass: bp.selectedClass ?? undefined,
-            selectedAscendancy: bp.selectedAscendancy ?? undefined,
+            selectedAscendancy: bp.selectedAscendancy || undefined,
           }))
         : (listing.breakpoints ?? []).map((bp) => ({
             name: bp.name,
-            level: bp.level,
+            order: bp.order,
             allocatedNodes: bp.allocatedNodes,
             allocatedAscendancyNodes: bp.allocatedAscendancyNodes,
-            selectedClass: bp.selectedClass ?? undefined,
-            selectedAscendancy: bp.selectedAscendancy ?? undefined,
+            selectedAscendancy: bp.selectedAscendancy || undefined,
           })),
     });
     setSubmitting(false);
@@ -659,7 +653,7 @@ function EditListingModal({
           {buildSets.map((b) => (
             <option key={b.id} value={b.id}>
               {b.name}
-              {b.className ? ` (${b.className}${b.ascendancy ? ` · ${b.ascendancy}` : ""})` : ""}
+              {b.className ? ` (${b.className})` : ""}
             </option>
           ))}
         </select>
@@ -689,9 +683,7 @@ function PublishModal({
   onClose: () => void;
   onPublished: () => void;
 }) {
-  const [buildSets, setBuildSets] = useState<
-    { id: string; name: string; className?: string; ascendancy?: string; breakpoints: any[] }[]
-  >([]);
+  const [buildSets, setBuildSets] = useState<BuildSet[]>([]);
   const [selectedId, setSelectedId] = useState("");
   const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -716,14 +708,12 @@ function PublishModal({
       name: build.name,
       description,
       className: build.className,
-      ascendancy: build.ascendancy || undefined,
       breakpoints: build.breakpoints.map((bp) => ({
         name: bp.name,
-        level: bp.level,
+        order: bp.order,
         allocatedNodes: bp.allocatedNodes,
         allocatedAscendancyNodes: bp.allocatedAscendancyNodes,
-        selectedClass: bp.selectedClass ?? undefined,
-        selectedAscendancy: bp.selectedAscendancy ?? undefined,
+        selectedAscendancy: bp.selectedAscendancy || undefined,
       })),
     });
     setSubmitting(false);
@@ -740,7 +730,7 @@ function PublishModal({
           {buildSets.map((b) => (
             <option key={b.id} value={b.id}>
               {b.name}
-              {b.className ? ` (${b.className}${b.ascendancy ? ` · ${b.ascendancy}` : ""})` : ""}
+              {b.className ? ` (${b.className})` : ""}
             </option>
           ))}
         </select>

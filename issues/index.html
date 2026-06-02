@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bonsai Builds — 0.5 Issues</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0f1117;
+      color: #c9d1d9;
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #e6edf3;
+      margin-bottom: 0.25rem;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: #6e7681;
+      margin-bottom: 2rem;
+    }
+
+    .issue-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-width: 780px;
+    }
+
+    .issue {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .issue-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.85rem 1.1rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .issue-header:hover {
+      background: #1c2230;
+    }
+
+    .issue-num {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #6e7681;
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 4px;
+      padding: 1px 6px;
+      flex-shrink: 0;
+    }
+
+    .issue-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #e6edf3;
+      flex: 1;
+    }
+
+    .blocked-badge {
+      font-size: 0.7rem;
+      font-weight: 500;
+      background: #3d1f00;
+      color: #f0883e;
+      border: 1px solid #6e3a00;
+      border-radius: 4px;
+      padding: 1px 7px;
+      flex-shrink: 0;
+    }
+
+    .ready-badge {
+      font-size: 0.7rem;
+      font-weight: 500;
+      background: #0d2d1a;
+      color: #3fb950;
+      border: 1px solid #1a4a2a;
+      border-radius: 4px;
+      padding: 1px 7px;
+      flex-shrink: 0;
+    }
+
+    .chevron {
+      color: #6e7681;
+      font-size: 0.75rem;
+      transition: transform 0.15s;
+      flex-shrink: 0;
+    }
+
+    .issue.open .chevron { transform: rotate(90deg); }
+
+    .issue-body {
+      display: none;
+      padding: 0 1.1rem 1.1rem;
+      border-top: 1px solid #21262d;
+    }
+
+    .issue.open .issue-body { display: block; }
+
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6e7681;
+      margin: 1rem 0 0.4rem;
+    }
+
+    .section-label:first-child { margin-top: 0.9rem; }
+
+    .desc { font-size: 0.88rem; color: #c9d1d9; }
+
+    .bullets {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .bullets li {
+      font-size: 0.85rem;
+      color: #c9d1d9;
+      padding-left: 1.1em;
+      position: relative;
+    }
+
+    .bullets li::before {
+      content: "–";
+      position: absolute;
+      left: 0;
+      color: #6e7681;
+    }
+
+    .layer {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #79c0ff;
+      margin-top: 0.6rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .checklist {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .checklist li {
+      font-size: 0.85rem;
+      color: #c9d1d9;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .checklist li::before {
+      content: "☐";
+      color: #6e7681;
+      flex-shrink: 0;
+      line-height: 1.5;
+    }
+
+    .blocked-by {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.4rem;
+    }
+
+    .dep {
+      font-size: 0.78rem;
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 4px;
+      padding: 2px 8px;
+      color: #79c0ff;
+    }
+
+    .none { font-size: 0.85rem; color: #6e7681; font-style: italic; }
+
+    code {
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 0.82em;
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 3px;
+      padding: 0.1em 0.35em;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Bonsai Builds — 0.5 Issues</h1>
+<p class="subtitle">10 issues &nbsp;·&nbsp; update-tree-0.5 branch</p>
+
+<div class="issue-list">
+
+  <!-- 001 -->
+  <div class="issue open">
+    <div class="issue-header" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="issue-num">#001</span>
+      <span class="issue-title">Schema cleanup</span>
+      <span class="ready-badge">ready</span>
+    </div>
+    <div class="issue-body">
+      <div class="section-label">What to build</div>
+      <p class="desc">Clean up the Convex schema to match the domain model before any other 0.5 work ships. Foundational — everything else depends on this.</p>
+
+      <div class="layer">Database</div>
+      <ul class="bullets">
+        <li>Drop <code>level</code> from <code>breakpoints</code></li>
+        <li>Drop <code>selectedClass</code> from <code>breakpoints</code></li>
+        <li>Drop <code>ascendancy</code> from <code>buildSets</code></li>
+        <li>Upgrade <code>allocatedNodes</code> from <code>v.array(v.string())</code> to <code>v.array(v.object({ id, weapon_set?, additional_text? }))</code></li>
+        <li>Add <code>order: v.number()</code> to <code>buildSets</code> and <code>breakpoints</code></li>
+        <li>Clean <code>marketplaceListings.breakpoints</code> snapshot to match</li>
+      </ul>
+
+      <div class="layer">Routes</div>
+      <ul class="bullets">
+        <li>Remove <code>resetAscendancy</code> mutation from <code>convex/breakpoints.ts</code></li>
+        <li>Update <code>breakpoints.add</code> / <code>update</code> args to accept new <code>allocatedNodes</code> shape and reject <code>level</code> / <code>selectedClass</code></li>
+        <li>Update <code>buildSets.getAll</code> / <code>get</code> return shapes accordingly</li>
+        <li>Update <code>marketplace.publish</code> and <code>marketplace.update</code> to use cleaned snapshot</li>
+      </ul>
+
+      <div class="layer">UI</div>
+      <p class="desc">No visible change — purely structural.</p>
+
+      <div class="section-label">Acceptance criteria</div>
+      <ul class="checklist">
+        <li><code>breakpoints</code> table has no <code>level</code> or <code>selectedClass</code> field</li>
+        <li><code>buildSets</code> table has no <code>ascendancy</code> field</li>
+        <li><code>allocatedNodes</code> stores objects <code>{id, weapon_set?, additional_text?}</code>, not bare strings</li>
+        <li>Both <code>buildSets</code> and <code>breakpoints</code> have an <code>order: number</code> field</li>
+        <li><code>resetAscendancy</code> mutation is deleted</li>
+        <li><code>marketplace.publish</code> and <code>marketplace.update</code> accept and store the new breakpoint snapshot shape</li>
+        <li><code>breakpoints.add</code> rejects <code>level</code> and <code>selectedClass</code> in its args</li>
+        <li>Convex type-checks pass</li>
+      </ul>
+
+      <div class="section-label">Blocked by</div>
+      <p class="none">None — can start immediately</p>
+    </div>
+  </div>
+
+  <!-- 002 -->
+  <div class="issue">
+    <div class="issue-header" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="issue-num">#002</span>
+      <span class="issue-title">Folder/file tree layout</span>
+      <span class="blocked-badge">blocked</span>
+    </div>
+    <div class="issue-body">
+      <div class="section-label">What to build</div>
+      <p class="desc">Render the build list as a folder/file tree. BuildSets appear as expandable folder rows; Breakpoints appear as indented file rows inside their parent. Layout is static (no drag yet). Rows are ordered by the <code>order</code> field added in #001.</p>
+
+      <div class="layer">Database</div>
+      <p class="desc">None — reads <code>order</code> from schema added in #001.</p>
+
+      <div class="layer">Routes</div>
+      <p class="desc">None — <code>buildSets.getAll</code> already returns breakpoints nested under each BuildSet.</p>
+
+      <div class="layer">UI</div>
+      <ul class="bullets">
+        <li>BuildSet rows render with a folder icon and expand/collapse toggle</li>
+        <li>Breakpoint rows render indented beneath their parent, with a file icon</li>
+        <li>List is sorted by <code>order</code> ascending within each container</li>
+        <li>Collapsed BuildSets hide their Breakpoint rows</li>
+      </ul>
+
+      <div class="section-label">Acceptance criteria</div>
+      <ul class="checklist">
+        <li>BuildSets render as expandable folder rows with a collapse toggle</li>
+        <li>Breakpoints render as indented file rows inside the correct BuildSet</li>
+        <li>Both are sorted by <code>order</code> ascending</li>
+        <li>Collapsing a BuildSet hides its Breakpoints</li>
+        <li>Expanding restores them</li>
+      </ul>
+
+      <div class="section-label">Blocked by</div>
+      <div class="blocked-by"><span class="dep">#001 schema cleanup</span></div>
+    </div>
+  </div>
+
+  <!-- 003 -->
+  <div class="issue">
+    <div class="issue-header" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="issue-num">#003</span>
+      <span class="issue-title">Drag-reorder BuildSets</span>
+      <span class="blocked-badge">blocked</span>
+    </div>
+    <div class="issue-body">
+      <div class="section-label">What to build</div>
+      <p class="desc">Allow build authors to drag-reorder BuildSets in the list. Dropping a BuildSet at a new position updates the <code>order</code> fields of the affected rows only.</p>
+
+      <div class="layer">Database</div>
+      <p class="desc">None.</p>
+
+      <div class="layer">Routes</div>
+      <p class="desc">Add <code>buildSets.reorder</code> mutation — accepts <code>{id, newOrder}</code> (or an ordered array of ids) and patches the <code>order</code> field on affected rows only.</p>
+
+      <div class="layer">UI</div>
+      <p class="desc">Drag handle on each BuildSet folder row. On drop, calls <code>buildSets.reorder</code> and the list reorders optimistically.</p>
+
+      <div class="section-label">Acceptance criteria</div>
+      <ul class="checklist">
+        <li>BuildSet rows have a drag handle</li>
+        <li>Dragging a BuildSet to a new position and dropping updates the displayed order</li>
+        <li><code>buildSets.reorder</code> only patches <code>order</code> on the moved rows — other BuildSets are unaffected</li>
+        <li>Reorder survives a page reload (order is persisted, not local state)</li>
+      </ul>
+
+      <div class="section-label">Blocked by</div>
+      <div class="blocked-by"><span class="dep">#002 folder/file tree layout</span></div>
+    </div>
+  </div>
+
+  <!-- 004 -->
+  <div class="issue">
+    <div class="issue-header" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="issue-num">#004</span>
+      <span class="issue-title">Drag-reorder Breakpoints</span>
+      <span class="blocked-badge">blocked</span>
+    </div>
+    <div class="issue-body">
+      <div class="section-label">What to build</div>
+      <p class="desc">Allow build authors to drag-reorder Breakpoints within their parent BuildSet. A Breakpoint cannot be dragged into a different BuildSet — cross-folder movement is out of scope.</p>
+
+      <div class="layer">Database</div>
+      <p class="desc">None.</p>
+
+      <div class="layer">Routes</div>
+      <p class="desc">Add <code>breakpoints.reorder</code> mutation — accepts <code>{id, newOrder}</code> and patches the <code>order</code> field on affected rows within a single BuildSet.</p>
+
+      <div class="layer">UI</div>
+      <p class="desc">Drag handle on each Breakpoint file row. On drop within the same BuildSet, calls <code>breakpoints.reorder</code>. Dragging across BuildSet boundaries is not supported.</p>
+
+      <div class="section-label">Acceptance criteria</div>
+      <ul class="checklist">
+        <li>Breakpoint rows have a drag handle</li>
+        <li>Dragging a Breakpoint within its BuildSet updates the displayed order</li>
+        <li><code>breakpoints.reorder</code> only patches <code>order</code> on affected rows — other Breakpoints and other BuildSets are unchanged</li>
+        <li>Dropping a Breakpoint outside its parent BuildSet has no effect</li>
+        <li>Reorder survives a page reload</li>
+      </ul>
+
+      <div class="section-label">Blocked by</div>
+      <div class="blocked-by"><span class="dep">#002 folder/file tree layout</span></div>
+    </div>
+  </div>
+
+  <!-- 005 -->
+  <div class="issue">
+    <div class="issue-header" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="issue-num">#005</span>
+      <span class="issue-title">Per-breakpoint ascendancy</span>
+      <span class="blocked-badge">blocked</span>
+    </div>
+    <div class="issue-body">
+      <div class="section-label">What to build</div>
+      <p class="desc">Move ascendancy editing to the individual Breakpoint level. Each Breakpoint gets its own ascendancy selector. The BuildSet-level ascendancy reset control is removed.</p>
+
+      <div class="layer">Database</div>
+      <p class="desc">None — <code>selectedAscendancy</code> is already per-Breakpoint after #001. The BuildSet-level <code>ascendancy</code> field is dropped in #001.</p>
+
+      <div class="layer">Routes</div>
+      <p class="desc">Remove any remaining call sites that invoked <code>resetAscendancy</code> (the mutation itself is deleted in #001).</p>
+
+      <div class="layer">UI</div>
+      <ul class="bullets">
+        <li>Ascendancy selector appears in each Breakpoint's edit form (not on the BuildSet)</li>
+        <li>Any UI control that previously called <code>resetAscendancy</code> or set ascendancy at the BuildSet level is removed</li>
+        <li>Base class (<code>className</code>) remains fixed at the BuildSet level and is not editable per-Breakpoint</li>
+      </ul>
+
+      <div class="section-label">Acceptance criteria</div>
+      <ul class="checklist">
+        <li>Each Breakpoint has its own ascendancy selector</li>
+        <li>Changing one Breakpoint's ascendancy does not affect siblings</li>
+        <li>No UI control for BuildSet-level ascendancy reset remains</li>
+        <li><code>className</code> is not editable at the Breakpoint level</li>
+      </ul>
+
+      <div class="section-label">Blocked by</div>
+      <div class="blocked-by"><span class="dep">#001 schema cleanup</span></div>
+    </div>
+  </div>
+
+  <!-- 006 -->
+  <div class="issue">
+    <div class="issue-header" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="issue-num">#006</span>
+      <span class="issue-title">Section copy/paste between Breakpoints</span>
+      <span class="blocked-badge">blocked</span>
+    </div>
+    <div class="issue-body">
+      <div class="section-label">What to build</div>
+      <p class="desc">Let build authors copy an entire section (passives, skills, or inventory) from one Breakpoint and paste it into another, replacing that section entirely. Cross-BuildSet paste is allowed only between BuildSets with the same <code>className</code>.</p>
+
+      <div class="layer">Database</div>
+      <p class="desc">None.</p>
+
+      <div class="layer">Routes</div>
+      <p class="desc">Add <code>breakpoints.copySection</code> mutation — args: <code>{ sourceId, targetId, section: "passives" | "skills" | "inventory" }</code>. Reads the source Breakpoint's section, writes it to the target, leaves all other sections on the target untouched. Returns an error if the source and target BuildSets have different <code>className</code> values.</p>
+
+      <div class="layer">UI</div>
+      <ul class="bullets">
+        <li>Context menu on each Breakpoint row: <strong>Copy Passives</strong>, <strong>Copy Skills</strong>, <strong>Copy Inventory</strong></li>
+        <li>Paste action appears in the context menu showing the source Breakpoint name (e.g. "Paste Passives from Act 1")</li>
+        <li>Paste is disabled (not hidden) when source and target BuildSets have different classes; tooltip explains why</li>
+        <li>In-memory clipboard holds one section at a time</li>
+      </ul>
+
+      <div class="section-label">Acceptance criteria</div>
+      <ul class="checklist">
+        <li>Copying a section stores it in the in-app clipboard</li>
+        <li>Pasting replaces only the named section on the target Breakpoint; other sections are unchanged</li>
+        <li>Paste is disabled when source and target BuildSets have different <code>className</code></li>
+        <li>Disabled paste shows a tooltip explaining the class mismatch</li>
+        <li>Paste works cross-BuildSet when classes match</li>
+        <li><code>breakpoints.copySection</code> returns an error for cross-class paste attempts (server-side guard)</li>
+      </ul>
+
+      <div class="section-label">Blocked by</div>
+      <div class="blocked-by"><span class="dep">#001 schema cleanup</span></div>
+    </div>
+  </div>
+
+  <!-- 007 -->
+  <div class="issue">
+    <div class="issue-header" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="issue-num">#007</span>
+      <span class="issue-title">Passive node note editing</span>
+      <span class="blocked-badge">blocked</span>
+    </div>
+    <div class="issue-body">
+      <div class="section-label">What to build</div>
+      <p class="desc">Expose the <code>additional_text</code> field on passive nodes in the passive tree UI. Build authors can click an allocated node to open an inline note editor.</p>
+
+      <div class="layer">Database</div>
+      <p class="desc">None — <code>additional_text</code> lives on node objects in <code>allocatedNodes</code> after #001.</p>
+
+      <div class="layer">Routes</div>
+      <p class="desc">No new mutations needed — <code>breakpoints.update</code> already accepts the full <code>allocatedNodes</code> array. The UI patches the relevant node object in the array and calls <code>update</code>.</p>
+
+      <div class="layer">UI</div>
+      <ul class="bullets">
+        <li>Clicking an allocated passive node opens an inline or panel editor for <code>additional_text</code></li>
+        <li>The editor uses the same markup textarea, live preview, and tag toolbar already built for inventory slot and skill notes</li>
+        <li>Saving patches the node object in <code>allocatedNodes</code> (field absent when note is empty — not stored as <code>""</code>)</li>
+        <li>Nodes with a note get a visual indicator on the tree (e.g. a small dot or highlight)</li>
+      </ul>
+
+      <div class="section-label">Acceptance criteria</div>
+      <ul class="checklist">
+        <li>Clicking an allocated passive node opens the <code>additional_text</code> editor</li>
+        <li>Editor uses the shared markup textarea, live preview, and tag toolbar</li>
+        <li>Saving a note updates the node's <code>additional_text</code> in the <code>allocatedNodes</code> array</li>
+        <li>Clearing a note removes <code>additional_text</code> from the node object entirely (no empty string stored)</li>
+        <li>Nodes with a note are visually distinguishable on the passive tree</li>
+        <li>Round-trips losslessly through export and import</li>
+      </ul>
+
+      <div class="section-label">Blocked by</div>
+      <div class="blocked-by"><span class="dep">#001 schema cleanup</span></div>
+    </div>
+  </div>
+
+  <!-- 008 -->
+  <div class="issue">
+    <div class="issue-header" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="issue-num">#008</span>
+      <span class="issue-title">Export to game folder</span>
+      <span class="ready-badge">ready</span>
+    </div>
+    <div class="issue-body">
+      <div class="section-label">What to build</div>
+      <p class="desc">Add a one-click "Export to game" action per Breakpoint that writes the <code>.build</code> file directly to the game's <code>Preferences/BuildPlanner</code> directory via the Overwolf file system API. Distinct from the existing "Export to computer" blob download, which stays unchanged.</p>
+
+      <div class="layer">Database</div>
+      <p class="desc">None.</p>
+
+      <div class="layer">Routes</div>
+      <p class="desc">Overwolf FS adapter — <code>writeToGameFolder(filename, payload)</code> wraps the Overwolf file system write call with the correct base path. Filename is constructed as <code>{BuildSet name}~{Breakpoint name}.build</code> with <code>~</code> stripped from both name components before joining.</p>
+
+      <div class="layer">UI</div>
+      <p class="desc">"Export to game" button on each Breakpoint row (or in its context menu), alongside the existing "Export to computer" option. On success, show a brief confirmation. On failure (Overwolf API unavailable), surface a clear error.</p>
+
+      <div class="section-label">Acceptance criteria</div>
+      <ul class="checklist">
+        <li>"Export to game" button is present per Breakpoint</li>
+        <li>Clicking it writes <code>{BuildSet}~{Breakpoint}.build</code> to <code>Preferences/BuildPlanner</code> (with <code>~</code> stripped from both name segments)</li>
+        <li>Existing "Export to computer" blob download is unaffected</li>
+        <li>Overwolf FS adapter is tested with a mocked Overwolf global — adapter tests never touch the real file system</li>
+        <li>A clear error is shown when the Overwolf API is unavailable</li>
+      </ul>
+
+      <div class="section-label">Blocked by</div>
+      <p class="none">None — can start immediately</p>
+    </div>
+  </div>
+
+  <!-- 009 -->
+  <div class="issue">
+    <div class="issue-header" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="issue-num">#009</span>
+      <span class="issue-title">Game folder panel</span>
+      <span class="ready-badge">ready</span>
+    </div>
+    <div class="issue-body">
+      <div class="section-label">What to build</div>
+      <p class="desc">Add a persistent Game Folder Panel that lists all <code>.build</code> files currently in the game's <code>Preferences/BuildPlanner</code> directory. Players can import any file directly from the panel without using a file picker. The panel stays open across imports.</p>
+
+      <div class="layer">Database</div>
+      <p class="desc">None.</p>
+
+      <div class="layer">Routes</div>
+      <ul class="bullets">
+        <li>Overwolf FS adapter — <code>listGameFolder()</code> returns all <code>.build</code> filenames; <code>readFromGameFolder(filename)</code> returns file contents</li>
+        <li>Filename parser (pure function) — splits on the first <code>~</code>: left → BuildSet name, right → Breakpoint name. If no <code>~</code>, full filename (minus <code>.build</code>) → BuildSet name, Breakpoint name → <code>"Default"</code>. Multiple <code>~</code>: split on the first only</li>
+        <li>All layers above the adapter mock it — no real file system access in tests</li>
+      </ul>
+
+      <div class="layer">UI</div>
+      <ul class="bullets">
+        <li>Persistent side panel (not a modal); opens via a toolbar button or navigation item</li>
+        <li>Panel lists all <code>.build</code> files found on open; each row shows the filename and an Import button</li>
+        <li>Importing a file runs the filename parser, then creates or appends to the matching BuildSet as a new Breakpoint</li>
+        <li>Panel stays open after import</li>
+        <li>Panel must not cover the Ad Container</li>
+      </ul>
+
+      <div class="section-label">Acceptance criteria</div>
+      <ul class="checklist">
+        <li>Panel is persistent (not a modal) and can stay open while navigating</li>
+        <li>Panel lists all <code>.build</code> files in <code>Preferences/BuildPlanner</code> when opened</li>
+        <li>Each file has an Import button; clicking it imports without a file picker</li>
+        <li><code>"ColdSnap~Endgame.build"</code> → BuildSet <code>"ColdSnap"</code>, Breakpoint <code>"Endgame"</code></li>
+        <li><code>"TornadoShot.build"</code> → BuildSet <code>"TornadoShot"</code>, Breakpoint <code>"Default"</code></li>
+        <li><code>"My~Build~Act1.build"</code> → BuildSet <code>"My"</code>, Breakpoint <code>"Build~Act1"</code> (split on first <code>~</code> only)</li>
+        <li>Panel stays open after each import</li>
+        <li>Panel does not cover the Ad Container</li>
+        <li>Filename parser is tested as a pure function with no Overwolf dependency</li>
+      </ul>
+
+      <div class="section-label">Blocked by</div>
+      <p class="none">None — can start immediately (shares Overwolf FS adapter with #008, can be developed in parallel)</p>
+    </div>
+  </div>
+
+  <!-- 010 -->
+  <div class="issue">
+    <div class="issue-header" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="issue-num">#010</span>
+      <span class="issue-title">Remove Marketplace premium gate</span>
+      <span class="ready-badge">ready</span>
+    </div>
+    <div class="issue-body">
+      <div class="section-label">What to build</div>
+      <p class="desc">Remove the <code>isPremium</code> check that gates the Marketplace publish action in the UI. Any logged-in user can publish at launch. The <code>isPremium</code> field stays in the <code>users</code> table for future use but gates nothing.</p>
+
+      <div class="layer">Database</div>
+      <p class="desc">None — <code>isPremium</code> remains on <code>users</code>, unused by any feature at launch.</p>
+
+      <div class="layer">Routes</div>
+      <p class="desc">None — <code>marketplace.publish</code> already only blocks <code>authorId === "anon"</code>. No server-side change needed.</p>
+
+      <div class="layer">UI</div>
+      <p class="desc">Find and remove any conditional that checks <code>isPremium</code> before showing or enabling the Publish button or the publish flow in the Marketplace screen.</p>
+
+      <div class="section-label">Acceptance criteria</div>
+      <ul class="checklist">
+        <li>A logged-in user who is not premium can open and complete the publish flow</li>
+        <li>No <code>isPremium</code> check gates the Publish button or any step of the publish modal</li>
+        <li><code>isPremium</code> is still present in the <code>users</code> table schema (not removed)</li>
+        <li>Anonymous users still cannot publish (existing <code>authorId === "anon"</code> guard is untouched)</li>
+      </ul>
+
+      <div class="section-label">Blocked by</div>
+      <p class="none">None — can start immediately</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function toggle(header) {
+    header.closest('.issue').classList.toggle('open');
+  }
+</script>
+</body>
+</html>

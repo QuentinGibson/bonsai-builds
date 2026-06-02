@@ -8,75 +8,47 @@ import './AddBreakpoint.scss'
 export type AddBreakpointProps = {
   className?: string
   onClose: () => void
-  onSubmit: (name: string, level: number) => void
+  onSubmit: (name: string) => void
 }
 
 export function AddBreakpoint({ className, onClose, onSubmit }: AddBreakpointProps) {
   const [name, setName] = useState('')
-  const [level, setLevel] = useState('')
-
-  const submit = () => {
-    if (isValid) {
-      onSubmit(name, parseInt(level))
-      onClose()
-    }
-  }
 
   const isNameValid = useMemo(() => {
     return name.trim().length > 0 && name.length <= 50
   }, [name])
 
-  const isLevelValid = useMemo(() => {
-    const levelNum = parseInt(level)
-    return !isNaN(levelNum) && levelNum >= 1 && levelNum <= 100
-  }, [level])
-
-  const isValid = useMemo(() => {
-    return isNameValid && isLevelValid
-  }, [isNameValid, isLevelValid])
+  const submit = () => {
+    if (isNameValid) {
+      onSubmit(name)
+      onClose()
+    }
+  }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && isValid) {
+    if (e.key === 'Enter' && isNameValid) {
       submit()
     }
   }
 
   return (
     <div className={classNames('AddBreakpoint', className)}>
-      <h3>New Level Breakpoint</h3>
+      <h3>New Step</h3>
 
       <div className="content">
         <div className="form-group">
-          <label htmlFor="breakpoint-name">Breakpoint Name</label>
+          <label htmlFor="breakpoint-name">Step Name</label>
           <input
             id="breakpoint-name"
             className={classNames('text', { invalid: name.length > 0 && !isNameValid })}
             type="text"
-            placeholder="e.g., Level 30, Act 3, Early Game"
+            placeholder="e.g., Early Game, Act 3, Endgame"
             value={name}
             onChange={e => setName(e.target.value)}
             onKeyPress={handleKeyPress}
             autoFocus
           />
           <div className="char-length">{name.length}/50</div>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="breakpoint-level">Character Level</label>
-          <input
-            id="breakpoint-level"
-            className={classNames('text', { invalid: level.length > 0 && !isLevelValid })}
-            type="number"
-            placeholder="1-100"
-            min="1"
-            max="100"
-            value={level}
-            onChange={e => setLevel(e.target.value)}
-            onKeyPress={handleKeyPress}
-          />
-          {level.length > 0 && !isLevelValid && (
-            <div className="error-message">Level must be between 1 and 100</div>
-          )}
         </div>
       </div>
 
@@ -85,8 +57,8 @@ export function AddBreakpoint({ className, onClose, onSubmit }: AddBreakpointPro
         <button
           className="action submit"
           onClick={submit}
-          disabled={!isValid}
-        >Create Breakpoint</button>
+          disabled={!isNameValid}
+        >Create Step</button>
       </div>
     </div>
   )

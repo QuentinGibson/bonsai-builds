@@ -36,7 +36,7 @@ export function ScreenPassiveTree({ className }: ScreenPassiveTreeProps) {
 		buildSets
 			.find((b) => b.id === currentBuildSetId)
 			?.breakpoints.slice()
-			.sort((a, b) => a.level - b.level) ?? [];
+			.sort((a, b) => a.order - b.order) ?? [];
 
 	const currentBuildSet = buildSets.find((b) => b.id === currentBuildSetId) ?? null;
 	const currentBreakpoint = currentBuildSet?.breakpoints.find((bp) => bp.id === currentBreakpointId) ?? null;
@@ -56,21 +56,21 @@ export function ScreenPassiveTree({ className }: ScreenPassiveTreeProps) {
 			}
 		};
 
-		const handleCreateBreakpoint = (data: { name: string; level: number }) => {
+		const handleCreateBreakpoint = (data: { name: string }) => {
 			if (treeManagerRef.current) {
-				treeManagerRef.current.handleCreateBreakpoint(data.name, data.level);
+				treeManagerRef.current.handleCreateBreakpoint(data.name);
 			}
 		};
 
-		const handleEditBuildSet = (data: { id: string; name: string; ascendancy: string | null }) => {
+		const handleEditBuildSet = (data: { id: string; name: string }) => {
 			if (treeManagerRef.current) {
-				treeManagerRef.current.handleEditBuildSet(data.id, data.name, data.ascendancy);
+				treeManagerRef.current.handleEditBuildSet(data.id, data.name);
 			}
 		};
 
-		const handleEditBreakpoint = (data: { buildSetId: string; breakpointId: string; name: string; level: number }) => {
+		const handleEditBreakpoint = (data: { buildSetId: string; breakpointId: string; name: string; order: number }) => {
 			if (treeManagerRef.current) {
-				treeManagerRef.current.handleEditBreakpoint(data.buildSetId, data.breakpointId, data.name, data.level);
+				treeManagerRef.current.handleEditBreakpoint(data.buildSetId, data.breakpointId, data.name, data.order);
 			}
 		};
 
@@ -252,7 +252,7 @@ export function ScreenPassiveTree({ className }: ScreenPassiveTreeProps) {
 										<option value="">— Select Step —</option>
 										{currentBreakpointSortedList.map((step) => (
 											<option key={step.id} value={step.id}>
-												L{step.level} · {step.name || "Unnamed"}
+												{step.name || "Unnamed"}
 											</option>
 										))}
 									</select>
@@ -306,8 +306,8 @@ export function ScreenPassiveTree({ className }: ScreenPassiveTreeProps) {
 						eventBus.emit('setPopup', kAppPopups.AddBuildSet);
 						setShowBuildModal(false);
 					}}
-					onEdit={(id, name, ascendancy) => {
-						eventBus.emit('openEditBuildSet', { id, name, ascendancy });
+					onEdit={(id, name) => {
+						eventBus.emit('openEditBuildSet', { id, name });
 						setShowBuildModal(false);
 					}}
 					onDelete={(id) => treeManagerRef.current?.handleDeleteBuildSet(id)}

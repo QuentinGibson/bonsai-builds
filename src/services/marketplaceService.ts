@@ -1,7 +1,7 @@
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
-import type { Breakpoint } from "./buildStorage";
+import type { AllocatedNode } from "./buildStorage";
 
 export interface MarketplaceComment {
   id: string;
@@ -28,8 +28,16 @@ export interface MarketplaceBuild {
   ratingCount: number;
   averageRating: number;
   createdAt: number;
-  breakpoints?: Pick<Breakpoint, "name" | "level" | "allocatedNodes" | "allocatedAscendancyNodes" | "selectedClass" | "selectedAscendancy">[];
+  breakpoints?: BreakpointSnapshot[];
   comments?: MarketplaceComment[];
+}
+
+export interface BreakpointSnapshot {
+  name: string;
+  order: number;
+  allocatedNodes: AllocatedNode[];
+  allocatedAscendancyNodes: string[];
+  selectedAscendancy?: string;
 }
 
 export interface PublishArgs {
@@ -37,7 +45,7 @@ export interface PublishArgs {
   description: string;
   className: string;
   ascendancy?: string;
-  breakpoints: Pick<Breakpoint, "name" | "level" | "allocatedNodes" | "allocatedAscendancyNodes" | "selectedClass" | "selectedAscendancy">[];
+  breakpoints: BreakpointSnapshot[];
 }
 
 function resolveOverwolfUser(): Promise<{ userId: string; username: string }> {
@@ -89,11 +97,10 @@ class MarketplaceService {
         ascendancy: args.ascendancy,
         breakpoints: args.breakpoints.map((bp) => ({
           name: bp.name,
-          level: bp.level,
+          order: bp.order,
           allocatedNodes: bp.allocatedNodes,
           allocatedAscendancyNodes: bp.allocatedAscendancyNodes,
-          selectedClass: bp.selectedClass ?? undefined,
-          selectedAscendancy: bp.selectedAscendancy ?? undefined,
+          selectedAscendancy: bp.selectedAscendancy || undefined,
         })),
       })) as string;
     } catch (error) {
@@ -114,11 +121,10 @@ class MarketplaceService {
         ascendancy: args.ascendancy,
         breakpoints: args.breakpoints.map((bp) => ({
           name: bp.name,
-          level: bp.level,
+          order: bp.order,
           allocatedNodes: bp.allocatedNodes,
           allocatedAscendancyNodes: bp.allocatedAscendancyNodes,
-          selectedClass: bp.selectedClass ?? undefined,
-          selectedAscendancy: bp.selectedAscendancy ?? undefined,
+          selectedAscendancy: bp.selectedAscendancy || undefined,
         })),
       });
       return true;
