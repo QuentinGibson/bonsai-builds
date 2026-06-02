@@ -8,6 +8,7 @@ import { SkillsEditor } from "../SkillsEditor/SkillsEditor";
 import { InventorySlotsEditor } from "../InventorySlotsEditor/InventorySlotsEditor";
 import { parseBuildFile, serializeBuildFile, parseFilename, type BuildFileData } from "../../../convex/build_file";
 import { resolveAscendancy } from "../../services/class-ascendancy-map";
+import { buildExportFilename, writeToGameFolder } from "../../services/overwolfFs";
 
 import "./ScreenBuilder.scss";
 
@@ -287,6 +288,31 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  };
+
+  const [exportToGameStatus, setExportToGameStatus] = useState<Record<string, "success" | "error">>({});
+
+  const handleExportToGame = async (step: Breakpoint) => {
+    if (!selectedBuild) return;
+    const fileData = serializeBuildFile(
+      { ...step, selectedAscendancy: step.selectedAscendancy ?? undefined },
+      selectedBuild,
+    );
+    const json = JSON.stringify(fileData, null, 2);
+    const filename = buildExportFilename(selectedBuild.name, step.name);
+    try {
+      await writeToGameFolder(filename, json);
+      setExportToGameStatus((prev) => ({ ...prev, [step.id]: "success" }));
+    } catch {
+      setExportToGameStatus((prev) => ({ ...prev, [step.id]: "error" }));
+    }
+    setTimeout(() => {
+      setExportToGameStatus((prev) => {
+        const next = { ...prev };
+        delete next[step.id];
+        return next;
+      });
+    }, 3000);
   };
 
   const [editingStepId, setEditingStepId] = useState<string | null>(null);
@@ -701,6 +727,17 @@ export function ScreenBuilder({ className: cls }: ScreenBuilderProps) {
                                 onClick={() => handleExportStep(step)}
                               >
                                 Export
+                              </button>
+                              <button
+                                className={`step-export-game${exportToGameStatus[step.id] === "success" ? " step-export-game--success" : exportToGameStatus[step.id] === "error" ? " step-export-game--error" : ""}`}
+                                title="Export to game folder"
+                                onClick={() => handleExportToGame(step)}
+                              >
+                                {exportToGameStatus[step.id] === "success"
+                                  ? "Saved!"
+                                  : exportToGameStatus[step.id] === "error"
+                                  ? "Failed"
+                                  : "Export to game"}
                               </button>
                               <button
                                 className="step-delete"
