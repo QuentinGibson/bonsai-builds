@@ -1,6 +1,18 @@
 import { expect, test } from "vitest";
 import { patchNodeNote, hasNodeNote } from "./passiveNodeNote";
+import { CLASS_START_NODES } from "./classStartNodes";
 import type { PassiveNode } from "../../services/buildStorage";
+
+// ── CLASS_START_NODES ─────────────────────────────────────────────────────────
+
+test("CLASS_START_NODES uses game string table IDs, not numeric skill integers", () => {
+	expect(CLASS_START_NODES["Warrior"]).toBe("marauder594");
+	expect(CLASS_START_NODES["Ranger"]).toBe("ranger596");
+	expect(CLASS_START_NODES["Witch"]).toBe("witch595");
+	for (const id of Object.values(CLASS_START_NODES)) {
+		expect(/^\d+$/.test(id)).toBe(false);
+	}
+});
 
 // ── patchNodeNote ─────────────────────────────────────────────────────────────
 

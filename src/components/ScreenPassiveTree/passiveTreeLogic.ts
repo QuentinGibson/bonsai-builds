@@ -31,17 +31,11 @@ export interface NodeData {
 	isNotable?: boolean;
 }
 
+export { CLASS_START_NODES } from "./classStartNodes";
+import { CLASS_START_NODES } from "./classStartNodes";
+
 export class PassiveTreeManager {
-	private static readonly CLASS_START_NODES: Record<string, string> = {
-		"Warrior": "47175",
-		"Ranger": "50459",
-		"Huntress": "50459",
-		"Mercenary": "50986",
-		"Sorceress": "54447",
-		"Witch": "54447",
-		"Monk": "44683",
-		"Druid": "61525",
-	};
+	private static readonly CLASS_START_NODES = CLASS_START_NODES;
 
 	private svg: SVGSVGElement | null = null;
 	private treeData: TreeData | null = null;

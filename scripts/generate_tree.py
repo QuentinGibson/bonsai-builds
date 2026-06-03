@@ -19,6 +19,8 @@ import re
 # -------------------------------------------------------------------
 TREE_JSON = os.path.join(os.path.dirname(__file__),
     '../../PathOfBuilding-PoE2/src/TreeData/0_5/tree.json')
+SKILL_EXPORT_JSON = os.path.join(os.path.dirname(__file__),
+    '../../poe2-skilltree-export/data.json')
 OUT_SVG = os.path.join(os.path.dirname(__file__), '../public/poe2snippet.html')
 OUT_JSON = os.path.join(os.path.dirname(__file__), '../public/data_us.json')
 
@@ -37,6 +39,26 @@ ASCENDANCY_NODE_SCALE = 2.0
 def load_tree():
     with open(TREE_JSON) as f:
         return json.load(f)
+
+
+def load_skill_id_map():
+    """Map numeric skill string -> game PassiveSkills string ID.
+
+    Reads poe2-skilltree-export/data.json which carries both the numeric 'skill'
+    and the game's string 'id' for each node.  Nodes with no string ID are not
+    included; callers fall back to the numeric string for those.
+    """
+    try:
+        with open(SKILL_EXPORT_JSON) as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        print(f'WARNING: {SKILL_EXPORT_JSON} not found, using numeric IDs', file=sys.stderr)
+        return {}
+    return {
+        str(v['skill']): v['id']
+        for v in data['nodes'].values()
+        if v.get('skill') and v.get('id')
+    }
 
 
 def compute_node_positions(tree):
@@ -120,7 +142,7 @@ def fmt(v):
     return f'{v:.2f}'
 
 
-def build_svg(tree, positions):
+def build_svg(tree, positions, skill_id_map):
     """Build SVG string."""
     nodes = tree['nodes']
     groups = tree['groups']
@@ -169,8 +191,10 @@ def build_svg(tree, positions):
             if n_is_asc and t_is_asc and n.get('ascendancyName') != tn.get('ascendancyName'):
                 continue
 
-            # Canonical connection key (lower id first)
-            pair = tuple(sorted([nid, tid], key=int))
+            # Canonical connection key (lexicographic to work with string IDs)
+            nid_str = skill_id_map.get(nid, nid)
+            tid_str = skill_id_map.get(tid, tid)
+            pair = tuple(sorted([nid_str, tid_str]))
             if pair in seen_conns:
                 continue
             seen_conns.add(pair)
@@ -264,8 +288,9 @@ def build_svg(tree, positions):
         x, y = positions[nid]
         cls = node_class(n)
         r = CIRCLE_RADII[cls]
+        node_table_id = skill_id_map.get(nid, nid)
         lines.append(f'<circle cx="{fmt(x)}" cy="{fmt(y)}" r="{r}" '
-                     f'class="{cls}" id="n{n["skill"]}"></circle>')
+                     f'class="{cls}" id="n{node_table_id}"></circle>')
 
     lines.append('</svg>')
     return '\n'.join(lines)
@@ -284,13 +309,13 @@ def convert_icon_path(dds_path):
     return None
 
 
-def build_data_json(tree):
+def build_data_json(tree, skill_id_map):
     """Build data_us.json matching the format passiveTreeLogic.ts expects."""
     nodes_out = {}
     for nid, n in tree['nodes'].items():
         if should_skip(n):
             continue
-        skill_id = str(n['skill'])
+        skill_id = skill_id_map.get(nid, nid)
         entry = {
             'name': n.get('name', ''),
             'stats': n.get('stats', []),
@@ -333,31 +358,37 @@ def resolve_replace_ascendancies(classes, asc_nodes, asc_starts, asc_transforms)
                 asc_transforms[name] = asc_transforms[replace]
 
 
-def print_ascendancy_data(tree, positions):
+def print_ascendancy_data(tree, positions, skill_id_map):
     """Print ascendancy data for manual insertion into ascendancyConfig.ts."""
     nodes = tree['nodes']
     classes = tree['classes']
 
-    # Gather ascendancy nodes
-    asc_nodes = {}  # ascName -> list of skill IDs
-    asc_starts = {}  # ascName -> start node skill ID
+    # Gather ascendancy nodes (keyed by numeric nid for position lookups)
+    asc_nids = {}   # ascName -> list of numeric nids
+    asc_starts = {} # ascName -> start node numeric nid
     for nid, n in nodes.items():
         asc = n.get('ascendancyName')
         if not asc:
             continue
         if should_skip(n):
             continue
-        asc_nodes.setdefault(asc, []).append(str(n['skill']))
+        asc_nids.setdefault(asc, []).append(nid)
         if n.get('isAscendancyStart'):
-            asc_starts[asc] = str(n['skill'])
+            asc_starts[asc] = nid
 
     # Compute transforms: negate cluster mean so ascendancies render at (0,0).
     asc_transforms = {}
-    for asc_name, skill_ids in asc_nodes.items():
-        xs = [positions[s][0] for s in skill_ids if s in positions]
-        ys = [positions[s][1] for s in skill_ids if s in positions]
+    for asc_name, nids in asc_nids.items():
+        xs = [positions[n][0] for n in nids if n in positions]
+        ys = [positions[n][1] for n in nids if n in positions]
         if xs:
             asc_transforms[asc_name] = (-sum(xs) / len(xs), -sum(ys) / len(ys))
+
+    # Build string-ID versions for output
+    asc_nodes = {
+        asc: [skill_id_map.get(n, n) for n in nids]
+        for asc, nids in asc_nids.items()
+    }
 
     # Propagate data for replacement ascendancies (e.g. Abyssal Lich ← Lich)
     resolve_replace_ascendancies(classes, asc_nodes, asc_starts, asc_transforms)
@@ -372,7 +403,7 @@ def print_ascendancy_data(tree, positions):
             name = asc['name']
             if name not in asc_nodes:
                 continue
-            node_list = sorted(asc_nodes[name], key=int)
+            node_list = sorted(asc_nodes[name])
             tx, ty = asc_transforms.get(name, (0, 0))
             nodes_str = ', '.join(f'"{n}"' for n in node_list)
             print(f'    "{name}": {{ nodes: [{nodes_str}], '
@@ -403,7 +434,8 @@ def print_ascendancy_data(tree, positions):
         for asc in cls.get('ascendancies', []):
             name = asc['name']
             if name in asc_starts:
-                print(f'    "{name}": "{asc_starts[name]}",')
+                start_id = skill_id_map.get(asc_starts[name], asc_starts[name])
+                print(f'    "{name}": "{start_id}",')
     print('};')
 
 
@@ -412,23 +444,27 @@ def main():
     tree = load_tree()
     print(f'  Nodes: {len(tree["nodes"])}, Groups: {len(tree["groups"])}')
 
+    print('Loading skill ID map...')
+    skill_id_map = load_skill_id_map()
+    print(f'  Loaded {len(skill_id_map)} skill -> string ID mappings')
+
     print('Computing node positions...')
     positions = compute_node_positions(tree)
     print(f'  Computed positions for {len(positions)} nodes')
 
     print('Building SVG...')
-    svg = build_svg(tree, positions)
+    svg = build_svg(tree, positions, skill_id_map)
     with open(OUT_SVG, 'w') as f:
         f.write(svg)
     print(f'  Wrote {OUT_SVG} ({len(svg)} bytes)')
 
     print('Building data_us.json...')
-    data = build_data_json(tree)
+    data = build_data_json(tree, skill_id_map)
     with open(OUT_JSON, 'w') as f:
         json.dump(data, f, separators=(',', ':'))
     print(f'  Wrote {OUT_JSON} ({len(data["nodes"])} nodes)')
 
-    print_ascendancy_data(tree, positions)
+    print_ascendancy_data(tree, positions, skill_id_map)
 
 
 if __name__ == '__main__':

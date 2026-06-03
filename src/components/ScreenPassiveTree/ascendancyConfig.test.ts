@@ -45,9 +45,22 @@ describe("every ascendancy in classAscendancies has complete config", () => {
 
 		test(`${name} has ascendancyStartNodes entry`, () => {
 			expect(ascendancyStartNodes[name]).toBeDefined();
-			expect(ascendancyStartNodes[name]).toMatch(/^\d+$/);
 		});
 	}
+});
+
+// ── data_us.json uses string table IDs ───────────────────────────────────────
+
+test("data_us.json keys are string table IDs, not raw numeric skill integers", () => {
+	const dataPath = resolve(__dirname, "../../../public/data_us.json");
+	const treeData = JSON.parse(readFileSync(dataPath, "utf-8")) as {
+		nodes: Record<string, unknown>;
+	};
+	const keys = Object.keys(treeData.nodes);
+	expect(keys).toContain("marauder594"); // Warrior start node
+	const numericKeys = keys.filter(k => /^\d+$/.test(k));
+	// At most 19 nodes lack a string ID and fall back to numeric
+	expect(numericKeys.length).toBeLessThanOrEqual(19);
 });
 
 // ── Data integrity: all node IDs must exist in data_us.json ──────────────────
