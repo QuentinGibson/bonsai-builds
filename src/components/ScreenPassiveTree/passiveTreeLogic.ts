@@ -2,6 +2,7 @@
 
 import { type BuildSet, type PassiveNode, buildStorage } from "../../services/buildStorage";
 import { patchNodeNote } from "./passiveNodeNote";
+import { findShortestPath, findDisconnectedNodes } from "./passiveBFS";
 import {
 	ascendancyData as ascendancyDataConfig,
 	ascendancyNames as ascendancyNamesConfig,
@@ -655,76 +656,12 @@ export class PassiveTreeManager {
 	}
 
 	private findShortestPath(targetNodeId: string): string[] | null {
-		if (this.allocatedNodes.size === 0) return [];
-
-		const queue: string[] = [];
-		const visited = new Set<string>();
-		const parent = new Map<string, string>();
-
-		queue.push(targetNodeId);
-		visited.add(targetNodeId);
-
-		while (queue.length > 0) {
-			const currentId = queue.shift()!;
-
-			if (this.allocatedNodes.has(currentId)) {
-				const path: string[] = [];
-				let node = currentId;
-				while (parent.has(node)) {
-					node = parent.get(node)!;
-					if (!this.allocatedNodes.has(node)) {
-						path.push(node);
-					}
-				}
-				return path;
-			}
-
-			const neighbors = this.connectionGraph.get(currentId) || [];
-			neighbors.forEach((neighborId) => {
-				if (
-					!visited.has(neighborId) &&
-					!this.allAscendancyNodeIds.has(neighborId)
-				) {
-					visited.add(neighborId);
-					parent.set(neighborId, currentId);
-					queue.push(neighborId);
-				}
-			});
-		}
-
-		return null;
+		return findShortestPath(this.connectionGraph, this.allocatedNodes, this.allAscendancyNodeIds, targetNodeId);
 	}
 
 	private findDisconnectedNodes(removedNodeId: string): string[] {
 		if (!this.startingNodeId) return [];
-
-		// Single BFS from start (excluding removedNodeId) — O(nodes) instead of O(nodes²)
-		const reachable = new Set<string>();
-		const queue = [this.startingNodeId];
-		reachable.add(this.startingNodeId);
-
-		while (queue.length > 0) {
-			const currentId = queue.shift()!;
-			for (const neighborId of this.connectionGraph.get(currentId) || []) {
-				if (
-					!reachable.has(neighborId) &&
-					neighborId !== removedNodeId &&
-					this.allocatedNodes.has(neighborId) &&
-					!this.allAscendancyNodeIds.has(neighborId)
-				) {
-					reachable.add(neighborId);
-					queue.push(neighborId);
-				}
-			}
-		}
-
-		const disconnected: string[] = [];
-		this.allocatedNodes.forEach((nodeId) => {
-			if (nodeId !== removedNodeId && !reachable.has(nodeId)) {
-				disconnected.push(nodeId);
-			}
-		});
-		return disconnected;
+		return findDisconnectedNodes(this.connectionGraph, this.allocatedNodes, this.allAscendancyNodeIds, this.startingNodeId, removedNodeId);
 	}
 
 	private findShortestPathAscendancy(targetNodeId: string): string[] | null {
