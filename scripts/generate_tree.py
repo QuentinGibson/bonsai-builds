@@ -22,7 +22,7 @@ TREE_JSON = os.path.join(os.path.dirname(__file__),
 OUT_SVG = os.path.join(os.path.dirname(__file__), '../public/poe2snippet.html')
 OUT_JSON = os.path.join(os.path.dirname(__file__), '../public/data_us.json')
 
-CIRCLE_RADII = {'normal': 40, 'notable': 56, 'keystone': 104}
+CIRCLE_RADII = {'normal': 100, 'notable': 140, 'keystone': 200}
 
 # Scale factor for the main tree to open up the center for ascendancies.
 # The largest ascendancy cluster radius is ~1891; the innermost main-tree
