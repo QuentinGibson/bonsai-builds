@@ -27,7 +27,11 @@ CIRCLE_RADII = {'normal': 100, 'notable': 140, 'keystone': 200}
 # Scale factor for the main tree to open up the center for ascendancies.
 # The largest ascendancy cluster radius is ~1891; the innermost main-tree
 # node is ~1443 from center.  1.5× pushes that to ~2165, giving clearance.
-MAIN_TREE_SCALE = 2.0
+MAIN_TREE_SCALE = 3.0
+
+# Scale factor applied to ascendancy nodes relative to their cluster center.
+# Values > 1.0 spread nodes apart within each ascendancy cluster.
+ASCENDANCY_NODE_SCALE = 2.0
 
 
 def load_tree():
@@ -67,6 +71,28 @@ def compute_node_positions(tree):
             y *= MAIN_TREE_SCALE
 
         positions[nid] = (round(x), round(y))
+
+    # Spread ascendancy nodes within each cluster relative to the cluster center.
+    # The cluster center (mean) is invariant under this scaling, so ascendancy
+    # transforms in ascendancyConfig.ts do not need to change.
+    if ASCENDANCY_NODE_SCALE != 1.0:
+        asc_groups = {}
+        for nid, n in nodes.items():
+            asc = n.get('ascendancyName')
+            if asc and not should_skip(n) and nid in positions:
+                asc_groups.setdefault(asc, []).append(nid)
+        for node_ids in asc_groups.values():
+            xs = [positions[nid][0] for nid in node_ids]
+            ys = [positions[nid][1] for nid in node_ids]
+            cx = sum(xs) / len(xs)
+            cy = sum(ys) / len(ys)
+            for nid in node_ids:
+                x, y = positions[nid]
+                positions[nid] = (
+                    round(cx + ASCENDANCY_NODE_SCALE * (x - cx)),
+                    round(cy + ASCENDANCY_NODE_SCALE * (y - cy)),
+                )
+
     return positions
 
 

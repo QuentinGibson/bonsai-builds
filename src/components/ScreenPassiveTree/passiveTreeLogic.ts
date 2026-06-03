@@ -268,25 +268,47 @@ export class PassiveTreeManager {
 
 		const nodes = this.treeData.nodes;
 
+		let defs = this.svg.querySelector("defs");
+		if (!defs) {
+			defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+			this.svg.insertBefore(defs, this.svg.firstChild);
+		}
+
 		// Query all circles once instead of one querySelector per node (was 4,701 queries)
 		this.svg.querySelectorAll('circle[id^="n"]').forEach((circle) => {
 			const nodeId = circle.id.slice(1);
 			const nodeData = nodes[nodeId];
 			if (!nodeData?.icon) return;
 
-			const img = document.createElementNS(
-				"http://www.w3.org/2000/svg",
-				"image",
-			);
 			const cx = parseFloat(circle.getAttribute("cx") || "0");
 			const cy = parseFloat(circle.getAttribute("cy") || "0");
 			const r = parseFloat(circle.getAttribute("r") || "0");
 
-			const imgSize = r * 1.5;
+			// Clip path so icon is bounded by the circle border.
+			// clipPathUnits="userSpaceOnUse" (default) resolves coordinates in the
+			// referencing element's local space, which matches the circle's cx/cy
+			// even for ascendancy nodes already moved inside a <g transform="...">.
+			const clipId = `clip-n${nodeId}`;
+			const clipPath = document.createElementNS("http://www.w3.org/2000/svg", "clipPath");
+			clipPath.id = clipId;
+			const clipCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+			clipCircle.setAttribute("cx", cx.toString());
+			clipCircle.setAttribute("cy", cy.toString());
+			clipCircle.setAttribute("r", r.toString());
+			clipPath.appendChild(clipCircle);
+			defs.appendChild(clipPath);
+
+			const img = document.createElementNS(
+				"http://www.w3.org/2000/svg",
+				"image",
+			);
+
+			const imgSize = r * 1.8;
 			img.setAttribute("x", (cx - imgSize / 2).toString());
 			img.setAttribute("y", (cy - imgSize / 2).toString());
 			img.setAttribute("width", imgSize.toString());
 			img.setAttribute("height", imgSize.toString());
+			img.setAttribute("clip-path", `url(#${clipId})`);
 
 			const passivesPath = nodeData.icon.match(/passives\/(.+)\.webp/);
 			const skillIconPath = nodeData.icon.match(/SkillIcons\/([^/]+)\.webp/);
