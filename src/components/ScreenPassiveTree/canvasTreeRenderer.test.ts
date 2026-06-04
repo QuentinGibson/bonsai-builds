@@ -11,6 +11,7 @@ import {
   pixelToTreeSpace,
   buildSpatialIndex,
   findNodeAtPoint,
+  selectPreviewEdges,
 } from "./canvasTreeRenderer";
 
 // ── defaultCamera ─────────────────────────────────────────────────────────────
@@ -446,5 +447,33 @@ describe("parseSvgNodes", () => {
     const svg = `<svg><circle cx="-26047" cy="-13830" r="200" id="npassive_keystone_zealots_oath"></circle></svg>`;
     const nodes = parseSvgNodes(svg);
     expect(nodes[0]).toEqual({ id: "passive_keystone_zealots_oath", x: -26047, y: -13830, radius: 200 });
+  });
+});
+
+// ── selectPreviewEdges ────────────────────────────────────────────────────────
+
+describe("selectPreviewEdges", () => {
+  it("returns only connections where both endpoints are in the preview set", () => {
+    const connections = [
+      { fromId: "a", toId: "b" },
+      { fromId: "b", toId: "c" },
+      { fromId: "c", toId: "d" },
+    ];
+    const preview = new Set(["a", "b", "c"]);
+    expect(selectPreviewEdges(connections, preview)).toEqual([
+      { fromId: "a", toId: "b" },
+      { fromId: "b", toId: "c" },
+    ]);
+  });
+
+  it("excludes a connection when only one endpoint is in the preview set", () => {
+    const connections = [{ fromId: "a", toId: "b" }];
+    expect(selectPreviewEdges(connections, new Set(["a"]))).toEqual([]);
+    expect(selectPreviewEdges(connections, new Set(["b"]))).toEqual([]);
+  });
+
+  it("returns empty array when preview set is empty", () => {
+    const connections = [{ fromId: "a", toId: "b" }];
+    expect(selectPreviewEdges(connections, new Set())).toEqual([]);
   });
 });

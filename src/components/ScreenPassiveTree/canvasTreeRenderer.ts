@@ -174,6 +174,11 @@ export function parseSvgConnections(svgText: string): Connection[] {
   return result;
 }
 
+/** Return connections where both endpoints are in the preview path node set. */
+export function selectPreviewEdges(connections: Connection[], previewNodes: Set<string>): Connection[] {
+  return connections.filter((c) => previewNodes.has(c.fromId) && previewNodes.has(c.toId));
+}
+
 /** Initial camera state. */
 export function defaultCamera(): CameraState {
   return { zoom: 1.0, panX: 0, panY: 0 };
@@ -254,11 +259,14 @@ export class CanvasTreeRenderer {
   private spatialIndex = new Map<string, string[]>();
   private drawnNodeMap = new Map<string, NodePosition>();
   private onNodeClick: ((nodeId: string) => void) | null = null;
+  private onHoverNode: ((nodeId: string | null) => void) | null = null;
+  private lastHoveredNodeId: string | null | undefined = undefined;
   private isDragging = false;
   private dragMoved = false;
   private lastX = 0;
   private lastY = 0;
   private dragRafPending = false;
+  private hoverRafPending = false;
 
   setup(container: HTMLElement): void {
     // Two stacked canvases: static (nodes+edges) below, dynamic (hover, preview) above
@@ -308,6 +316,53 @@ export class CanvasTreeRenderer {
 
   setClickHandler(cb: (nodeId: string) => void): void {
     this.onNodeClick = cb;
+  }
+
+  setHoverHandler(cb: (nodeId: string | null) => void): void {
+    this.onHoverNode = cb;
+  }
+
+  clearDynamicLayer(): void {
+    if (!this.dynamicCanvas) return;
+    const ctx = this.dynamicCanvas.getContext("2d");
+    if (!ctx) return;
+    ctx.clearRect(0, 0, this.dynamicCanvas.width, this.dynamicCanvas.height);
+  }
+
+  drawPreviewPath(nodeIds: string[], connections: Connection[]): void {
+    if (!this.dynamicCanvas) return;
+    const ctx = this.dynamicCanvas.getContext("2d");
+    if (!ctx) return;
+    const { scale, tx, ty } = computeCanvasTransform(
+      this.camera,
+      this.dynamicCanvas.width,
+      this.dynamicCanvas.height,
+    );
+    ctx.clearRect(0, 0, this.dynamicCanvas.width, this.dynamicCanvas.height);
+    ctx.setTransform(scale, 0, 0, scale, tx, ty);
+    ctx.strokeStyle = "#90c8f0";
+    ctx.lineWidth = 3 / scale;
+    for (const conn of connections) {
+      const a = this.drawnNodeMap.get(conn.fromId);
+      const b = this.drawnNodeMap.get(conn.toId);
+      if (!a || !b) continue;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+    }
+    ctx.lineWidth = 2 / scale;
+    for (const nodeId of nodeIds) {
+      const node = this.drawnNodeMap.get(nodeId);
+      if (!node) continue;
+      ctx.fillStyle = "#5b8db8";
+      ctx.strokeStyle = "#90c8f0";
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+    ctx.resetTransform();
   }
 
   loadTree(
@@ -398,20 +453,39 @@ export class CanvasTreeRenderer {
       this.dragMoved = false;
       this.lastX = e.clientX;
       this.lastY = e.clientY;
+      this.fireHover(null);
     });
     container.addEventListener("mousemove", (e) => {
-      if (!this.isDragging) return;
-      const dx = e.clientX - this.lastX;
-      const dy = e.clientY - this.lastY;
-      if (Math.abs(dx) > 2 || Math.abs(dy) > 2) this.dragMoved = true;
-      this.lastX = e.clientX;
-      this.lastY = e.clientY;
-      this.camera = applyDragPan(this.camera, dx, dy);
-      if (!this.dragRafPending) {
-        this.dragRafPending = true;
+      if (this.isDragging) {
+        const dx = e.clientX - this.lastX;
+        const dy = e.clientY - this.lastY;
+        if (Math.abs(dx) > 2 || Math.abs(dy) > 2) this.dragMoved = true;
+        this.lastX = e.clientX;
+        this.lastY = e.clientY;
+        this.camera = applyDragPan(this.camera, dx, dy);
+        if (!this.dragRafPending) {
+          this.dragRafPending = true;
+          requestAnimationFrame(() => {
+            this.dragRafPending = false;
+            this.drawStatic();
+          });
+        }
+        return;
+      }
+      if (!this.onHoverNode || !this.staticCanvas) return;
+      const rect = this.staticCanvas.getBoundingClientRect();
+      const transform = computeCanvasTransform(
+        this.camera,
+        this.staticCanvas.width,
+        this.staticCanvas.height,
+      );
+      const { x, y } = pixelToTreeSpace(e.clientX - rect.left, e.clientY - rect.top, transform);
+      const nodeId = findNodeAtPoint(this.spatialIndex, this.drawnNodeMap, x, y, SPATIAL_CELL_SIZE);
+      if (!this.hoverRafPending) {
+        this.hoverRafPending = true;
         requestAnimationFrame(() => {
-          this.dragRafPending = false;
-          this.drawStatic();
+          this.hoverRafPending = false;
+          this.fireHover(nodeId);
         });
       }
     });
@@ -439,7 +513,10 @@ export class CanvasTreeRenderer {
       }
       this.isDragging = false;
     });
-    container.addEventListener("mouseleave", () => { this.isDragging = false; });
+    container.addEventListener("mouseleave", () => {
+      this.isDragging = false;
+      this.fireHover(null);
+    });
     container.addEventListener("wheel", (e) => {
       e.preventDefault();
       const rect = container.getBoundingClientRect();
@@ -449,6 +526,12 @@ export class CanvasTreeRenderer {
       this.drawStatic();
       this.dispatchZoomEvent();
     }, { passive: false });
+  }
+
+  private fireHover(nodeId: string | null): void {
+    if (nodeId === this.lastHoveredNodeId) return;
+    this.lastHoveredNodeId = nodeId;
+    this.onHoverNode?.(nodeId);
   }
 
   private lastDispatchedZoom = -1;

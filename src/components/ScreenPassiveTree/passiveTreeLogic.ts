@@ -4,10 +4,12 @@ import { type BuildSet, type PassiveNode, buildStorage } from "../../services/bu
 import { patchNodeNote } from "./passiveNodeNote";
 import { findShortestPath, findDisconnectedNodes } from "./passiveBFS";
 import {
+	type Connection,
 	CanvasTreeRenderer,
 	parseSvgNodes,
 	parseSvgConnections,
 	parseAscendancyTransform,
+	selectPreviewEdges,
 } from "./canvasTreeRenderer";
 import {
 	ascendancyData as ascendancyDataConfig,
@@ -57,6 +59,7 @@ export class PassiveTreeManager {
 	private lastX = 0;
 	private lastY = 0;
 	private connectionGraph = new Map<string, string[]>();
+	private canvasConnections: Connection[] = [];
 	private allAscendancyNodeIds = new Set<string>();
 	private hiddenNodeIds = new Set<string>();
 	private isReadOnly = true; // read-only until "Edit Tree" is triggered from Builder
@@ -142,10 +145,12 @@ export class PassiveTreeManager {
 			// Parse node positions and connections from SVG text for canvas rendering
 			const nodePositions = parseSvgNodes(svgContent);
 			const connections = parseSvgConnections(svgContent);
+			this.canvasConnections = connections;
 
 			// Render via canvas instead of appending the SVG to the live DOM
 			this.canvasRenderer.setup(container);
 			this.canvasRenderer.setClickHandler((nodeId) => this.handleCanvasNodeClick(nodeId));
+			this.canvasRenderer.setHoverHandler((nodeId) => this.handleCanvasNodeHover(nodeId));
 			this.canvasRenderer.loadTree(
 				nodePositions,
 				connections,
@@ -1502,6 +1507,27 @@ export class PassiveTreeManager {
 		this.syncCanvasAllocation();
 		this.updatePointsDisplay();
 		this.autoSave();
+	}
+
+	private handleCanvasNodeHover(nodeId: string | null): void {
+		if (!nodeId) {
+			this.canvasRenderer.clearDynamicLayer();
+			return;
+		}
+		const isAllocated = this.allocatedNodes.has(nodeId) || this.allocatedAscendancyNodes.has(nodeId);
+		if (isAllocated) {
+			this.canvasRenderer.clearDynamicLayer();
+			return;
+		}
+		const path = this.findShortestPath(nodeId);
+		if (!path) {
+			this.canvasRenderer.clearDynamicLayer();
+			return;
+		}
+		const previewNodeIds = [...path, nodeId];
+		const previewNodes = new Set(previewNodeIds);
+		const previewEdges = selectPreviewEdges(this.canvasConnections, previewNodes);
+		this.canvasRenderer.drawPreviewPath(previewNodeIds, previewEdges);
 	}
 
 	private updateCanvasAscendancy(): void {
