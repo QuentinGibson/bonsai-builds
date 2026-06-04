@@ -37,9 +37,77 @@ const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 10.0;
 const ZOOM_STEP = 0.3;
 const PAN_SCALE = 50;
+// Must be ≥ max node radius (200) so the 9-cell hit-test search is always correct
+const SPATIAL_CELL_SIZE = 300;
 
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
+}
+
+/** Invert a canvas transform to convert pixel coordinates back to tree space. */
+export function pixelToTreeSpace(
+  pixelX: number,
+  pixelY: number,
+  transform: CanvasTransform,
+): { x: number; y: number } {
+  return {
+    x: (pixelX - transform.tx) / transform.scale,
+    y: (pixelY - transform.ty) / transform.scale,
+  };
+}
+
+/**
+ * Build a grid spatial index mapping "cellX,cellY" → node IDs whose center
+ * falls in that cell. Used to narrow hit-testing to O(1) candidate lookups.
+ */
+export function buildSpatialIndex(
+  nodes: NodePosition[],
+  cellSize: number,
+): Map<string, string[]> {
+  const index = new Map<string, string[]>();
+  for (const node of nodes) {
+    const cx = Math.floor(node.x / cellSize);
+    const cy = Math.floor(node.y / cellSize);
+    const key = `${cx},${cy}`;
+    const bucket = index.get(key);
+    if (bucket) bucket.push(node.id);
+    else index.set(key, [node.id]);
+  }
+  return index;
+}
+
+/**
+ * Find the first node within its own hit radius of (treeX, treeY).
+ * Checks the clicked cell and its 8 neighbours so nodes near cell boundaries
+ * are never missed (requires cellSize ≥ max node radius).
+ */
+export function findNodeAtPoint(
+  index: Map<string, string[]>,
+  nodeMap: Map<string, NodePosition>,
+  treeX: number,
+  treeY: number,
+  cellSize: number,
+): string | null {
+  const cx = Math.floor(treeX / cellSize);
+  const cy = Math.floor(treeY / cellSize);
+  let best: string | null = null;
+  let bestDist = Infinity;
+  for (let dx = -1; dx <= 1; dx++) {
+    for (let dy = -1; dy <= 1; dy++) {
+      const bucket = index.get(`${cx + dx},${cy + dy}`);
+      if (!bucket) continue;
+      for (const id of bucket) {
+        const node = nodeMap.get(id);
+        if (!node) continue;
+        const dist = Math.hypot(treeX - node.x, treeY - node.y);
+        if (dist <= node.radius && dist < bestDist) {
+          best = id;
+          bestDist = dist;
+        }
+      }
+    }
+  }
+  return best;
 }
 
 /** Parse `translate(dx, dy)` from an ascendancy config transform string. */
@@ -181,7 +249,13 @@ export class CanvasTreeRenderer {
   private allAscendancyNodeIds = new Set<string>();
   private activeAscendancyNodeIds: string[] = [];
   private activeAscendancyTransform: { dx: number; dy: number } | null = null;
+  private allocatedMainNodes = new Set<string>();
+  private allocatedAscendancyNodes = new Set<string>();
+  private spatialIndex = new Map<string, string[]>();
+  private drawnNodeMap = new Map<string, NodePosition>();
+  private onNodeClick: ((nodeId: string) => void) | null = null;
   private isDragging = false;
+  private dragMoved = false;
   private lastX = 0;
   private lastY = 0;
   private dragRafPending = false;
@@ -232,6 +306,10 @@ export class CanvasTreeRenderer {
     this.setCamera(defaultCamera());
   }
 
+  setClickHandler(cb: (nodeId: string) => void): void {
+    this.onNodeClick = cb;
+  }
+
   loadTree(
     nodes: NodePosition[],
     connections: Connection[],
@@ -242,12 +320,20 @@ export class CanvasTreeRenderer {
     this.connections = connections;
     if (hiddenNodeIds) this.hiddenNodeIds = hiddenNodeIds;
     if (allAscendancyNodeIds) this.allAscendancyNodeIds = allAscendancyNodeIds;
+    // Spatial index is built from raw nodes once and never rebuilt on zoom/pan
+    this.spatialIndex = buildSpatialIndex(nodes, SPATIAL_CELL_SIZE);
     this.drawStatic();
   }
 
   setAscendancy(activeNodeIds: string[], transform: { dx: number; dy: number } | null): void {
     this.activeAscendancyNodeIds = activeNodeIds;
     this.activeAscendancyTransform = transform;
+    this.drawStatic();
+  }
+
+  setAllocatedNodes(main: Set<string>, ascendancy: Set<string>): void {
+    this.allocatedMainNodes = main;
+    this.allocatedAscendancyNodes = ascendancy;
     this.drawStatic();
   }
 
@@ -272,15 +358,19 @@ export class CanvasTreeRenderer {
       this.activeAscendancyNodeIds,
       this.activeAscendancyTransform,
     );
-    const nodeMap = new Map(nodes.map((n) => [n.id, n]));
+    this.drawnNodeMap = new Map(nodes.map((n) => [n.id, n]));
+
+    const isAllocated = (id: string) =>
+      this.allocatedMainNodes.has(id) || this.allocatedAscendancyNodes.has(id);
 
     // Connections
-    ctx.strokeStyle = "#888";
     ctx.lineWidth = 3 / scale;
     for (const conn of this.connections) {
-      const a = nodeMap.get(conn.fromId);
-      const b = nodeMap.get(conn.toId);
+      const a = this.drawnNodeMap.get(conn.fromId);
+      const b = this.drawnNodeMap.get(conn.toId);
       if (!a || !b) continue;
+      ctx.strokeStyle =
+        isAllocated(conn.fromId) && isAllocated(conn.toId) ? "#c8a84b" : "#555";
       ctx.beginPath();
       ctx.moveTo(a.x, a.y);
       ctx.lineTo(b.x, b.y);
@@ -288,10 +378,11 @@ export class CanvasTreeRenderer {
     }
 
     // Nodes
-    ctx.fillStyle = "#444";
-    ctx.strokeStyle = "#aaa";
     ctx.lineWidth = 2 / scale;
     for (const node of nodes) {
+      const allocated = isAllocated(node.id);
+      ctx.fillStyle = allocated ? "#c8a84b" : "#333";
+      ctx.strokeStyle = allocated ? "#f5d47b" : "#888";
       ctx.beginPath();
       ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
       ctx.fill();
@@ -304,6 +395,7 @@ export class CanvasTreeRenderer {
   private bindEvents(container: HTMLElement): void {
     container.addEventListener("mousedown", (e) => {
       this.isDragging = true;
+      this.dragMoved = false;
       this.lastX = e.clientX;
       this.lastY = e.clientY;
     });
@@ -311,6 +403,7 @@ export class CanvasTreeRenderer {
       if (!this.isDragging) return;
       const dx = e.clientX - this.lastX;
       const dy = e.clientY - this.lastY;
+      if (Math.abs(dx) > 2 || Math.abs(dy) > 2) this.dragMoved = true;
       this.lastX = e.clientX;
       this.lastY = e.clientY;
       this.camera = applyDragPan(this.camera, dx, dy);
@@ -322,7 +415,30 @@ export class CanvasTreeRenderer {
         });
       }
     });
-    container.addEventListener("mouseup", () => { this.isDragging = false; });
+    container.addEventListener("mouseup", (e) => {
+      if (!this.dragMoved && this.onNodeClick && this.staticCanvas) {
+        const rect = this.staticCanvas.getBoundingClientRect();
+        const transform = computeCanvasTransform(
+          this.camera,
+          this.staticCanvas.width,
+          this.staticCanvas.height,
+        );
+        const { x, y } = pixelToTreeSpace(
+          e.clientX - rect.left,
+          e.clientY - rect.top,
+          transform,
+        );
+        const nodeId = findNodeAtPoint(
+          this.spatialIndex,
+          this.drawnNodeMap,
+          x,
+          y,
+          SPATIAL_CELL_SIZE,
+        );
+        if (nodeId) this.onNodeClick(nodeId);
+      }
+      this.isDragging = false;
+    });
     container.addEventListener("mouseleave", () => { this.isDragging = false; });
     container.addEventListener("wheel", (e) => {
       e.preventDefault();

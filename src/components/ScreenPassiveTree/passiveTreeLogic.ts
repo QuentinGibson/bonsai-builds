@@ -145,6 +145,7 @@ export class PassiveTreeManager {
 
 			// Render via canvas instead of appending the SVG to the live DOM
 			this.canvasRenderer.setup(container);
+			this.canvasRenderer.setClickHandler((nodeId) => this.handleCanvasNodeClick(nodeId));
 			this.canvasRenderer.loadTree(
 				nodePositions,
 				connections,
@@ -1444,9 +1445,63 @@ export class PassiveTreeManager {
 		this.updateDropdownsFromState();
 
 		this.updateCanvasAscendancy();
+		this.syncCanvasAllocation();
 		this.updatePointsDisplay();
 		this.updateAllConnections();
 		this.applyNoteIndicators();
+	}
+
+	private syncCanvasAllocation(): void {
+		this.canvasRenderer.setAllocatedNodes(
+			new Set(this.allocatedNodes),
+			new Set(this.allocatedAscendancyNodes),
+		);
+	}
+
+	private handleCanvasNodeClick(nodeId: string): void {
+		if (this.isReadOnly) return;
+		if (!this.startingNodeId) return;
+
+		const isAscNode = this.isAscendancyNode(nodeId);
+		const isAllocated = isAscNode
+			? this.allocatedAscendancyNodes.has(nodeId)
+			: this.allocatedNodes.has(nodeId);
+
+		if (isAllocated) {
+			// Deallocation — protect starting nodes
+			if (nodeId === this.startingNodeId || nodeId === this.ascendancyStartingNodeId) return;
+
+			if (isAscNode) {
+				const disconnected = this.findDisconnectedNodesAscendancy(nodeId);
+				this.allocatedAscendancyNodes.delete(nodeId);
+				disconnected.forEach((id) => this.allocatedAscendancyNodes.delete(id));
+			} else {
+				const disconnected = this.findDisconnectedNodes(nodeId);
+				this.allocatedNodes.delete(nodeId);
+				disconnected.forEach((id) => this.allocatedNodes.delete(id));
+			}
+		} else {
+			// Allocation
+			if (isAscNode) {
+				if (!this.ascendancyStartingNodeId) return;
+				if (this.allocatedAscendancyNodes.size - 1 >= this.maxAscendancyPoints) return;
+				const path = this.findShortestPathAscendancy(nodeId);
+				if (path !== null) {
+					this.allocatedAscendancyNodes.add(nodeId);
+					path.forEach((id) => this.allocatedAscendancyNodes.add(id));
+				}
+			} else {
+				const path = this.findShortestPath(nodeId);
+				if (path !== null) {
+					this.allocatedNodes.add(nodeId);
+					path.forEach((id) => this.allocatedNodes.add(id));
+				}
+			}
+		}
+
+		this.syncCanvasAllocation();
+		this.updatePointsDisplay();
+		this.autoSave();
 	}
 
 	private updateCanvasAscendancy(): void {
@@ -1485,6 +1540,7 @@ export class PassiveTreeManager {
 		this.ascendancyStartingNodeId = null;
 		this.currentSelectedAscendancy = null;
 		this.updateCanvasAscendancy();
+		this.syncCanvasAllocation();
 	}
 
 	updateDropdownsFromState() {

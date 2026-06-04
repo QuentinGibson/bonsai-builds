@@ -8,6 +8,9 @@ import {
   computeCanvasTransform,
   parseAscendancyTransform,
   selectCanvasNodes,
+  pixelToTreeSpace,
+  buildSpatialIndex,
+  findNodeAtPoint,
 } from "./canvasTreeRenderer";
 
 // ── defaultCamera ─────────────────────────────────────────────────────────────
@@ -193,6 +196,113 @@ describe("parseSvgConnections", () => {
     const conns = parseSvgConnections(svg);
     expect(conns).toHaveLength(2);
     expect(conns.map((c) => c.fromId)).toEqual(["lightning14", "blind2"]);
+  });
+});
+
+// ── pixelToTreeSpace ──────────────────────────────────────────────────────────
+
+describe("pixelToTreeSpace", () => {
+  it("inverts computeCanvasTransform: roundtrip returns original tree point", () => {
+    const cam = defaultCamera();
+    const transform = computeCanvasTransform(cam, 800, 600);
+    // A known tree-space point
+    const treeX = 1000;
+    const treeY = -500;
+    // Forward: tree → canvas
+    const canvasX = treeX * transform.scale + transform.tx;
+    const canvasY = treeY * transform.scale + transform.ty;
+    // Inverse: canvas → tree
+    const result = pixelToTreeSpace(canvasX, canvasY, transform);
+    expect(result.x).toBeCloseTo(treeX);
+    expect(result.y).toBeCloseTo(treeY);
+  });
+
+  it("works at non-default zoom and pan", () => {
+    const cam = { zoom: 2.5, panX: 3000, panY: -1500 };
+    const transform = computeCanvasTransform(cam, 1200, 900);
+    const treeX = -8000;
+    const treeY = 12000;
+    const canvasX = treeX * transform.scale + transform.tx;
+    const canvasY = treeY * transform.scale + transform.ty;
+    const result = pixelToTreeSpace(canvasX, canvasY, transform);
+    expect(result.x).toBeCloseTo(treeX);
+    expect(result.y).toBeCloseTo(treeY);
+  });
+});
+
+// ── buildSpatialIndex ─────────────────────────────────────────────────────────
+
+describe("buildSpatialIndex", () => {
+  const CELL = 300;
+
+  it("maps a node to the cell containing its center", () => {
+    const node = { id: "a", x: 350, y: 750, radius: 100 };
+    const index = buildSpatialIndex([node], CELL);
+    const cellKey = `${Math.floor(350 / CELL)},${Math.floor(750 / CELL)}`;
+    expect(index.get(cellKey)).toContain("a");
+  });
+
+  it("places multiple nodes in distinct cells when far apart", () => {
+    const n1 = { id: "a", x: 0, y: 0, radius: 100 };
+    const n2 = { id: "b", x: 1000, y: 1000, radius: 100 };
+    const index = buildSpatialIndex([n1, n2], CELL);
+    const key1 = `${Math.floor(0 / CELL)},${Math.floor(0 / CELL)}`;
+    const key2 = `${Math.floor(1000 / CELL)},${Math.floor(1000 / CELL)}`;
+    expect(index.get(key1)).toContain("a");
+    expect(index.get(key2)).toContain("b");
+    expect(index.get(key1)).not.toContain("b");
+  });
+
+  it("places two nodes in the same cell when they share a center cell", () => {
+    const n1 = { id: "a", x: 10, y: 10, radius: 100 };
+    const n2 = { id: "b", x: 290, y: 290, radius: 100 };
+    const index = buildSpatialIndex([n1, n2], CELL);
+    const key = "0,0";
+    expect(index.get(key)).toContain("a");
+    expect(index.get(key)).toContain("b");
+  });
+
+  it("handles negative coordinates correctly", () => {
+    const node = { id: "neg", x: -350, y: -750, radius: 100 };
+    const index = buildSpatialIndex([node], CELL);
+    const cx = Math.floor(-350 / CELL);
+    const cy = Math.floor(-750 / CELL);
+    expect(index.get(`${cx},${cy}`)).toContain("neg");
+  });
+});
+
+// ── findNodeAtPoint ───────────────────────────────────────────────────────────
+
+describe("findNodeAtPoint", () => {
+  const CELL = 300;
+  const nodes = [
+    { id: "a", x: 0, y: 0, radius: 100 },
+    { id: "b", x: 500, y: 0, radius: 140 },
+  ];
+  const nodeMap = new Map(nodes.map((n) => [n.id, n]));
+  const index = buildSpatialIndex(nodes, CELL);
+
+  it("returns the node id when clicking within its radius", () => {
+    expect(findNodeAtPoint(index, nodeMap, 50, 0, CELL)).toBe("a");
+  });
+
+  it("returns null when clicking outside all node radii", () => {
+    expect(findNodeAtPoint(index, nodeMap, 200, 0, CELL)).toBeNull();
+  });
+
+  it("returns the nearest node when click is between two nodes", () => {
+    // Point at x=200 is 200 from "a" (radius 100, miss) and 300 from "b" (radius 140, miss)
+    expect(findNodeAtPoint(index, nodeMap, 200, 0, CELL)).toBeNull();
+    // Point at x=420 is 420 from "a" (miss) and 80 from "b" (hit within r=140)
+    expect(findNodeAtPoint(index, nodeMap, 420, 0, CELL)).toBe("b");
+  });
+
+  it("handles nodes at negative coordinates", () => {
+    const neg = [{ id: "neg", x: -500, y: -500, radius: 100 }];
+    const negMap = new Map(neg.map((n) => [n.id, n]));
+    const negIdx = buildSpatialIndex(neg, CELL);
+    expect(findNodeAtPoint(negIdx, negMap, -450, -500, CELL)).toBe("neg");
+    expect(findNodeAtPoint(negIdx, negMap, 0, 0, CELL)).toBeNull();
   });
 });
 
