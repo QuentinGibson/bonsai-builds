@@ -4,6 +4,11 @@ import { type BuildSet, type PassiveNode, buildStorage } from "../../services/bu
 import { patchNodeNote } from "./passiveNodeNote";
 import { findShortestPath, findDisconnectedNodes } from "./passiveBFS";
 import {
+	CanvasTreeRenderer,
+	parseSvgNodes,
+	parseSvgConnections,
+} from "./canvasTreeRenderer";
+import {
 	ascendancyData as ascendancyDataConfig,
 	ascendancyNames as ascendancyNamesConfig,
 	ascendancyStartNodes as ascendancyStartNodesConfig,
@@ -71,6 +76,8 @@ export class PassiveTreeManager {
 	private currentBreakpointId: string | null = null;
 	private initialized = false; // prevents repeated auto-select on every loadBuildSets call
 
+	private canvasRenderer = new CanvasTreeRenderer();
+
 	// Element caches — populated once after setup to avoid querySelector in hot paths
 	private nodeElements = new Map<string, SVGElement>();
 	private connElements = new Map<string, SVGElement>();
@@ -131,8 +138,13 @@ export class PassiveTreeManager {
 
 			this.setupTree();
 
-			// Insert into the live DOM only once — after all mutations are complete
-			container.appendChild(this.svg);
+			// Parse node positions and connections from SVG text for canvas rendering
+			const nodePositions = parseSvgNodes(svgContent);
+			const connections = parseSvgConnections(svgContent);
+
+			// Render via canvas instead of appending the SVG to the live DOM
+			this.canvasRenderer.setup(container);
+			this.canvasRenderer.loadTree(nodePositions, connections);
 		} catch (err) {
 			console.error("Failed to initialize passive tree:", err);
 			container.innerHTML =
@@ -991,36 +1003,29 @@ export class PassiveTreeManager {
 			});
 		}
 
-		// Camera overlay buttons
+		// Camera overlay buttons — delegated to CanvasTreeRenderer
 		const resetCameraBtn = document.getElementById("reset-camera-btn");
 		if (resetCameraBtn) {
 			resetCameraBtn.addEventListener("click", () => {
-				this.resetCamera();
+				this.canvasRenderer.resetCamera();
 			});
 		}
 
 		const zoomInBtn = document.getElementById("zoom-in-btn");
 		if (zoomInBtn) {
 			zoomInBtn.addEventListener("click", () => {
-				this.zoom = Math.min(10.0, this.zoom + 0.5);
-				this.updateViewBox();
+				const cam = this.canvasRenderer.getCamera();
+				this.canvasRenderer.setCamera({ ...cam, zoom: Math.min(10.0, cam.zoom + 0.5) });
 			});
 		}
 
 		const zoomOutBtn = document.getElementById("zoom-out-btn");
 		if (zoomOutBtn) {
 			zoomOutBtn.addEventListener("click", () => {
-				this.zoom = Math.max(0.5, this.zoom - 0.5);
-				this.updateViewBox();
+				const cam = this.canvasRenderer.getCamera();
+				this.canvasRenderer.setCamera({ ...cam, zoom: Math.max(0.5, cam.zoom - 0.5) });
 			});
 		}
-	}
-
-	private resetCamera() {
-		this.zoom = 1.0;
-		this.panX = 0;
-		this.panY = 0;
-		this.updateViewBox();
 	}
 
 	private setupBuildManagement() {
