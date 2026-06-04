@@ -7,6 +7,7 @@ import {
 	CanvasTreeRenderer,
 	parseSvgNodes,
 	parseSvgConnections,
+	parseAscendancyTransform,
 } from "./canvasTreeRenderer";
 import {
 	ascendancyData as ascendancyDataConfig,
@@ -144,7 +145,12 @@ export class PassiveTreeManager {
 
 			// Render via canvas instead of appending the SVG to the live DOM
 			this.canvasRenderer.setup(container);
-			this.canvasRenderer.loadTree(nodePositions, connections);
+			this.canvasRenderer.loadTree(
+				nodePositions,
+				connections,
+				this.hiddenNodeIds,
+				this.allAscendancyNodeIds,
+			);
 		} catch (err) {
 			console.error("Failed to initialize passive tree:", err);
 			container.innerHTML =
@@ -998,6 +1004,7 @@ export class PassiveTreeManager {
 					this.currentSelectedAscendancy = null;
 				}
 
+				this.updateCanvasAscendancy();
 				this.updatePointsDisplay();
 				this.updateAllConnections();
 			});
@@ -1436,9 +1443,22 @@ export class PassiveTreeManager {
 		// Update UI dropdowns
 		this.updateDropdownsFromState();
 
+		this.updateCanvasAscendancy();
 		this.updatePointsDisplay();
 		this.updateAllConnections();
 		this.applyNoteIndicators();
+	}
+
+	private updateCanvasAscendancy(): void {
+		if (this.currentSelectedAscendancy) {
+			const config = this.ascendancyData[this.currentSelectedAscendancy];
+			this.canvasRenderer.setAscendancy(
+				config.nodes,
+				parseAscendancyTransform(config.transform),
+			);
+		} else {
+			this.canvasRenderer.setAscendancy([], null);
+		}
 	}
 
 	clearAllAllocations() {
@@ -1464,6 +1484,7 @@ export class PassiveTreeManager {
 		this.startingNodeId = null;
 		this.ascendancyStartingNodeId = null;
 		this.currentSelectedAscendancy = null;
+		this.updateCanvasAscendancy();
 	}
 
 	updateDropdownsFromState() {

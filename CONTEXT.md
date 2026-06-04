@@ -49,6 +49,8 @@ A bundled JSON of all valid skill and support gem IDs and display names, extract
 ## Passive Node
 A node allocated on the passive skill tree. Stored as `{id: string, weapon_set?: number, additional_text?: string}`. `weapon_set` distinguishes nodes specific to weapon set 1 or 2 (absent = applies to both). `additional_text` is part of the POE2 `.build` format's `BuildPassive` object and round-trips losslessly through import/export. Ascendancy nodes are stored in the same array as regular nodes — distinguished in the UI by ID prefix (`"Ascendancy..."`), not by separate storage.
 
+**Node ID format:** The `id` field is the game's **PassiveSkills table ID** — a string like `"melee17"` or `"AscendancyWarrior3Start"`. This is distinct from Path of Building's internal numeric `skill` integer. The mapping is sourced from `poe2-skilltree-export/data.json` at tree-generation time; the SVG and all stored data use the string table ID exclusively.
+
 Weapon-set nodes are always visible simultaneously, color-coded by set (matching in-game presentation). No toggle.
 
 ## Skill

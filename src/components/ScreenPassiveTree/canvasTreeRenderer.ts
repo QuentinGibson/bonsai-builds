@@ -42,6 +42,40 @@ function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
+/** Parse `translate(dx, dy)` from an ascendancy config transform string. */
+export function parseAscendancyTransform(transform: string): { dx: number; dy: number } {
+  const m = transform.match(/translate\(\s*([+-]?\d+(?:\.\d+)?)\s*,\s*([+-]?\d+(?:\.\d+)?)\s*\)/);
+  if (!m) return { dx: 0, dy: 0 };
+  return { dx: parseFloat(m[1]), dy: parseFloat(m[2]) };
+}
+
+/**
+ * Return the subset of nodes to draw on the static canvas layer:
+ * - Main tree nodes: not in allAscendancyNodeIds and not in hiddenNodeIds
+ * - Active ascendancy nodes: those in activeAscendancyNodeIds, with the ascendancy
+ *   transform applied (dx, dy added to x, y) so they appear centred at the tree origin
+ */
+export function selectCanvasNodes(
+  nodes: NodePosition[],
+  hiddenNodeIds: Set<string>,
+  allAscendancyNodeIds: Set<string>,
+  activeAscendancyNodeIds: string[],
+  transform: { dx: number; dy: number } | null,
+): NodePosition[] {
+  const activeSet = new Set(activeAscendancyNodeIds);
+  const result: NodePosition[] = [];
+  for (const node of nodes) {
+    if (hiddenNodeIds.has(node.id)) continue;
+    if (allAscendancyNodeIds.has(node.id)) {
+      if (!activeSet.has(node.id) || !transform) continue;
+      result.push({ ...node, x: node.x + transform.dx, y: node.y + transform.dy });
+    } else {
+      result.push(node);
+    }
+  }
+  return result;
+}
+
 /** Parse `<circle id="n{id}" cx cy r>` elements out of raw SVG text. */
 export function parseSvgNodes(svgText: string): NodePosition[] {
   const tagPattern = /<circle\b[^>]*\bid="n([^"]+)"[^>]*>/g;
@@ -141,8 +175,12 @@ export class CanvasTreeRenderer {
   private staticCanvas: HTMLCanvasElement | null = null;
   private dynamicCanvas: HTMLCanvasElement | null = null;
   private camera: CameraState = defaultCamera();
-  private nodes: NodePosition[] = [];
+  private rawNodes: NodePosition[] = [];
   private connections: Connection[] = [];
+  private hiddenNodeIds = new Set<string>();
+  private allAscendancyNodeIds = new Set<string>();
+  private activeAscendancyNodeIds: string[] = [];
+  private activeAscendancyTransform: { dx: number; dy: number } | null = null;
   private isDragging = false;
   private lastX = 0;
   private lastY = 0;
@@ -194,9 +232,22 @@ export class CanvasTreeRenderer {
     this.setCamera(defaultCamera());
   }
 
-  loadTree(nodes: NodePosition[], connections: Connection[]): void {
-    this.nodes = nodes;
+  loadTree(
+    nodes: NodePosition[],
+    connections: Connection[],
+    hiddenNodeIds?: Set<string>,
+    allAscendancyNodeIds?: Set<string>,
+  ): void {
+    this.rawNodes = nodes;
     this.connections = connections;
+    if (hiddenNodeIds) this.hiddenNodeIds = hiddenNodeIds;
+    if (allAscendancyNodeIds) this.allAscendancyNodeIds = allAscendancyNodeIds;
+    this.drawStatic();
+  }
+
+  setAscendancy(activeNodeIds: string[], transform: { dx: number; dy: number } | null): void {
+    this.activeAscendancyNodeIds = activeNodeIds;
+    this.activeAscendancyTransform = transform;
     this.drawStatic();
   }
 
@@ -214,12 +265,21 @@ export class CanvasTreeRenderer {
     ctx.clearRect(0, 0, this.staticCanvas.width, this.staticCanvas.height);
     ctx.setTransform(scale, 0, 0, scale, tx, ty);
 
+    const nodes = selectCanvasNodes(
+      this.rawNodes,
+      this.hiddenNodeIds,
+      this.allAscendancyNodeIds,
+      this.activeAscendancyNodeIds,
+      this.activeAscendancyTransform,
+    );
+    const nodeMap = new Map(nodes.map((n) => [n.id, n]));
+
     // Connections
     ctx.strokeStyle = "#888";
     ctx.lineWidth = 3 / scale;
     for (const conn of this.connections) {
-      const a = this.nodes.find((n) => n.id === conn.fromId);
-      const b = this.nodes.find((n) => n.id === conn.toId);
+      const a = nodeMap.get(conn.fromId);
+      const b = nodeMap.get(conn.toId);
       if (!a || !b) continue;
       ctx.beginPath();
       ctx.moveTo(a.x, a.y);
@@ -231,7 +291,7 @@ export class CanvasTreeRenderer {
     ctx.fillStyle = "#444";
     ctx.strokeStyle = "#aaa";
     ctx.lineWidth = 2 / scale;
-    for (const node of this.nodes) {
+    for (const node of nodes) {
       ctx.beginPath();
       ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
       ctx.fill();

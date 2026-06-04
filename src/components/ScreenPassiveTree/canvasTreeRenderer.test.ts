@@ -6,6 +6,8 @@ import {
   applyWheelZoom,
   applyDragPan,
   computeCanvasTransform,
+  parseAscendancyTransform,
+  selectCanvasNodes,
 } from "./canvasTreeRenderer";
 
 // ── defaultCamera ─────────────────────────────────────────────────────────────
@@ -191,6 +193,105 @@ describe("parseSvgConnections", () => {
     const conns = parseSvgConnections(svg);
     expect(conns).toHaveLength(2);
     expect(conns.map((c) => c.fromId)).toEqual(["lightning14", "blind2"]);
+  });
+});
+
+// ── parseAscendancyTransform ──────────────────────────────────────────────────
+
+describe("parseAscendancyTransform", () => {
+  it("parses negative dx and dy", () => {
+    expect(parseAscendancyTransform("translate(-16049.53, -1939.79)")).toEqual({
+      dx: -16049.53,
+      dy: -1939.79,
+    });
+  });
+
+  it("parses positive dy (e.g. Stormweaver)", () => {
+    expect(parseAscendancyTransform("translate(0.00, 16231.57)")).toEqual({
+      dx: 0,
+      dy: 16231.57,
+    });
+  });
+
+  it("parses mixed signs", () => {
+    expect(parseAscendancyTransform("translate(11977.82, -10636.82)")).toEqual({
+      dx: 11977.82,
+      dy: -10636.82,
+    });
+  });
+});
+
+// ── selectCanvasNodes ─────────────────────────────────────────────────────────
+
+describe("selectCanvasNodes", () => {
+  const mainNode = { id: "strength1", x: 100, y: 200, radius: 100 };
+  const masteryNode = { id: "mastery_placeholder", x: 0, y: 0, radius: 0 };
+  const deadeye1 = { id: "AscendancyRanger1Notable3", x: 15055, y: 2394, radius: 140 };
+  const deadeye2 = { id: "AscendancyRanger1Small3", x: 16069, y: 2512, radius: 100 };
+  const pathfinder1 = { id: "AscendancyRanger3Notable1_", x: 14000, y: 5000, radius: 140 };
+
+  const allAscendancyIds = new Set([deadeye1.id, deadeye2.id, pathfinder1.id]);
+  const deadeyeIds = [deadeye1.id, deadeye2.id];
+  const deadeyeTransform = { dx: -16049.53, dy: -1939.79 };
+
+  it("excludes nodes in hiddenNodeIds (mastery placeholders)", () => {
+    const result = selectCanvasNodes(
+      [mainNode, masteryNode],
+      new Set([masteryNode.id]),
+      new Set(),
+      [],
+      null,
+    );
+    expect(result.map((n) => n.id)).toEqual([mainNode.id]);
+  });
+
+  it("includes main tree nodes that are not hidden", () => {
+    const result = selectCanvasNodes(
+      [mainNode],
+      new Set(),
+      new Set(),
+      [],
+      null,
+    );
+    expect(result).toHaveLength(1);
+    expect(result[0].id).toBe(mainNode.id);
+  });
+
+  it("excludes nodes from non-active ascendancy groups", () => {
+    const result = selectCanvasNodes(
+      [mainNode, pathfinder1],
+      new Set(),
+      allAscendancyIds,
+      deadeyeIds,
+      deadeyeTransform,
+    );
+    expect(result.map((n) => n.id)).not.toContain(pathfinder1.id);
+    expect(result.map((n) => n.id)).toContain(mainNode.id);
+  });
+
+  it("includes active ascendancy nodes with transform applied", () => {
+    const result = selectCanvasNodes(
+      [mainNode, deadeye1, deadeye2],
+      new Set(),
+      allAscendancyIds,
+      deadeyeIds,
+      deadeyeTransform,
+    );
+    const d1 = result.find((n) => n.id === deadeye1.id)!;
+    expect(d1).toBeDefined();
+    expect(d1.x).toBeCloseTo(deadeye1.x + deadeyeTransform.dx);
+    expect(d1.y).toBeCloseTo(deadeye1.y + deadeyeTransform.dy);
+  });
+
+  it("excludes all ascendancy nodes when activeAscendancyNodeIds is empty", () => {
+    const result = selectCanvasNodes(
+      [mainNode, deadeye1, pathfinder1],
+      new Set(),
+      allAscendancyIds,
+      [],
+      null,
+    );
+    expect(result.map((n) => n.id)).toEqual([mainNode.id]);
   });
 });
 
