@@ -10,6 +10,7 @@ import {
 	parseSvgConnections,
 	parseAscendancyTransform,
 	selectPreviewEdges,
+	buildStatsHtml,
 } from "./canvasTreeRenderer";
 import {
 	ascendancyData as ascendancyDataConfig,
@@ -150,7 +151,7 @@ export class PassiveTreeManager {
 			// Render via canvas instead of appending the SVG to the live DOM
 			this.canvasRenderer.setup(container);
 			this.canvasRenderer.setClickHandler((nodeId) => this.handleCanvasNodeClick(nodeId));
-			this.canvasRenderer.setHoverHandler((nodeId) => this.handleCanvasNodeHover(nodeId));
+			this.canvasRenderer.setHoverHandler((nodeId, clientX, clientY) => this.handleCanvasNodeHover(nodeId, clientX, clientY));
 			this.canvasRenderer.loadTree(
 				nodePositions,
 				connections,
@@ -1509,25 +1510,57 @@ export class PassiveTreeManager {
 		this.autoSave();
 	}
 
-	private handleCanvasNodeHover(nodeId: string | null): void {
+	private handleCanvasNodeHover(nodeId: string | null, clientX: number, clientY: number): void {
 		if (!nodeId) {
 			this.canvasRenderer.clearDynamicLayer();
+			this.hideCanvasTooltip();
 			return;
 		}
 		const isAllocated = this.allocatedNodes.has(nodeId) || this.allocatedAscendancyNodes.has(nodeId);
 		if (isAllocated) {
 			this.canvasRenderer.clearDynamicLayer();
-			return;
+		} else {
+			const path = this.findShortestPath(nodeId);
+			if (!path) {
+				this.canvasRenderer.clearDynamicLayer();
+			} else {
+				const previewNodeIds = [...path, nodeId];
+				const previewNodes = new Set(previewNodeIds);
+				const previewEdges = selectPreviewEdges(this.canvasConnections, previewNodes);
+				this.canvasRenderer.drawPreviewPath(previewNodeIds, previewEdges);
+			}
 		}
-		const path = this.findShortestPath(nodeId);
-		if (!path) {
-			this.canvasRenderer.clearDynamicLayer();
-			return;
+		this.showCanvasTooltip(nodeId, clientX, clientY);
+	}
+
+	private showCanvasTooltip(nodeId: string, clientX: number, clientY: number): void {
+		if (!this.treeData) return;
+		const nodeData = this.treeData.nodes[nodeId];
+		if (!nodeData) return;
+		const tooltip = document.getElementById("node-tooltip");
+		if (!tooltip) return;
+		if (this.tooltipNodeId !== nodeId) {
+			this.tooltipNodeId = nodeId;
+			const tooltipTitle = tooltip.querySelector(".tooltip-title");
+			const tooltipStats = tooltip.querySelector(".tooltip-stats");
+			if (tooltipTitle && tooltipStats) {
+				tooltipTitle.textContent = nodeData.name || "Unknown Node";
+				tooltipTitle.className = "tooltip-title";
+				if (nodeData.isKeystone) tooltipTitle.classList.add("keystone");
+				else if (nodeData.isNotable) tooltipTitle.classList.add("notable");
+				tooltipStats.innerHTML = buildStatsHtml(nodeData.stats);
+			}
 		}
-		const previewNodeIds = [...path, nodeId];
-		const previewNodes = new Set(previewNodeIds);
-		const previewEdges = selectPreviewEdges(this.canvasConnections, previewNodes);
-		this.canvasRenderer.drawPreviewPath(previewNodeIds, previewEdges);
+		tooltip.style.transform = `translate(${clientX + 15}px, ${clientY + 15}px)`;
+		tooltip.style.display = "block";
+	}
+
+	private hideCanvasTooltip(): void {
+		if (this.tooltipNodeId !== null) {
+			this.tooltipNodeId = null;
+			const tooltip = document.getElementById("node-tooltip");
+			if (tooltip) tooltip.style.display = "none";
+		}
 	}
 
 	private updateCanvasAscendancy(): void {

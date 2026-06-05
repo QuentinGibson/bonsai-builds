@@ -174,6 +174,13 @@ export function parseSvgConnections(svgText: string): Connection[] {
   return result;
 }
 
+/** Build the innerHTML string for the tooltip stats section. */
+export function buildStatsHtml(stats: string[] | undefined): string {
+  return stats?.length
+    ? stats.map((stat) => `<div>${stat}</div>`).join("")
+    : '<div style="color: #888; font-style: italic;">No stats</div>';
+}
+
 /** Return connections where both endpoints are in the preview path node set. */
 export function selectPreviewEdges(connections: Connection[], previewNodes: Set<string>): Connection[] {
   return connections.filter((c) => previewNodes.has(c.fromId) && previewNodes.has(c.toId));
@@ -259,8 +266,7 @@ export class CanvasTreeRenderer {
   private spatialIndex = new Map<string, string[]>();
   private drawnNodeMap = new Map<string, NodePosition>();
   private onNodeClick: ((nodeId: string) => void) | null = null;
-  private onHoverNode: ((nodeId: string | null) => void) | null = null;
-  private lastHoveredNodeId: string | null | undefined = undefined;
+  private onHoverNode: ((nodeId: string | null, clientX: number, clientY: number) => void) | null = null;
   private isDragging = false;
   private dragMoved = false;
   private lastX = 0;
@@ -318,7 +324,7 @@ export class CanvasTreeRenderer {
     this.onNodeClick = cb;
   }
 
-  setHoverHandler(cb: (nodeId: string | null) => void): void {
+  setHoverHandler(cb: (nodeId: string | null, clientX: number, clientY: number) => void): void {
     this.onHoverNode = cb;
   }
 
@@ -453,7 +459,7 @@ export class CanvasTreeRenderer {
       this.dragMoved = false;
       this.lastX = e.clientX;
       this.lastY = e.clientY;
-      this.fireHover(null);
+      this.fireHover(null, 0, 0);
     });
     container.addEventListener("mousemove", (e) => {
       if (this.isDragging) {
@@ -481,11 +487,13 @@ export class CanvasTreeRenderer {
       );
       const { x, y } = pixelToTreeSpace(e.clientX - rect.left, e.clientY - rect.top, transform);
       const nodeId = findNodeAtPoint(this.spatialIndex, this.drawnNodeMap, x, y, SPATIAL_CELL_SIZE);
+      const clientX = e.clientX;
+      const clientY = e.clientY;
       if (!this.hoverRafPending) {
         this.hoverRafPending = true;
         requestAnimationFrame(() => {
           this.hoverRafPending = false;
-          this.fireHover(nodeId);
+          this.fireHover(nodeId, clientX, clientY);
         });
       }
     });
@@ -515,7 +523,7 @@ export class CanvasTreeRenderer {
     });
     container.addEventListener("mouseleave", () => {
       this.isDragging = false;
-      this.fireHover(null);
+      this.fireHover(null, 0, 0);
     });
     container.addEventListener("wheel", (e) => {
       e.preventDefault();
@@ -528,10 +536,8 @@ export class CanvasTreeRenderer {
     }, { passive: false });
   }
 
-  private fireHover(nodeId: string | null): void {
-    if (nodeId === this.lastHoveredNodeId) return;
-    this.lastHoveredNodeId = nodeId;
-    this.onHoverNode?.(nodeId);
+  private fireHover(nodeId: string | null, clientX: number, clientY: number): void {
+    this.onHoverNode?.(nodeId, clientX, clientY);
   }
 
   private lastDispatchedZoom = -1;

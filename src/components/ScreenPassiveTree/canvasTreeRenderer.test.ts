@@ -12,6 +12,7 @@ import {
   buildSpatialIndex,
   findNodeAtPoint,
   selectPreviewEdges,
+  buildStatsHtml,
 } from "./canvasTreeRenderer";
 
 // ── defaultCamera ─────────────────────────────────────────────────────────────
@@ -475,5 +476,27 @@ describe("selectPreviewEdges", () => {
   it("returns empty array when preview set is empty", () => {
     const connections = [{ fromId: "a", toId: "b" }];
     expect(selectPreviewEdges(connections, new Set())).toEqual([]);
+  });
+});
+
+// ── buildStatsHtml ────────────────────────────────────────────────────────────
+
+describe("buildStatsHtml", () => {
+  it("returns italic placeholder when stats is empty", () => {
+    expect(buildStatsHtml([])).toBe(
+      '<div style="color: #888; font-style: italic;">No stats</div>',
+    );
+  });
+
+  it("wraps each stat in a <div>", () => {
+    expect(buildStatsHtml(["10% increased Life", "+5 Strength"])).toBe(
+      "<div>10% increased Life</div><div>+5 Strength</div>",
+    );
+  });
+
+  it("returns placeholder when stats is undefined", () => {
+    expect(buildStatsHtml(undefined)).toBe(
+      '<div style="color: #888; font-style: italic;">No stats</div>',
+    );
   });
 });
