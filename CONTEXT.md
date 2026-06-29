@@ -53,6 +53,9 @@ A node allocated on the passive skill tree. Stored as `{id: string, weapon_set?:
 
 Weapon-set nodes are always visible simultaneously, color-coded by set (matching in-game presentation). No toggle.
 
+## Node Type
+The visual and mechanical tier of a passive node, determined by its SVG circle radius. Three tiers exist on the main tree: **Normal** (r=100, small stat nodes), **Notable** (r=140, named nodes with larger effects), and **Keystone** (r=200, major build-defining nodes). **Ascendancy** nodes are a fourth visual category, identified by their ID prefix (`"Ascendancy..."`), regardless of radius. Node type governs border weight, color, and glow intensity on the canvas renderer.
+
 ## Skill
 A skill gem assigned to a build, including its support gems and the level range it is active (`level_interval`). Displayed as a flat list — main gem as a row, support gems listed beneath it. `level_interval` is editable via a simple two-number range input. Skills are selected from a searchable picker backed by a bundled gem database (not free-text ID entry).
 
