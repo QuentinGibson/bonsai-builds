@@ -2,6 +2,8 @@
 // Pure functions are exported for testability; the CanvasTreeRenderer class
 // owns the stateful canvas setup and draw loop.
 
+import { getActiveFrame, getDisabledFrame, type SpriteFrame } from "../../services/passiveIconSprite";
+
 export type NodePosition = {
   id: string;
   x: number;
@@ -248,6 +250,30 @@ export function computeCanvasTransform(
   return { scale, tx, ty };
 }
 
+/**
+ * Compute ctx.drawImage arguments to render a sprite frame centered at (cx, cy).
+ * The destination is a square of side radius * 1.8; the source is the frame rect
+ * within the sprite sheet. Canvas clip (arc) must be applied by the caller.
+ */
+export function computeIconDrawArgs(
+  cx: number,
+  cy: number,
+  radius: number,
+  frame: SpriteFrame,
+): { sx: number; sy: number; sw: number; sh: number; dx: number; dy: number; dw: number; dh: number } {
+  const imgSize = radius * 1.8;
+  return {
+    sx: frame.x,
+    sy: frame.y,
+    sw: frame.w,
+    sh: frame.h,
+    dx: cx - imgSize / 2,
+    dy: cy - imgSize / 2,
+    dw: imgSize,
+    dh: imgSize,
+  };
+}
+
 // ── CanvasTreeRenderer ────────────────────────────────────────────────────────
 // Stateful class; DOM and canvas interactions live here.
 
@@ -267,6 +293,9 @@ export class CanvasTreeRenderer {
   private drawnNodeMap = new Map<string, NodePosition>();
   private onNodeClick: ((nodeId: string) => void) | null = null;
   private onHoverNode: ((nodeId: string | null, clientX: number, clientY: number) => void) | null = null;
+  private nodeIcons = new Map<string, string>(); // nodeId → iconName
+  private activeSprite: HTMLImageElement | null = null;
+  private disabledSprite: HTMLImageElement | null = null;
   private isDragging = false;
   private dragMoved = false;
   private lastX = 0;
@@ -294,6 +323,25 @@ export class CanvasTreeRenderer {
 
     this.bindEvents(container);
     this.syncCanvasSize();
+    this.loadSprites();
+  }
+
+  loadIcons(nodeIcons: Map<string, string>): void {
+    this.nodeIcons = nodeIcons;
+    this.drawStatic();
+  }
+
+  private loadSprites(): void {
+    const load = (src: string, onReady: (img: HTMLImageElement) => void) => {
+      const img = new Image();
+      img.onload = () => {
+        onReady(img);
+        this.drawStatic();
+      };
+      img.src = src;
+    };
+    load("/assets-static/images/skills.webp", (img) => { this.activeSprite = img; });
+    load("/assets-static/images/skills-disabled.webp", (img) => { this.disabledSprite = img; });
   }
 
   private syncCanvasSize(): void {
@@ -448,6 +496,22 @@ export class CanvasTreeRenderer {
       ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
+
+      const iconName = this.nodeIcons.get(node.id);
+      if (iconName) {
+        const sprite = allocated ? this.activeSprite : this.disabledSprite;
+        const frame = allocated ? getActiveFrame(iconName) : getDisabledFrame(iconName);
+        if (sprite?.complete && frame) {
+          const { sx, sy, sw, sh, dx, dy, dw, dh } = computeIconDrawArgs(node.x, node.y, node.radius, frame);
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+          ctx.clip();
+          if (!allocated) ctx.globalAlpha = 0.7;
+          ctx.drawImage(sprite, sx, sy, sw, sh, dx, dy, dw, dh);
+          ctx.restore();
+        }
+      }
     }
 
     ctx.resetTransform();

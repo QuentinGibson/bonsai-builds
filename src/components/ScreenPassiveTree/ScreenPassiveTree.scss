@@ -107,6 +107,32 @@
 			opacity: 0.6;
 		}
 
+		// Sprite-based icon toggling — two images per node (active + disabled).
+		// CSS sibling selectors toggle visibility based on the circle's .allocated class.
+		.node-icon-active {
+			display: none;
+			pointer-events: none;
+		}
+
+		circle.allocated + .node-icon-active {
+			display: inline;
+		}
+
+		circle.allocated + .node-icon-active + .node-icon-disabled {
+			display: none;
+		}
+
+		circle.preview + .node-icon-active,
+		circle.preview-remove + .node-icon-active {
+			display: inline;
+			opacity: 0.6;
+		}
+
+		circle.preview + .node-icon-active + .node-icon-disabled,
+		circle.preview-remove + .node-icon-active + .node-icon-disabled {
+			display: none;
+		}
+
 		// ── Connection styles ──────────────────────────────────────────────
 
 		#connections line,

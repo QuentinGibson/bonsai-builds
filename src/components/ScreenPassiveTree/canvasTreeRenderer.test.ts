@@ -13,6 +13,7 @@ import {
   findNodeAtPoint,
   selectPreviewEdges,
   buildStatsHtml,
+  computeIconDrawArgs,
 } from "./canvasTreeRenderer";
 
 // ── defaultCamera ─────────────────────────────────────────────────────────────
@@ -476,6 +477,36 @@ describe("selectPreviewEdges", () => {
   it("returns empty array when preview set is empty", () => {
     const connections = [{ fromId: "a", toId: "b" }];
     expect(selectPreviewEdges(connections, new Set())).toEqual([]);
+  });
+});
+
+// ── computeIconDrawArgs ───────────────────────────────────────────────────────
+
+describe("computeIconDrawArgs", () => {
+  it("source rect equals the sprite frame", () => {
+    const frame = { x: 306, y: 0, w: 34, h: 34 };
+    const args = computeIconDrawArgs(0, 0, 100, frame);
+    expect(args.sx).toBe(306);
+    expect(args.sy).toBe(0);
+    expect(args.sw).toBe(34);
+    expect(args.sh).toBe(34);
+  });
+
+  it("destination is centered at (cx, cy) with size radius * 1.8", () => {
+    const frame = { x: 0, y: 0, w: 34, h: 34 };
+    const args = computeIconDrawArgs(100, 200, 50, frame);
+    const imgSize = 50 * 1.8;
+    expect(args.dx).toBeCloseTo(100 - imgSize / 2);
+    expect(args.dy).toBeCloseTo(200 - imgSize / 2);
+    expect(args.dw).toBeCloseTo(imgSize);
+    expect(args.dh).toBeCloseTo(imgSize);
+  });
+
+  it("destination is square regardless of frame dimensions", () => {
+    const frame = { x: 0, y: 0, w: 49, h: 49 };
+    const args = computeIconDrawArgs(0, 0, 70, frame);
+    expect(args.dw).toBe(args.dh);
+    expect(args.dw).toBeCloseTo(70 * 1.8);
   });
 });
 

@@ -158,6 +158,13 @@ export class PassiveTreeManager {
 				this.hiddenNodeIds,
 				this.allAscendancyNodeIds,
 			);
+
+			const nodeIconMap = new Map<string, string>();
+			for (const [nodeId, nodeData] of Object.entries(treeData.nodes)) {
+				const m = (nodeData as { icon?: string }).icon?.match(/passives\/(.+)\.webp/i);
+				if (m) nodeIconMap.set(nodeId, m[1].toLowerCase());
+			}
+			this.canvasRenderer.loadIcons(nodeIconMap);
 		} catch (err) {
 			console.error("Failed to initialize passive tree:", err);
 			container.innerHTML =
@@ -186,9 +193,6 @@ export class PassiveTreeManager {
 
 		// Group ascendancy nodes first
 		this.setupAscendancyGroups();
-
-		// Apply node images
-		this.applyNodeImages();
 
 		// Build connection graph
 		this.buildConnectionGraph();
@@ -282,73 +286,6 @@ export class PassiveTreeManager {
 		});
 	}
 
-	private applyNodeImages() {
-		if (!this.svg || !this.treeData) return;
-
-		const nodes = this.treeData.nodes;
-
-		let defs = this.svg.querySelector("defs");
-		if (!defs) {
-			defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
-			this.svg.insertBefore(defs, this.svg.firstChild);
-		}
-
-		// Query all circles once instead of one querySelector per node (was 4,701 queries)
-		this.svg.querySelectorAll('circle[id^="n"]').forEach((circle) => {
-			const nodeId = circle.id.slice(1);
-			const nodeData = nodes[nodeId];
-			if (!nodeData?.icon) return;
-
-			const cx = parseFloat(circle.getAttribute("cx") || "0");
-			const cy = parseFloat(circle.getAttribute("cy") || "0");
-			const r = parseFloat(circle.getAttribute("r") || "0");
-
-			// Clip path so icon is bounded by the circle border.
-			// clipPathUnits="userSpaceOnUse" (default) resolves coordinates in the
-			// referencing element's local space, which matches the circle's cx/cy
-			// even for ascendancy nodes already moved inside a <g transform="...">.
-			const clipId = `clip-n${nodeId}`;
-			const clipPath = document.createElementNS("http://www.w3.org/2000/svg", "clipPath");
-			clipPath.id = clipId;
-			const clipCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-			clipCircle.setAttribute("cx", cx.toString());
-			clipCircle.setAttribute("cy", cy.toString());
-			clipCircle.setAttribute("r", r.toString());
-			clipPath.appendChild(clipCircle);
-			defs.appendChild(clipPath);
-
-			const img = document.createElementNS(
-				"http://www.w3.org/2000/svg",
-				"image",
-			);
-
-			const imgSize = r * 1.8;
-			img.setAttribute("x", (cx - imgSize / 2).toString());
-			img.setAttribute("y", (cy - imgSize / 2).toString());
-			img.setAttribute("width", imgSize.toString());
-			img.setAttribute("height", imgSize.toString());
-			img.setAttribute("clip-path", `url(#${clipId})`);
-
-			const passivesPath = nodeData.icon.match(/passives\/(.+)\.webp/);
-			const skillIconPath = nodeData.icon.match(/SkillIcons\/([^/]+)\.webp/);
-
-			if (passivesPath) {
-				img.setAttribute(
-					"href",
-					`/assets-static/images/passives/${passivesPath[1].toLowerCase()}.png`,
-				);
-			} else if (skillIconPath) {
-				img.setAttribute(
-					"href",
-					`/assets-static/images/${skillIconPath[1].toLowerCase()}.png`,
-				);
-			}
-
-			img.setAttribute("pointer-events", "none");
-			img.classList.add("node-icon");
-			circle.parentNode?.insertBefore(img, circle.nextSibling);
-		});
-	}
 
 	private buildConnectionGraph() {
 		if (!this.svg) return;
@@ -385,11 +322,6 @@ export class PassiveTreeManager {
 				(circle as SVGElement).style.display = "none";
 				(circle as SVGElement).style.pointerEvents = "none";
 
-				// applyNodeImages() inserts a .node-icon <image> immediately after the circle
-				const icon = circle.nextElementSibling;
-				if (icon?.classList.contains("node-icon")) {
-					(icon as SVGElement).style.display = "none";
-				}
 			}
 		});
 
