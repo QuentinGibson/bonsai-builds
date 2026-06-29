@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ascendancy Background Gradient — Proposed Issues</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      color: #f0f6fc;
+    }
+
+    .subtitle {
+      color: #8b949e;
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+
+    .issue {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+
+    .issue-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid #30363d;
+      background: #1c2128;
+    }
+
+    .issue-number {
+      font-size: 0.8rem;
+      color: #8b949e;
+      font-weight: 500;
+    }
+
+    .issue-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #f0f6fc;
+      flex: 1;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.2em 0.6em;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-afk {
+      background: #1a4f1a;
+      color: #56d364;
+      border: 1px solid #2ea043;
+    }
+
+    .badge-hitl {
+      background: #3d2a00;
+      color: #e3b341;
+      border: 1px solid #9e6a03;
+    }
+
+    .issue-body {
+      padding: 1.25rem;
+    }
+
+    .section {
+      margin-bottom: 1.25rem;
+    }
+
+    .section:last-child {
+      margin-bottom: 0;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #8b949e;
+      margin-bottom: 0.5rem;
+    }
+
+    .section p {
+      font-size: 0.9rem;
+      color: #c9d1d9;
+    }
+
+    .criteria {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .criteria li {
+      display: flex;
+      gap: 0.6rem;
+      font-size: 0.9rem;
+      color: #c9d1d9;
+    }
+
+    .criteria li::before {
+      content: "☐";
+      color: #58a6ff;
+      flex-shrink: 0;
+      line-height: 1.6;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .meta-item {
+      background: #0d1117;
+      border: 1px solid #21262d;
+      border-radius: 6px;
+      padding: 0.6rem 0.85rem;
+    }
+
+    .meta-key {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #8b949e;
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+    }
+
+    .meta-val {
+      font-size: 0.85rem;
+      color: #c9d1d9;
+    }
+
+    .blocker-none {
+      color: #56d364;
+    }
+
+    .blocker-ref {
+      color: #58a6ff;
+    }
+
+    .us-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .us-tag {
+      font-size: 0.75rem;
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 4px;
+      padding: 0.15em 0.5em;
+      color: #8b949e;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #21262d;
+      margin: 1rem 0;
+    }
+
+    .question-box {
+      background: #1c2128;
+      border: 1px solid #30363d;
+      border-left: 3px solid #58a6ff;
+      border-radius: 6px;
+      padding: 1rem 1.25rem;
+      margin-top: 2rem;
+    }
+
+    .question-box h2 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #58a6ff;
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .question-box ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .question-box li {
+      font-size: 0.875rem;
+      color: #c9d1d9;
+      padding-left: 1.1rem;
+      position: relative;
+    }
+
+    .question-box li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: #58a6ff;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Ascendancy Background Radial Gradient</h1>
+  <p class="subtitle">Proposed issues — pending your approval before publishing</p>
+
+  <!-- Issue 1 -->
+  <div class="issue">
+    <div class="issue-header">
+      <span class="issue-number">Slice 1 of 2</span>
+      <span class="issue-title">Implement <code>drawAscendancyBackground</code> pure function + unit tests</span>
+      <span class="badge badge-afk">AFK</span>
+    </div>
+    <div class="issue-body">
+
+      <div class="section">
+        <div class="section-label">What to build</div>
+        <p>
+          Export a new pure function <code>drawAscendancyBackground(ctx, outerRadius, colorStops)</code>
+          from <code>canvasTreeRenderer.ts</code>, placed in the pure-function section alongside the existing
+          helpers (<code>computeIconDrawArgs</code>, <code>buildStatsHtml</code>, etc.).
+          The function calls <code>ctx.createRadialGradient(0, 0, 0, 0, 0, outerRadius)</code> and
+          adds colour stops: an opaque dark fill at the inner stop, a subtle coloured ring stop just
+          inside the outer edge, and fully transparent at the outer edge. It then fills a circle of
+          radius <code>outerRadius</code> with the resulting gradient. No image assets are loaded;
+          the effect is produced entirely with the Canvas 2D gradient API.
+        </p>
+      </div>
+
+      <hr class="divider">
+
+      <div class="section">
+        <div class="section-label">Acceptance criteria</div>
+        <ul class="criteria">
+          <li>Function is exported from <code>canvasTreeRenderer.ts</code> and importable in tests without instantiating the renderer class.</li>
+          <li><code>createRadialGradient</code> is called with centre at (0, 0) in both inner and outer circles.</li>
+          <li><code>createRadialGradient</code> is called with the configured <code>outerRadius</code> constant as the outer radius.</li>
+          <li>At least one fully opaque dark colour stop is added via <code>addColorStop</code>.</li>
+          <li>At least one fully transparent colour stop is added via <code>addColorStop</code>.</li>
+          <li>A coloured ring stop is added at a position between the inner opaque stop and the outer transparent stop.</li>
+          <li>All tests live in <code>canvasTreeRenderer.test.ts</code> and use plain Vitest <code>describe</code>/<code>it</code>/<code>expect</code> with a lightweight mock of <code>CanvasRenderingContext2D</code> — no DOM required.</li>
+          <li>All new tests pass (<code>npx vitest run</code>).</li>
+        </ul>
+      </div>
+
+      <hr class="divider">
+
+      <div class="meta-grid">
+        <div class="meta-item">
+          <div class="meta-key">Blocked by</div>
+          <div class="meta-val blocker-none">None — can start immediately</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-key">User stories</div>
+          <div class="us-list">
+            <span class="us-tag">US 7</span>
+            <span class="us-tag">US 8</span>
+            <span class="us-tag">US 12</span>
+            <span class="us-tag">US 14</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Issue 2 -->
+  <div class="issue">
+    <div class="issue-header">
+      <span class="issue-number">Slice 2 of 2</span>
+      <span class="issue-title">Wire <code>drawAscendancyBackground</code> into <code>drawStatic()</code></span>
+      <span class="badge badge-afk">AFK</span>
+    </div>
+    <div class="issue-body">
+
+      <div class="section">
+        <div class="section-label">What to build</div>
+        <p>
+          Inside <code>CanvasTreeRenderer.drawStatic()</code>, call <code>drawAscendancyBackground</code>
+          immediately after <code>ctx.setTransform</code> is applied and before the connection and node
+          draw loops. Guard the call so it only executes when <code>activeAscendancyNodeIds</code> is
+          non-empty and <code>activeAscendancyTransform</code> is non-null — otherwise skip entirely,
+          leaving the canvas unchanged for builds with no ascendancy selected.
+          Because <code>setAscendancy</code> already centres all active ascendancy nodes around
+          tree-space (0, 0), the gradient centre requires no per-ascendancy position lookup.
+        </p>
+      </div>
+
+      <hr class="divider">
+
+      <div class="section">
+        <div class="section-label">Acceptance criteria</div>
+        <ul class="criteria">
+          <li>Selecting an ascendancy class causes a radial gradient to appear behind the ascendancy cluster on the static canvas layer.</li>
+          <li>The gradient is dark at the centre and fades to transparent at the outer edge, not obscuring adjacent main-tree nodes.</li>
+          <li>A subtle coloured ring is visible at the outer edge of the gradient.</li>
+          <li>The gradient is centred on the ascendancy cluster regardless of which ascendancy is selected.</li>
+          <li>The gradient remains correctly positioned when panning and zooming.</li>
+          <li>When no ascendancy is selected, no gradient is drawn and the canvas is unaffected.</li>
+          <li>Switching ascendancies redraws the gradient for the new selection.</li>
+          <li>Ascendancy nodes are drawn on top of the gradient (gradient is below nodes in paint order).</li>
+          <li>The gradient is rendered on the static canvas layer, not the dynamic hover layer.</li>
+          <li>All existing tests continue to pass (<code>npx vitest run</code>).</li>
+        </ul>
+      </div>
+
+      <hr class="divider">
+
+      <div class="meta-grid">
+        <div class="meta-item">
+          <div class="meta-key">Blocked by</div>
+          <div class="meta-val blocker-ref">Slice 1 — <code>drawAscendancyBackground</code> must exist first</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-key">User stories</div>
+          <div class="us-list">
+            <span class="us-tag">US 1</span>
+            <span class="us-tag">US 2</span>
+            <span class="us-tag">US 3</span>
+            <span class="us-tag">US 4</span>
+            <span class="us-tag">US 5</span>
+            <span class="us-tag">US 6</span>
+            <span class="us-tag">US 9</span>
+            <span class="us-tag">US 10</span>
+            <span class="us-tag">US 11</span>
+            <span class="us-tag">US 13</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Open questions -->
+  <div class="question-box">
+    <h2>Open questions before publishing</h2>
+    <ul>
+      <li><strong>Granularity:</strong> These two slices could be merged into one (it's a small feature). Split or merge?</li>
+      <li><strong>Dependencies:</strong> Slice 2 → Slice 1. Does that ordering look correct?</li>
+      <li><strong>HITL / AFK:</strong> Both marked AFK — no design decisions left open. Agree?</li>
+      <li><strong>Missing slice?</strong> Should there be a separate manual QA / verify pass as a HITL issue?</li>
+    </ul>
+  </div>
+
+</body>
+</html>
